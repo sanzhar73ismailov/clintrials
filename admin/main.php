@@ -8,5 +8,6 @@ echo "----<br>";
 //print_r($metadataCreator);
 // echo "<pre>$str</pre>";
 $ddlExecutor = new DdlExecutor($metadataCreator->getDb());
-$ddlExecutor->createDbWhole();
+//$ddlExecutor->createDbWhole();
+print_r($ddlExecutor->dbExists());
 echo "<br>----";
