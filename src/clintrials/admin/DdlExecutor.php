@@ -1,6 +1,13 @@
 <?php
-include_once 'config.php';
-include_once 'metadata.php';
+
+namespace clintrials\admin;
+
+use clintrials\admin\metadata\Table;
+use PDO;
+use PDOException;
+
+//include_once 'config.php';
+//include_once 'DbSchema.php';
 class DdlExecutor {
 	private $db;
 	private $conn;
@@ -23,7 +30,6 @@ class DdlExecutor {
 	}
 	function createDb() {
 		try {
-			
 			$this->conn->exec ( $this->db->ddl );
 			return true;
 		} catch ( PDOException $e ) {

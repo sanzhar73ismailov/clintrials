@@ -3,7 +3,7 @@ define("HOME_HOST", 1);
 define("HOSTER_HOST", 2);
 
 $file_exists = file_exists("../../test_site.txt");
-print_r('$file_exists='.$file_exists);
+//print_r('$file_exists='.$file_exists);
 if($file_exists){
 	$hoster_var = HOME_HOST; // в домашних условиях
 }else{
