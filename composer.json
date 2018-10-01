@@ -1,8 +1,16 @@
 {
-    "require-dev": {
-        "phpunit/phpunit": "5.7"
-    },
-	 "autoload": {
-        "classmap": ["src/", "tests/"]
-    }
+	"require-dev" : {
+		"apache/log4php" : "2.3.0",
+		"phpunit/phpunit" : "5.7"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"clintrials\\" : "src/"
+		},
+		"classmap" : [
+			"src/",
+			"tests/",
+			"configs/"
+		]
+	}
 }

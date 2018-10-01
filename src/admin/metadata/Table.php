@@ -19,5 +19,9 @@ class Table extends MetaGeneral {
 	public function setFields($fields) {
 		$this->fields = $fields;
 	}
+	
+	public function addField($field) {
+		$this->fields[] = $field;
+	}
 }
 
