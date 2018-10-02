@@ -7,6 +7,7 @@ use Logger;
 use PDO;
 use PDOException;
 use clintrials\admin\metadata\DbSchema;
+use phpDocumentor\Reflection\Types\String_;
 
 //Logger::configure("configs/" . LOG_SET_FILE);
 //include_once 'config.php';
@@ -109,12 +110,20 @@ class DdlExecutor {
 	}
 	
 	function createTable(Table $table) {
+		return $this->createTableFromDdl($table->getDdl());
+	}
+	
+	function createTableJrnl(Table $table) {
+		return $this->createTableFromDdl($table->getDdlJrnl());
+	}
+	
+	function createTableFromDdl($ddl) {
 		$this->logger->trace("START");
 		$result = false;
 		try {
 			$this->conn->exec('USE ' . $this->db->getName());
-			$this->logger->trace("table ddl: " . $table->getDdl());
-			$this->conn->exec ( $table->getDdl() );
+			$this->logger->trace("table ddl: " . $ddl);
+			$this->conn->exec ($ddl);
 			$result = true;
 		} catch ( PDOException $e ) {
 			$this->logger->error("error", $e);
@@ -123,6 +132,7 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
+	
 	function createDbWhole() {
 		if ($this->createDb ()) {
 			echo "Database " . $this->db->name . " created successfully<br>";

@@ -93,6 +93,9 @@ class DdlExecutorTest extends TestCase {
 				$table = new Table();
 			$this->assertTrue($ddlExecutor->createTable($table));
 			$this->assertTrue ( $ddlExecutor->tableExists ($table->getName()) );
+			
+			$this->assertTrue($ddlExecutor->createTableJrnl($table));
+			$this->assertTrue ( $ddlExecutor->tableExists ($table->getNameJrnl()) );
 		}
 		$this->logger->debug("FINISH");
 	}
