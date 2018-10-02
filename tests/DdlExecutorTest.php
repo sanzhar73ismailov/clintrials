@@ -1,43 +1,100 @@
 <?php
-require_once 'configs/config_dev.php';
+require_once "configs/app_prop_test.php";
+
 use PHPUnit\Framework\TestCase;
 use clintrials\admin\MetadataCreator;
 use clintrials\admin\metadata\DbSchema;
 use clintrials\admin\DdlExecutor;
+use clintrials\admin\metadata\Table;
 
-Logger::configure("configs/log4php_tests.xml");
-
-class A{
-	public $field1;
-	
-}
 
 class DdlExecutorTest extends TestCase {
 	private $logger;
+	private $metadataCreator;
 	
 	public function __construct() {
 		$this->logger = Logger::getLogger(__CLASS__);
 	}
 	
+	public function setUp(){
+		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
+	}
+	public function tearDown() {
+		$this->metadataCreator = null;
+	}
+	public function testPropsOfMetadataCreator() {
+		$this->logger->debug("START");
+		$this->assertNotNull($this->metadataCreator);
+		$this->assertNotNull($this->metadataCreator->getXmlObj());
+		$this->assertNotNull($this->metadataCreator->getDb());
+		$this->assertInstanceOf('SimpleXMLElement', $this->metadataCreator->getXmlObj());
+		$this->assertInstanceOf(DbSchema::class, $this->metadataCreator->getDb());
+		$this->logger->debug ( "FINISH" );
+	}
+	
+	public function testCreateDrobDb() {
+		$this->logger->debug ( "START" );
+		$db = $this->metadataCreator->getDb ();
+		if (0) {
+			$db = new DbSchema ();
+		}
+		$ddlExecutor = new DdlExecutor ( $db );
+		if ($ddlExecutor->dbExists ()) {
+			$this->assertTrue ( $ddlExecutor->dropDb () );
+		}
+		$this->assertFalse ( $ddlExecutor->dbExists () );
+		$this->assertTrue ( $ddlExecutor->createDb () );
+		$this->assertTrue ( $ddlExecutor->dbExists () );
+		$this->assertTrue ( $ddlExecutor->dropDb () );
+		$this->assertFalse ( $ddlExecutor->dbExists () );
+		$this->logger->debug ( "FINISH" );
+	}
+	
+	public function testTableExists() {
+		$this->logger->debug ( "START" );
+		$db = $this->metadataCreator->getDb ();
+		if (0) {
+			$db = new DbSchema ();
+		}
+		$ddlExecutor = new DdlExecutor ( $db );
+		if ($ddlExecutor->dbExists ()) {
+			$this->assertTrue ( $ddlExecutor->dropDb () );
+		}
+		$this->assertFalse ( $ddlExecutor->dbExists () );
+		$this->assertTrue ( $ddlExecutor->createDb () );
+		$this->assertTrue ( $ddlExecutor->dbExists () );
+		
+		$this->assertFalse ( $ddlExecutor->tableExists ("t1") );
+		$sql = "create table t1 (id int, name varchar(20))";
+		$this->assertTrue ($ddlExecutor->runSql($sql));
+		
+		$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
+		
+		$this->logger->debug ( "FINISH" );
+	}
+	
 	public function testMetadataCreator() {
 		$this->logger->debug("START");
-		$metadataCreator = new MetadataCreator ("tests/clintrials_test.xml");
-		$this->assertNotNull($metadataCreator);
-		$this->assertNotNull($metadataCreator->getXmlObj());
-		$this->assertNotNull($metadataCreator->getDb());
+		$db = $this->metadataCreator->getDb();
+		if(0) {
+			$db = new DbSchema();
+		}
+		$ddlExecutor = new DdlExecutor($db);
+		$this->logger->debug("\$this->metadataCreator->getDb()->getName()=" . $db->getName());
+		if($ddlExecutor->dbExists()){
+			$ddlExecutor->dropDb();
+		}
+		$this->assertFalse($ddlExecutor->dbExists());
+		$this->assertTrue($ddlExecutor->createDb());
 		
-		$ddlExecutor = new DdlExecutor($metadataCreator->getDb());
-		//$this->assertTrue($ddlExecutor->createDb());
-		
-
-		
-		//$this->assertInstanceOf('SimpleXMLElement', $metadataCreator->getXmlObj());
-		//$this->assertInstanceOf(DbSchema::class, $metadataCreator->getDb());
-		
-		
-		//$this->assertTrue($a->field1 == null);
-		//$this->assertNull($a->field1);
-
+		$tables = $db->getTables();
+		foreach ($tables as $table) {
+			if (0)
+				$table = new Table();
+			$this->assertTrue($ddlExecutor->createTable($table));
+			$this->assertTrue ( $ddlExecutor->tableExists ($table->getName()) );
+		}
 		$this->logger->debug("FINISH");
 	}
+	
 }

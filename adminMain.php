@@ -6,7 +6,7 @@ require_once "configs/app_prop.php";
 use clintrials\admin\DdlExecutor;
 use clintrials\admin\MetadataCreator;
 
-Logger::configure("configs/" . LOG_SET_FILE);
+
 //$log = Logger::getRootLogger();
 
 $log = Logger::getLogger('adminMain.php');
@@ -23,6 +23,7 @@ $log->debug("Hello World - debug!");
 //include_once 'DdlExecutor.php';
 //$xmlObj = \simplexml_load_file ( "clintrials.xml" ) or die ( "Error: Cannot create object" );
 
+$log->debug("defined(\"HOST\")=".defined("HOST"));
 $metadataCreator = new MetadataCreator ( "clintrials.xml" );
 $str = $metadataCreator->getDb()->getDdl();
 // print_r($metadataCreator);

@@ -8,11 +8,7 @@ use PDO;
 use PDOException;
 use clintrials\admin\metadata\DbSchema;
 
-Logger::configure("configs/" . LOG_SET_FILE);
-
-
-
-
+//Logger::configure("configs/" . LOG_SET_FILE);
 //include_once 'config.php';
 //include_once 'DbSchema.php';
 class DdlExecutor {
@@ -20,13 +16,6 @@ class DdlExecutor {
 	private $db;
 	private $conn;
 	
-	/*
-	 * define("HOST", "localhost");
-	 * define("DB_USER", "root");
-	 * //define("DB_PASS", "elsieltc");
-	 * define("DB_PASS", "");
-	 * define("DB_NAME", "ovarian");
-	 */
 	function __construct(DbSchema $db) {
 		$this->logger = Logger::getLogger(__CLASS__);
 		$this->logger->trace("START");
@@ -45,7 +34,7 @@ class DdlExecutor {
 		$this->logger->trace("START");
 		$result = false;
 		try {
-			$this->conn->exec ( $this->db->ddl );
+			$this->conn->exec ( $this->db->getDdl() );
 			$result = true;
 		} catch ( PDOException $e ) {
 			//echo $sql . "<br>" . $e->getMessage ();
@@ -55,6 +44,22 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, returned " . $result);
 		return $result;
 	}
+	
+	function dropDb() {
+		$this->logger->trace("START");
+		$result = false;
+		try {
+			$this->conn->exec ( "drop database " . $this->db->getName() );
+			$result = true;
+		} catch ( PDOException $e ) {
+			//echo $sql . "<br>" . $e->getMessage ();
+			$this->logger->error("error", $e);
+			throw $e;
+		}
+		$this->logger->trace("FINISH, returned " . $result);
+		return $result;
+	}
+	
 	function dbExists() {
 		$this->logger->trace("START");
 		$result = false;
@@ -68,17 +73,55 @@ class DdlExecutor {
 			$this->logger->error("error", $e);
 			throw $e;
 		}
-		$this->logger->trace("FINISH, returned " . $result);
+		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
-	function createTable(Table $table) {
+	//show tables like "clin_test_lab"
+	function tableExists($table_name) {
+		$this->logger->trace("START");
+		$result = false;
 		try {
-			$this->conn->exec ( $this->db->ddl );
-			return true;
+			$this->conn->exec('USE ' . $this->db->getName());
+			$query = "show tables like '" . $table_name . "'";
+			$stmt = $this->conn->prepare ( $query );
+			$stmt->execute ();
+			$row = $stmt->fetchAll ( PDO::FETCH_ASSOC );
+			$this->logger->trace("\$stmt->rowCount ()=" . $stmt->rowCount ());
+			$result = $stmt->rowCount () > 0;
 		} catch ( PDOException $e ) {
-			echo $sql . "<br>" . $e->getMessage ();
-			return false;
+			$this->logger->error("error", $e);
 		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+	
+	function runSql($sql) {
+		$this->logger->trace("START");
+		$result = false;
+		try {
+			$this->conn->exec('USE ' . $this->db->getName());
+			$result = $this->conn->exec ( $sql ) !== false;
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+	
+	function createTable(Table $table) {
+		$this->logger->trace("START");
+		$result = false;
+		try {
+			$this->conn->exec('USE ' . $this->db->getName());
+			$this->logger->trace("table ddl: " . $table->getDdl());
+			$this->conn->exec ( $table->getDdl() );
+			$result = true;
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+			$result = false;
+		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
 	}
 	function createDbWhole() {
 		if ($this->createDb ()) {

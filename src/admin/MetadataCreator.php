@@ -6,7 +6,6 @@ use clintrials\admin\metadata\DbSchema;
 use clintrials\admin\metadata\Table;
 use clintrials\admin\metadata\Field;
 
-// include "DbSchema.php";
 libxml_use_internal_errors ( true );
 class MetadataCreator {
 	private $xmlObj;
@@ -58,7 +57,8 @@ class MetadataCreator {
 	}
 	private function fillDb() {
 		$this->db = new DbSchema ();
-		$this->db->setName ( $this->xmlObj->prefix->__toString () );
+		//$this->db->setName ( $this->xmlObj->prefix->__toString () );
+		$this->db->setName ( DB_NAME); //db name from configs/config_env.php 
 		$this->db->setComment ( $this->xmlObj->title->__toString () );
 		$this->db->setDdl ( $this->buildCreateDb ( $this->db ) );
 		foreach ( $this->xmlObj->data->investigations->children () as $investigation ) {
@@ -93,40 +93,76 @@ class MetadataCreator {
 		$template = "CREATE DATABASE `%s` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 		return sprintf ( $template, $db->getName () );
 	}
+	
 	private function buildCreateTableDdl($table) {
+		return $this->buildCreateTableHelp($table);
+	}
+	
+	private function buildCreateJournalTableDdl($table) {
+		return $this->buildCreateTableHelp($table, true);
+	}
+	private function buildCreateTableHelp($table, $is_journal=false) {
 		if (0)
 			$table = new Table ();
-		$ddl = "";
-		$ddl .= sprintf ( "CREATE TABLE %s (\nid INT AUTO_INCREMENT,\n", $table->getName () );
-		foreach ( $table->getFields () as $field ) {
-			if(0) 
-				$field = new Field();
-			$ddl .= $field->getName () . "";
-			if ($field->getType() == "list")
-				$ddl .= " INT";
-			else
-				$ddl .= " " . $field->getType . "";
+			$ddl = "";
+			$id_column = "id";
+			$table_name = $table->getName ();
+			if($is_journal){
+				$table_name = $table->getName () . "_jrnl";
+			    $id_column =  "jrnl_id";
+			}
 			
-				if ($field->getType() == "float")
-				$ddl .= "(11,2)";
+			$ddl .= sprintf ( "CREATE TABLE %s (\n %s INTEGER(11) AUTO_INCREMENT,\n", $table_name ,$id_column  );
+			if($is_journal){
+				$ddl .= "id INTEGER(11) NOT NULL, ";
+			}
+			$ddl .= "patient_id INTEGER(11) NOT NULL COMMENT 'Пациент',\n";
+			$ddl .= "visit_id INTEGER(11) NOT NULL COMMENT 'Визит',\n";
+			foreach ( $table->getFields () as $field ) {
+				if(0)
+					$field = new Field();
+					$ddl .= $field->getName () . "";
+					switch ($field->getType()){
+						case "date":
+							$ddl .= " DATE";
+							break;
+						case "float":
+							$ddl .= " float(11,2)";
+							break;
+						case "text":
+							$ddl .= " text";
+							break;
+						case "varchar":
+							$ddl .= " varchar(50)";
+							break;
+						default:
+							$ddl .= " INTEGER(11)";
+							break;
+					}
+					
+					$ddl .= " COMMENT '" . $field->getComment(). "',\n";
+			}
+			$ddl .= "checked INTEGER(1) NOT NULL DEFAULT '0' COMMENT 'Проверено монитором',\n";
+			$ddl .= "user_insert VARCHAR(25) COMMENT 'Пользователь, создавший',\n";
+			$ddl .= "user_update VARCHAR(25) COMMENT 'Пользователь, обновивший',\n";
+			$ddl .= "insert_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
+			$ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
 			
-			$ddl .= " COMMENT '" . $field->getComment(). "',\n";
-		}
-		$ddl .= "checked INTEGER(1) NOT NULL DEFAULT '0' COMMENT 'Проверено монитором',\n";
-		$ddl .= "user_insert VARCHAR(25) COMMENT 'Пользователь, создавший',\n";
-		$ddl .= "user_update VARCHAR(25) COMMENT 'Пользователь, обновивший',\n";
-		$ddl .= "insert_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
-		$ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
-		
-		$ddl .= "PRIMARY KEY (id)";
-		foreach ( $table->getFields () as $field ) {
-			if ($field->getType() == "list")
-				$ddl .= ",\nKEY(" . $field->getName() . ")";
-		}
-		$ddl .= "\n) ENGINE=InnoDB\n";
-		$ddl .= "AUTO_INCREMENT=1 CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
-		return $ddl;
+			$ddl .= "PRIMARY KEY ($id_column)";
+			foreach ( $table->getFields () as $field ) {
+				if ($field->getType() == "list")
+					$ddl .= ",\nKEY(" . $field->getName() . ")";
+			}
+			
+			//UNIQUE KEY `patient_visit_uniq` (`patient_id`, `visit_id`),
+			//KEY `patient_id` (`patient_id`),
+			//KEY `visit_id` (`patient_id`),
+			
+			$ddl .= "\n) ENGINE=InnoDB\n";
+			$ddl .= "AUTO_INCREMENT=1 CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
+			return $ddl;
 	}
+	
 }
 
 ?>

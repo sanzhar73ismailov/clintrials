@@ -2,7 +2,7 @@
 use PHPUnit\Framework\TestCase;
 use clintrials\HelloWorld;
 
-Logger::configure("configs/log4php_tests.xml");
+require_once "configs/app_prop_test.php";
 
 class HelloWorldTest extends TestCase {
 	private static $logger;
