@@ -73,6 +73,7 @@ class MetadataCreator {
 			$table->addField ( $this->fillField ( $fieldArray ) );
 		}
 		$table->setDdl ( $this->buildCreateTableDdl ( $table ) );
+		$table->setDdlJrnl($this->buildCreateJournalTableDdl($table));
 		return $table;
 	}
 	private function fillField($fieldArray) {
@@ -147,7 +148,9 @@ class MetadataCreator {
 			$ddl .= "user_update VARCHAR(25) COMMENT 'Пользователь, обновивший',\n";
 			$ddl .= "insert_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
 			$ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
-			
+			if($is_journal){
+			    $ddl .= "insert_ind INTEGER(11) NOT NULL DEFAULT '0' COMMENT 'Индикатор вставки',\n ";
+			}
 			$ddl .= "PRIMARY KEY ($id_column)";
 			foreach ( $table->getFields () as $field ) {
 				if ($field->getType() == "list")
