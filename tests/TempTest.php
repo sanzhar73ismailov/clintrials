@@ -25,7 +25,7 @@ class TempTest extends TestCase {
 
 	
 	
-	public function testTableExists() {
+	public function TableExists() {
 		$this->logger->debug ( "START" );
 		$db = $this->metadataCreator->getDb ();
 		if (0) {
@@ -50,4 +50,48 @@ class TempTest extends TestCase {
 		$this->logger->debug ( "FINISH" );
 	}
 	
+	public function testCreateTrigger() {
+		$this->logger->debug ( "START" );
+		$servername = HOST;
+		$username = DB_USER;
+		$password = DB_PASS;
+		$dbname = DB_NAME;
+		
+		// Create connection
+		$conn = new mysqli($servername, $username, $password, $dbname);
+		// Check connection
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		
+		//$sql = "SELECT * FROM t1";
+		//$sql = "CREATE TRIGGER `trig_insert_name` AFTER INSERT ON `t1` FOR EACH ROW insert into t1_jrnl (id, f1, f2) values (new.id, new.f1, new.f2)";
+		$sql = "CREATE TRIGGER `t1_after_upd_trig` AFTER UPDATE ON `t1` FOR EACH ROW BEGIN\n"
+				  ." set @valf2 = concat(new.id, '-' , new.f2);\n" 
+                  . " insert into t1_jrnl (id, f1, f2) values (new.id, new.f1, @valf2);\n"
+                . "END";
+		$result = $conn->query($sql);
+		if ($result === TRUE) {
+			$this->logger->debug ( "Trigger created successfully");
+		} else {
+			$this->logger->debug ( "Error creating trigger: " . $conn->error);
+		}
+		
+		$this->assertTrue ( $result);
+		//$conn->error
+		
+		$this->logger->debug ( "result=" . $result );
+		
+		/*
+		if ($result->num_rows > 0) {
+				while($row = $result->fetch_assoc()) {
+				$this->logger->debug (  "id: " . $row["id"] . " - f1: " . $row["f1"] . "<br>" . PHP_EOL);
+			}
+		} else {
+			echo "0 results";
+		}
+		*/
+		$conn->close();
+		$this->logger->debug ( "FINISH" );
+	}
 }

@@ -2,10 +2,35 @@
 
 namespace clintrials\admin\metadata;
 
+use clintrials\admin\metadata\TableJrnl;
+
 class Table extends MetaGeneral {
-	private $fields = array ();
+	protected $fields = array ();
+	private $tableJrnj;
 	private $ddlJrnl;
 	
+	
+	public function __construct(){
+		
+	}
+	
+	
+	public function createTableJrnl() {
+		if(empty($this->fields)){
+			throw new \Exception("no fields in table");
+		}
+		$this->tableJrnj = new TableJrnl($table);
+	}
+	
+	public function getTableJrnj() {
+		return $this->tableJrnj;
+	}
+
+
+	public function setTableJrnj($tableJrnj) {
+		$this->tableJrnj = $tableJrnj;
+	}
+
 	public function addField($field) {
 		$this->fields[] = $field;
 	}

@@ -5,6 +5,7 @@ namespace clintrials\admin;
 use clintrials\admin\metadata\DbSchema;
 use clintrials\admin\metadata\Table;
 use clintrials\admin\metadata\Field;
+use clintrials\admin\metadata\TableJrnl;
 
 libxml_use_internal_errors ( true );
 class MetadataCreator {
@@ -62,7 +63,9 @@ class MetadataCreator {
 		$this->db->setComment ( $this->xmlObj->title->__toString () );
 		$this->db->setDdl ( $this->buildCreateDb ( $this->db ) );
 		foreach ( $this->xmlObj->data->investigations->children () as $investigation ) {
-			$this->db->addTable ( $this->fillTable ( $investigation ) );
+			$table = $this->fillTable ( $investigation );
+			$tableJrnl = $table->createTableJrnl();
+			$this->db->addTable ( $table );
 		}
 	}
 	private function fillTable($investigation) {
@@ -72,9 +75,15 @@ class MetadataCreator {
 		foreach ( $investigation->fields->children () as $fieldArray ) {
 			$table->addField ( $this->fillField ( $fieldArray ) );
 		}
+		
+	
 		$table->setDdl ( $this->buildCreateTableDdl ( $table ) );
 		$table->setDdlJrnl($this->buildCreateJournalTableDdl($table));
 		return $table;
+	}
+	
+	private function fillJrnlTable($table) {
+		
 	}
 	private function fillField($fieldArray) {
 		$field = new Field ();
@@ -119,21 +128,22 @@ class MetadataCreator {
 			}
 			$ddl .= "patient_id INTEGER(11) NOT NULL COMMENT 'Пациент',\n";
 			$ddl .= "visit_id INTEGER(11) NOT NULL COMMENT 'Визит',\n";
-			foreach ( $table->getFields () as $field ) {
-				if(0)
-					$field = new Field();
-					$ddl .= $field->getName () . "";
-					switch ($field->getType()){
-						case "date":
-							$ddl .= " DATE";
-							break;
-						case "float":
-							$ddl .= " float(11,2)";
-							break;
-						case "text":
-							$ddl .= " text";
-							break;
-						case "varchar":
+		foreach ( $table->getFields () as $field ) {
+			if (0) {
+				$field = new Field ();
+			}
+			$ddl .= $field->getName () . "";
+			switch ($field->getType ()) {
+				case "date" :
+					$ddl .= " DATE";
+					break;
+				case "float" :
+					$ddl .= " float(11,2)";
+					break;
+				case "text" :
+					$ddl .= " text";
+					break;
+				case "varchar":
 							$ddl .= " varchar(50)";
 							break;
 						default:
@@ -164,6 +174,49 @@ class MetadataCreator {
 			$ddl .= "\n) ENGINE=InnoDB\n";
 			$ddl .= "AUTO_INCREMENT=1 CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 			return $ddl;
+	}
+	
+	public function buildPkField($name){
+		$pkField = new Field($name, 'PK', "int");
+		$pkField->setPk(true);
+	}
+	public function buildServiceFields(){
+		/*
+		 $ddl .= "checked INTEGER(1) NOT NULL DEFAULT '0' COMMENT 'Проверено монитором',\n";
+			$ddl .= "user_insert VARCHAR(25) COMMENT 'Пользователь, создавший',\n";
+			$ddl .= "user_update VARCHAR(25) COMMENT 'Пользователь, обновивший',\n";
+			$ddl .= "insert_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
+			$ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
+		 */
+		$serviceFields = array();
+		
+		$fieldChecked = new Field("checked", 'Проверено монитором', 'bool');
+		$fieldChecked->setService(true);
+		$fieldChecked->setNull(false);
+		$fieldChecked->setDefault('0');
+		$serviceFields[] = $fieldChecked;
+		
+		$fieldUserInsert = new Field("user_insert", 'Пользователь, создавший', 'varchar');
+		$fieldUserInsert->setNull(false);
+		$fieldUserInsert->setDefault('no_user');
+		$serviceFields[] = $fieldUserInsert;
+		
+		$fieldUserUpdate = new Field("user_update", 'Пользователь, обновивший', 'varchar');
+		$fieldUserUpdate->setNull(false);
+		$fieldUserUpdate->setDefault('no_user');
+		$serviceFields[] = $fieldUserUpdate;
+		
+		$fieldInsertDate = new Field("insert_date", '', 'timestamp');
+		$fieldInsertDate->setNull(false);
+		$fieldInsertDate->setDefault('CURRENT_TIMESTAMP');
+		$serviceFields[] = $fieldInsertDate;
+		
+		$fieldUpdateDate = new Field("update_date", '', 'timestamp');
+		$fieldInsertDate->setNull(false);
+		$fieldInsertDate->setDefault('CURRENT_TIMESTAMP');
+		$serviceFields[] = $fieldUpdateDate;
+		
+		return $serviceFields;
 	}
 	
 }

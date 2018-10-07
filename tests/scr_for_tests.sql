@@ -25,3 +25,11 @@ update t1 set f2='233' where f1='2';
 update t1 set f2='344' where f1='3';
 
 --SHOW TRIGGERS;
+
+$sql = "CREATE TRIGGER `tr3` BEFORE DELETE ON `t1` FOR EACH ROW BEGIN\n"
+    . "set @valf2 = concat(old.id, \'-\' , old.f2)insert into t1_jrnl (id, f1, f2) values (old.id, \'del\', @valf2)END";
+
+$sql = "CREATE TRIGGER `trig_insert_name` BEFORE INSERT ON `t1` FOR EACH ROW insert into t1_jrnl (id, f1, f2) values (new.id, new.f1, new.f2)";
+
+$sql = "CREATE TRIGGER `t1_after_upd_trig` AFTER UPDATE ON `t1` FOR EACH ROW BEGIN\n"
+    . "set @valf2 = concat(new.id, \'-\' , new.f2)insert into t1_jrnl (id, f1, f2) values (new.id, new.f1, @valf2)END";
