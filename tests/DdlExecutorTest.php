@@ -89,13 +89,14 @@ class DdlExecutorTest extends TestCase {
 		
 		$tables = $db->getTables();
 		foreach ($tables as $table) {
-			if (0)
+			if (0) {
 				$table = new Table();
+			}
 			$this->assertTrue($ddlExecutor->createTable($table));
 			$this->assertTrue ( $ddlExecutor->tableExists ($table->getName()) );
 			
-			$this->assertTrue($ddlExecutor->createTableJrnl($table));
-			$this->assertTrue ( $ddlExecutor->tableExists ($table->getNameJrnl()) );
+			//$this->assertTrue($ddlExecutor->createTableJrnl($table));
+			//$this->assertTrue ( $ddlExecutor->tableExists ($table->getNameJrnl()) );
 		}
 		$this->logger->debug("FINISH");
 	}

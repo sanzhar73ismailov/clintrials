@@ -184,11 +184,11 @@ class MetadataCreator {
 				case "int" :
 				case "integer" :
 				case "list" :
-				case "bool" :
+				case "boolean" :
 					$ddl .= " INTEGER(11)";
 					break;
 				default :
-					throw Exception("type of field is unknown");
+					throw new Exception("type of field is unknown: " .$field->getType ());
 			}
 			
 			if (!$field->getNull ()) {
@@ -196,7 +196,11 @@ class MetadataCreator {
 				
 			} 
 			if ($field->getDefault () != null) {
-					$ddl .= " DEFAULT '" . $field->getDefault . "'";
+				if($field->getType () == 'timestamp'){
+					$ddl .= " DEFAULT " . $field->getDefault() . " ";
+				}else{
+					$ddl .= " DEFAULT '" . $field->getDefault() . "' ";
+				}
 			} 
 			$ddl .= " COMMENT '" . $field->getComment () . "',\n";
 		}
@@ -241,7 +245,7 @@ class MetadataCreator {
 		 */
 		$serviceFields = array ();
 		
-		$field = new Field ( "checked", 'Проверено монитором', 'bool' );
+		$field = new Field ( "checked", 'Проверено монитором', 'boolean' );
 		$field->setService ( true );
 		$field->setNull ( false );
 		$field->setDefault ( '0' );
