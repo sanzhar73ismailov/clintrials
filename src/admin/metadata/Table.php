@@ -19,7 +19,7 @@ class Table extends MetaGeneral {
 		if(empty($this->fields)){
 			throw new \Exception("no fields in table");
 		}
-		$this->tableJrnj = new TableJrnl($table);
+		$this->tableJrnj = new TableJrnl($this);
 	}
 	
 	public function getTableJrnj() {
@@ -33,6 +33,12 @@ class Table extends MetaGeneral {
 
 	public function addField($field) {
 		$this->fields[] = $field;
+	}
+	
+	public function addFields($fields) {
+		foreach ($fields as $field) {
+			$this->fields[] = $field;
+		}
 	}
 	
 	public function getFields() {

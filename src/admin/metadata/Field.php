@@ -6,7 +6,7 @@ class Field extends MetaGeneral {
 	private $type; //date|float|text|varchar|int
 	private $pk = false;
 	private $service = false; // служенбное поле (типа user_insert или user_update, которое в каждой таблице есть)
-	private $null = true; // null is possible
+	private $null = false; // null is possible
 	private $default = null;
 	
 	
@@ -37,9 +37,9 @@ class Field extends MetaGeneral {
 	 * 
 	 * */
 	
-	public function __construct(){
+	//public function __construct(){
 		
-	}
+	//}
 	
 	public function __construct($name, $comment, $type){
 		$this->name = $name;
@@ -96,11 +96,14 @@ class Field extends MetaGeneral {
 	}
 
 	public function cloneField(){
-		$field = new Field($this->name, $this->comment, $this->ddl, $this->type);
+		$field = new Field($this->name, $this->comment, $this->type);
+		$field->ddl = $this->ddl;
 		$field->pk = $this->pk;
 		$field->service = $this->service;
 		$field->null = $this->null;
 		$field->default = $this->default;
 		return $field;
 	}
+	
+	
 }
