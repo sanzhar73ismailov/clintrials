@@ -69,7 +69,11 @@ class MetadataCreator {
 		$this->db->setDdl ( $this->buildCreateDb ( $this->db ) );
 		foreach ( $this->xmlObj->data->investigations->children () as $investigation ) {
 			$table = $this->fillTable ( $investigation );
-			$tableJrnl = $table->createTableJrnl ();
+			$tableJrnl = $this->fillJrnlTable ( $table );
+			
+			$table->setDdl ( $this->buildCreateTableDdl ( $table ) );
+			$tableJrnl->setDdl ( $this->buildCreateTableDdl ( $tableJrnl ) );
+			
 			$this->db->addTable ( $table );
 		}
 	}
@@ -85,7 +89,7 @@ class MetadataCreator {
 		$table->addField ( $this->fillField ( 'patient_id', 'Пациент', 'int' ) );
 		$table->addField ( $this->fillField ( 'visit_id', 'Визит', 'int' ) );
 		foreach ( $investigation->fields->children () as $fieldArray ) {
-			$table->addField ( $this->fillFieldFromArray( $fieldArray ) );
+			$table->addField ( $this->fillFieldFromArray ( $fieldArray ) );
 		}
 		$table->addFields ( $this->buildServiceFields () );
 		$this->logger->debug ( "start print fields" );
@@ -93,12 +97,25 @@ class MetadataCreator {
 			$this->logger->debug ( "\$field=" . var_export ( $field, true ) );
 		}
 		$this->logger->debug ( "finish print fields" );
-		$table->setDdl ( $this->buildCreateTableDdl ( $table ) );
-		$table->setDdlJrnl ( $this->buildCreateJournalTableDdl ( $table ) );
 		$this->logger->debug ( "FINISH" );
 		return $table;
 	}
-	private function fillJrnlTable($table) {
+	private function fillJrnlTable(Table $table) {
+		$tableJrnl = new TableJrnl ( $table );
+		$tableJrnl->setName($table->getName() . '_jrnl');
+		$tableJrnl->addField ( $this->buildPkField ( "jrnl_id" ) );
+		foreach ( $table->getFields () as $field ) {
+			if (0) {
+				$field = new Field ();
+			}
+			if ($field->getPk ()) {
+				$tableJrnl->addField ( $this->convertPkFieldToSimple ( $field ) );
+			} else {
+				$tableJrnl->addField ( $field->cloneField () );
+			}
+		}
+		$tableJrnl->addField ( $this->buildInsertField () );
+		return $tableJrnl;
 	}
 	private function fillFieldFromArray($fieldArray) {
 		$name = $fieldArray ['name']->__toString ();
@@ -110,49 +127,33 @@ class MetadataCreator {
 		$field = new Field ( $name, $title, $type );
 		return $field;
 	}
-	// public function buildDdl() {
-	// $ddl = "";
-	// foreach ( $this->xmlObj->data->investigations->children () as $investigation ) {
-	// $ddl .= $this->buildCreateTableDdl ( $investigation ) . "\n";
-	// }
-	// return $ddl;
-	// }
 	private function buildCreateDb($db) {
 		$template = "CREATE DATABASE `%s` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 		return sprintf ( $template, $db->getName () );
 	}
 	private function buildCreateTableDdl($table) {
-		return $this->buildCreateTableHelp ( $table );
-	}
-	private function buildCreateJournalTableDdl($table) {
-		return $this->buildCreateTableHelp ( $table, true );
-	}
-	private function buildCreateTableHelp($table, $is_journal = false) {
+		// return $this->buildCreateTableHelp ( $table );
 		$this->logger->debug ( "START" );
 		if (0)
 			$table = new Table ();
 		$ddl = "";
-		$id_column = "id";
-		$table_name = $table->getName ();
-		if ($is_journal) {
-			$table_name = $table->getName () . "_jrnl";
-			$id_column = "jrnl_id";
-		}
-		
-		//$ddl .= sprintf ( "CREATE TABLE %s (\n %s INTEGER(11) AUTO_INCREMENT,\n", $table_name, $id_column );
-		$ddl .= sprintf ( "CREATE TABLE %s (\n", $table_name);
+				
+		// $ddl .= sprintf ( "CREATE TABLE %s (\n %s INTEGER(11) AUTO_INCREMENT,\n", $table_name, $id_column );
+		$ddl .= sprintf ( "CREATE TABLE %s (\n", $table->getName() );
 		
 		if ($is_journal) {
 			$ddl .= "id INTEGER(11) NOT NULL, ";
 		}
 		// $ddl .= "patient_id INTEGER(11) NOT NULL COMMENT 'Пациент',\n";
 		// $ddl .= "visit_id INTEGER(11) NOT NULL COMMENT 'Визит',\n";
+		$id_column = '';
 		foreach ( $table->getFields () as $field ) {
 			if (0) {
 				$field = new Field ( '', '', '' );
 			}
-			if($field->getPk()){
-				$ddl .= sprintf ( "%s INTEGER(11) AUTO_INCREMENT,\n", $field->getName() );
+			if ($field->getPk ()) {
+				$id_column = $field->getName ();
+				$ddl .= sprintf ( "%s INTEGER(11) AUTO_INCREMENT COMMENT '%s',\n", $field->getName (), $field->getComment() );
 				break;
 			}
 		}
@@ -160,7 +161,7 @@ class MetadataCreator {
 			if (0) {
 				$field = new Field ( '', '', '' );
 			}
-			if ($field->getPk()) {
+			if ($field->getPk ()) {
 				continue;
 			}
 			$this->logger->debug ( "field=" . var_export ( $field, true ) );
@@ -188,20 +189,19 @@ class MetadataCreator {
 					$ddl .= " INTEGER(11)";
 					break;
 				default :
-					throw new Exception("type of field is unknown: " .$field->getType ());
+					throw new Exception ( "type of field is unknown: " . $field->getType () );
 			}
 			
-			if (!$field->getNull ()) {
+			if (! $field->getNull ()) {
 				$ddl .= " NOT NULL ";
-				
-			} 
+			}
 			if ($field->getDefault () != null) {
-				if($field->getType () == 'timestamp'){
-					$ddl .= " DEFAULT " . $field->getDefault() . " ";
-				}else{
-					$ddl .= " DEFAULT '" . $field->getDefault() . "' ";
+				if ($field->getType () == 'timestamp') {
+					$ddl .= " DEFAULT " . $field->getDefault () . " ";
+				} else {
+					$ddl .= " DEFAULT '" . $field->getDefault () . "' ";
 				}
-			} 
+			}
 			$ddl .= " COMMENT '" . $field->getComment () . "',\n";
 		}
 		
@@ -212,9 +212,9 @@ class MetadataCreator {
 		 * $ddl .= "insert_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
 		 * $ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
 		 */
-		if ($is_journal) {
-			$ddl .= "insert_ind INTEGER(11) NOT NULL DEFAULT '0' COMMENT 'Индикатор вставки',\n ";
-		}
+		//if ($is_journal) {
+		//	$ddl .= "insert_ind INTEGER(11) NOT NULL DEFAULT '0' COMMENT 'Индикатор вставки',\n ";
+		//}
 		$ddl .= "PRIMARY KEY ($id_column)";
 		foreach ( $table->getFields () as $field ) {
 			if ($field->getType () == "list")
@@ -230,10 +230,25 @@ class MetadataCreator {
 		$this->logger->debug ( "FINISH, returned: " . $ddl );
 		return $ddl;
 	}
+	// private function buildCreateJournalTableDdl($table) {
+	// return $this->buildCreateTableHelp ( $table, true );
+	// }
+	// private function buildCreateTableHelp($table, $is_journal = false) {
+	// }
 	public function buildPkField($name) {
 		$pkField = new Field ( $name, 'PK', "int" );
 		$pkField->setPk ( true );
 		return $pkField;
+	}
+	private function convertPkFieldToSimple($pkField) {
+		if (0) {
+			$pkField = new Field ( null, null, null );
+		}
+		$field = $pkField->cloneField ();
+		$field->setComment( 'PK of src table' );
+		$field->setPk ( false );
+		$field->setNull ( false );
+		return $field;
 	}
 	public function buildServiceFields() {
 		/*
@@ -244,38 +259,29 @@ class MetadataCreator {
 		 * $ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
 		 */
 		$serviceFields = array ();
-		
-		$field = new Field ( "checked", 'Проверено монитором', 'boolean' );
+		$serviceFields [] = $this->buildServiceField ( "checked", 'Проверено монитором', 'boolean', '0' );
+		$serviceFields [] = $this->buildServiceField ( "user_insert", 'Пользователь, создавший', 'varchar', 'no_user' );
+		$serviceFields [] = $this->buildServiceField ( "user_update", 'Пользователь, обновивший', 'varchar', 'no_user' );
+		$serviceFields [] = $this->buildServiceField ( "insert_date", 'Дата добавления записи', 'timestamp', 'CURRENT_TIMESTAMP' );
+		$serviceFields [] = $this->buildServiceField ( "update_date", 'Дата обновления записи', 'timestamp', 'CURRENT_TIMESTAMP' );
+		return $serviceFields;
+	}
+	private function buildServiceField($name, $comment, $type, $default = null) {
+		$field = new Field ( $name, $comment, $type );
+		$field->setService ( true );
+		$field->setNull ( false );
+		$field->setDefault ( $default );
+		return $field;
+	}
+	public function buildInsertField() {
+		/*
+		 * $ddl .= "insert_ind INTEGER(11) NOT NULL DEFAULT '0' COMMENT 'Индикатор вставки',\n ";
+		 */
+		$field = new Field ( "insert_ind", 'Индикатор вставки', 'boolean' );
 		$field->setService ( true );
 		$field->setNull ( false );
 		$field->setDefault ( '0' );
-		$serviceFields [] = $field;
-		
-		$field = new Field ( "user_insert", 'Пользователь, создавший', 'varchar' );
-		$field->setService ( true );
-		$field->setNull ( false );
-		$field->setDefault ( 'no_user' );
-		$serviceFields [] = $field;
-		
-		$field = new Field ( "user_update", 'Пользователь, обновивший', 'varchar' );
-		$field->setService ( true );
-		$field->setNull ( false );
-		$field->setDefault ( 'no_user' );
-		$serviceFields [] = $field;
-		
-		$field = new Field ( "insert_date", '', 'timestamp' );
-		$field->setService ( true );
-		$field->setNull ( false );
-		$field->setDefault ( 'CURRENT_TIMESTAMP' );
-		$serviceFields [] = $field;
-		
-		$field = new Field ( "update_date", '', 'timestamp' );
-		$field->setService ( true );
-		$field->setNull ( false );
-		$field->setDefault ( 'CURRENT_TIMESTAMP' );
-		$serviceFields [] = $field;
-		
-		return $serviceFields;
+		return $field;
 	}
 }
 

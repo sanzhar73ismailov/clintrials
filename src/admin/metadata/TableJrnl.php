@@ -8,10 +8,12 @@ class TableJrnl extends Table {
 	
 	public function __construct(Table $table) {
 		$this->table = $table;
+		$table->setTableJrnj($this);
 		$this->init();
 	}
 	
 	private function init(){
+		/*
 		if(0){
 			$this->table = new Table();
 		}
@@ -22,6 +24,7 @@ class TableJrnl extends Table {
 			$this->fields[] = $field->cloneField();
 		}
 		$field = new Field($this->name, $this->comment, $this->ddl, $this->type);
+		*/
 	}
 	
 }

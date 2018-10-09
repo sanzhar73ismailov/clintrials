@@ -114,7 +114,7 @@ class DdlExecutor {
 	}
 	
 	function createTableJrnl(Table $table) {
-		return $this->createTableFromDdl($table->getDdlJrnl());
+		return $this->createTableFromDdl($table->getTableJrnj()->getDdl());
 	}
 	
 	function createTableFromDdl($ddl) {
@@ -126,7 +126,7 @@ class DdlExecutor {
 			$this->conn->exec ($ddl);
 			$result = true;
 		} catch ( PDOException $e ) {
-			$this->logger->error("error", $e);
+			$this->logger->error("error: " . $e->getMessage(), $e);
 			$result = false;
 		}
 		$this->logger->trace("FINISH, return " . $result);
