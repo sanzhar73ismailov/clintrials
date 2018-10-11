@@ -25,6 +25,7 @@ class TempTest extends TestCase {
 
 	
 	
+	
 	public function TableExists() {
 		$this->logger->debug ( "START" );
 		$db = $this->metadataCreator->getDb ();
@@ -50,7 +51,7 @@ class TempTest extends TestCase {
 		$this->logger->debug ( "FINISH" );
 	}
 	
-	public function testCreateTrigger() {
+	public function CreateTrigger() {
 		$this->logger->debug ( "START" );
 		$servername = HOST;
 		$username = DB_USER;
@@ -92,6 +93,17 @@ class TempTest extends TestCase {
 		}
 		*/
 		$conn->close();
+		$this->logger->debug ( "FINISH" );
+	}
+	
+	public function testTriggerExists() {
+		$this->logger->debug ( "START" );
+		$db = $this->metadataCreator->getDb ();
+		if (0) {
+			$db = new DbSchema ();
+		}
+		$ddlExecutor = new DdlExecutor ( $db );
+		$this->assertTrue ( $ddlExecutor->triggerExists("t1_after_ins_trig") );
 		$this->logger->debug ( "FINISH" );
 	}
 }

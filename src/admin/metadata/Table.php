@@ -3,11 +3,15 @@
 namespace clintrials\admin\metadata;
 
 use clintrials\admin\metadata\TableJrnl;
+use clintrials\admin\metadata\Trigger;
 
 class Table extends MetaGeneral {
 	protected $fields = array ();
 	private $tableJrnj;
-	// private $ddlJrnl;
+	private $triggerInsert;
+	private $triggerUpdate;
+	private $triggerDelete;
+	
 	public function __construct() {
 	}
 	public function createTableJrnl() {
@@ -36,17 +40,28 @@ class Table extends MetaGeneral {
 	public function setFields($fields) {
 		$this->fields = $fields;
 	}
-	
-	// public function getDdlJrnl() {
-	// return $this->ddlJrnl;
-	// }
-	
-	// public function getNameJrnl() {
-	// return $this->name . "_jrnl";
-	// }
-	
-	// public function setDdlJrnl($ddlJrnl) {
-	// $this->ddlJrnl = $ddlJrnl;
-	// }
+	public function getTriggerInsert() {
+		return $this->triggerInsert;
+	}
+
+	public function getTriggerUpdate() {
+		return $this->triggerUpdate;
+	}
+
+	public function getTriggerDelete() {
+		return $this->triggerDelete;
+	}
+
+	public function setTriggerInsert($triggerInsert) {
+		$this->triggerInsert = $triggerInsert;
+	}
+
+	public function setTriggerUpdate($triggerUpdate) {
+		$this->triggerUpdate = $triggerUpdate;
+	}
+
+	public function setTriggerDelete($triggerDelete) {
+		$this->triggerDelete = $triggerDelete;
+	}
 }
 

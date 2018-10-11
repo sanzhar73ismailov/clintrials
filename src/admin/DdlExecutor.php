@@ -95,7 +95,24 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
-	
+	function triggerExists($trigger_name) {
+		$this->logger->trace("START");
+		$result = false;
+		try {
+			$this->conn->exec('USE ' . $this->db->getName());
+			//show triggers where `Trigger` like '%ns%' and `table`='T1'
+			$query = "show triggers where `Trigger` = '" . $trigger_name . "'";
+			$stmt = $this->conn->prepare ( $query );
+			$stmt->execute ();
+			$row = $stmt->fetchAll ( PDO::FETCH_ASSOC );
+			$this->logger->trace("\$stmt->rowCount ()=" . $stmt->rowCount ());
+			$result = $stmt->rowCount () > 0;
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
 	function runSql($sql) {
 		$this->logger->trace("START");
 		$result = false;
@@ -122,7 +139,7 @@ class DdlExecutor {
 		$result = false;
 		try {
 			$this->conn->exec('USE ' . $this->db->getName());
-			$this->logger->trace("table ddl: " . $ddl);
+			$this->logger->trace("table ddl: " . PHP_EOL . $ddl);
 			$this->conn->exec ($ddl);
 			$result = true;
 		} catch ( PDOException $e ) {

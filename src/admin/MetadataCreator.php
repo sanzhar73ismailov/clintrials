@@ -8,6 +8,7 @@ use clintrials\admin\metadata\DbSchema;
 use clintrials\admin\metadata\Table;
 use clintrials\admin\metadata\Field;
 use clintrials\admin\metadata\TableJrnl;
+use clintrials\admin\metadata\Trigger;
 
 libxml_use_internal_errors ( true );
 class MetadataCreator {
@@ -26,7 +27,6 @@ class MetadataCreator {
 			exit ();
 		}
 		$this->fillDb ();
-		// print_r ( $this->db );
 		$this->logger->debug ( "FINISH" );
 	}
 	
@@ -83,20 +83,17 @@ class MetadataCreator {
 		$table->setName ( $this->getXmlObj ()->prefix . "_" . $investigation ['name'] );
 		$table->setComment ( $investigation->title->__toString () );
 		$table->addField ( $this->buildPkField ( 'id' ) );
-		// $ddl .= "patient_id INTEGER(11) NOT NULL COMMENT 'Пациент',\n";
-		// $ddl .= "visit_id INTEGER(11) NOT NULL COMMENT 'Визит',\n";
-		// $this->fillField
 		$table->addField ( $this->fillField ( 'patient_id', 'Пациент', 'int' ) );
 		$table->addField ( $this->fillField ( 'visit_id', 'Визит', 'int' ) );
 		foreach ( $investigation->fields->children () as $fieldArray ) {
 			$table->addField ( $this->fillFieldFromArray ( $fieldArray ) );
 		}
 		$table->addFields ( $this->buildServiceFields () );
-		$this->logger->debug ( "start print fields" );
+		$this->logger->debug ( "start print fields<<<" );
 		foreach ( $table->getFields () as $field ) {
 			$this->logger->debug ( "\$field=" . var_export ( $field, true ) );
 		}
-		$this->logger->debug ( "finish print fields" );
+		$this->logger->debug ( ">>>finish print fields" );
 		$this->logger->debug ( "FINISH" );
 		return $table;
 	}
@@ -212,9 +209,6 @@ class MetadataCreator {
 		 * $ddl .= "insert_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
 		 * $ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
 		 */
-		//if ($is_journal) {
-		//	$ddl .= "insert_ind INTEGER(11) NOT NULL DEFAULT '0' COMMENT 'Индикатор вставки',\n ";
-		//}
 		$ddl .= "PRIMARY KEY ($id_column)";
 		foreach ( $table->getFields () as $field ) {
 			if ($field->getType () == "list")
@@ -222,8 +216,11 @@ class MetadataCreator {
 		}
 		
 		// UNIQUE KEY `patient_visit_uniq` (`patient_id`, `visit_id`),
-		// KEY `patient_id` (`patient_id`),
-		// KEY `visit_id` (`patient_id`),
+		if (!$table instanceof TableJrnl){
+			$ddl .= ",\n UNIQUE KEY `patient_visit_uniq` (patient_id, visit_id)";
+		}
+		$ddl .=  ",\n KEY `patient_id` (patient_id)";
+		$ddl .=  ",\n KEY `visit_id` (visit_id)";
 		
 		$ddl .= "\n) ENGINE=InnoDB\n";
 		$ddl .= "AUTO_INCREMENT=1 CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
@@ -283,6 +280,29 @@ class MetadataCreator {
 		$field->setDefault ( '0' );
 		return $field;
 	}
+	private function buildTriggers(Table $table) {
+		$this->logger->debug ( "START" );
+		
+		$this->logger->debug ( "FINISH" );
+	}
+	
+	private function buildInsertTrigger(Table $table) {
+		$this->logger->debug ( "START" );
+		$trigger = new Trigger();
+		$trigger->setName($table->getName() . '_insert');
+		$ddl = sprintf("create trigger %s on %s", $trigger->getName(), $table->getName());
+		$ddl .= sprintf($ddl . "\nfor each row insert into %s ( ", $table->getTableJrnj()->getName());
+		//create trigger t1_after_ins_trig after insert on t1
+		//for each row insert into t1_jrnl (id, f1, f2) values (new.id, new.f1, new.f2);
+		$this->logger->debug ( "FINISH" );
+	}
+	
+	private function buildUpdateTrigger(Table $table) {
+		$this->logger->debug ( "START" );
+		
+		$this->logger->debug ( "FINISH" );
+	}
+
 }
 
 ?>
