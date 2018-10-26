@@ -97,6 +97,14 @@ class DdlExecutorTest extends TestCase {
 			
 			$this->assertTrue($ddlExecutor->createTableJrnl($table));
 			$this->assertTrue ( $ddlExecutor->tableExists ($table->getTableJrnj()->getName()) );
+			
+			$this->assertFalse($ddlExecutor->triggerExists($table->getTriggerInsert()));
+			$this->assertTrue($ddlExecutor->createTrigger($table->getTriggerInsert()));
+			$this->assertTrue($ddlExecutor->triggerExists($table->getTriggerInsert()));
+			
+			$this->assertFalse($ddlExecutor->triggerExists($table->getTriggerUpdate()));
+			$this->assertTrue($ddlExecutor->createTrigger($table->getTriggerUpdate()));
+			$this->assertTrue($ddlExecutor->triggerExists($table->getTriggerUpdate()));
 		}
 		$this->logger->debug("FINISH");
 	}

@@ -73,10 +73,11 @@ class MetadataCreator {
 			
 			$table->setDdl ( $this->buildCreateTableDdl ( $table ) );
 			$tableJrnl->setDdl ( $this->buildCreateTableDdl ( $tableJrnl ) );
-			
+			$this->buildTriggers($table);
 			$this->db->addTable ( $table );
 		}
 	}
+	
 	private function fillTable($investigation) {
 		$this->logger->debug ( "START" );
 		$table = new Table ();
@@ -257,6 +258,7 @@ class MetadataCreator {
 		 */
 		$serviceFields = array ();
 		$serviceFields [] = $this->buildServiceField ( "checked", 'Проверено монитором', 'boolean', '0' );
+		$serviceFields [] = $this->buildServiceField ( "row_stat", 'Статус строки (акт 1, удал 0)', 'int', '1' );
 		$serviceFields [] = $this->buildServiceField ( "user_insert", 'Пользователь, создавший', 'varchar', 'no_user' );
 		$serviceFields [] = $this->buildServiceField ( "user_update", 'Пользователь, обновивший', 'varchar', 'no_user' );
 		$serviceFields [] = $this->buildServiceField ( "insert_date", 'Дата добавления записи', 'timestamp', 'CURRENT_TIMESTAMP' );
@@ -282,27 +284,61 @@ class MetadataCreator {
 	}
 	private function buildTriggers(Table $table) {
 		$this->logger->debug ( "START" );
-		
+		$this->buildInsertTrigger($table);
+		$this->buildUpdateTrigger($table);
 		$this->logger->debug ( "FINISH" );
 	}
 	
 	private function buildInsertTrigger(Table $table) {
 		$this->logger->debug ( "START" );
-		$trigger = new Trigger();
-		$trigger->setName($table->getName() . '_insert');
-		$ddl = sprintf("create trigger %s on %s", $trigger->getName(), $table->getName());
-		$ddl .= sprintf($ddl . "\nfor each row insert into %s ( ", $table->getTableJrnj()->getName());
-		//create trigger t1_after_ins_trig after insert on t1
-		//for each row insert into t1_jrnl (id, f1, f2) values (new.id, new.f1, new.f2);
+		$trigger = $this->buildTrigger($table, "insert");
+		$table->setTriggerInsert($trigger);
 		$this->logger->debug ( "FINISH" );
 	}
 	
 	private function buildUpdateTrigger(Table $table) {
 		$this->logger->debug ( "START" );
-		
+		$trigger = $this->buildTrigger($table, "update");
+		$table->setTriggerUpdate($trigger);
 		$this->logger->debug ( "FINISH" );
 	}
-
+	
+	private function buildTrigger(Table $table, $typeTrigger='insert') {
+		$this->logger->debug ( "START" );
+		$trigger = new Trigger();
+		$trigger_name = "after_insert";
+		$insert_ind_val = 1;
+		$operation = "INSERT";
+		if($typeTrigger == "update"){
+			$trigger_name = "after_update";
+			$insert_ind_val = 0;
+			$operation = "UPDATE";
+		}
+		$trigger->setName($table->getName() . $trigger_name);
+		//$sql = "CREATE TRIGGER `t1_after_upd_trig` AFTER UPDATE ON `t1` FOR EACH ROW BEGIN\n"
+		
+		$ddl = sprintf("CREATE TRIGGER %s AFTER " . $operation . " ON %s", $trigger->getName(), $table->getName());
+		$ddl .= sprintf("\n FOR EACH ROW BEGIN\n insert into %s (", $table->getTableJrnj()->getName());
+		
+		foreach ($table->getFields() as $field){
+			if (0) $field = new Field(null, null, null);
+			$ddl .= " " . $field->getName() . ",";
+		}
+		
+		$ddl .= " insert_ind) VALUES (" ;
+		
+		foreach ($table->getFields() as $field){
+			if (0) $field = new Field(null, null, null);
+			$ddl .= " new." . $field->getName() . ",";
+		}
+		$ddl .= " " . $insert_ind_val . ");" ;
+		$ddl .= "\nEND\n";
+		$trigger->setDdl($ddl);
+		$this->logger->debug ( "trigger ddl:\n" . $ddl );
+		$this->logger->debug ( "FINISH return " . $trigger->getName() );
+		return $trigger;
+	}
+	
 }
 
 ?>

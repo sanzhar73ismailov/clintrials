@@ -10,7 +10,6 @@ class Table extends MetaGeneral {
 	private $tableJrnj;
 	private $triggerInsert;
 	private $triggerUpdate;
-	private $triggerDelete;
 	
 	public function __construct() {
 	}
@@ -48,10 +47,6 @@ class Table extends MetaGeneral {
 		return $this->triggerUpdate;
 	}
 
-	public function getTriggerDelete() {
-		return $this->triggerDelete;
-	}
-
 	public function setTriggerInsert($triggerInsert) {
 		$this->triggerInsert = $triggerInsert;
 	}
@@ -60,8 +55,5 @@ class Table extends MetaGeneral {
 		$this->triggerUpdate = $triggerUpdate;
 	}
 
-	public function setTriggerDelete($triggerDelete) {
-		$this->triggerDelete = $triggerDelete;
-	}
 }
 

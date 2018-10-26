@@ -8,6 +8,7 @@ use PDO;
 use PDOException;
 use clintrials\admin\metadata\DbSchema;
 use phpDocumentor\Reflection\Types\String_;
+use clintrials\admin\metadata\Trigger;
 
 //Logger::configure("configs/" . LOG_SET_FILE);
 //include_once 'config.php';
@@ -95,7 +96,12 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
-	function triggerExists($trigger_name) {
+	
+	function triggerExists(Trigger $trigger) {
+		return $this->triggerExistsByName($trigger->getName());
+	}
+	
+	function triggerExistsByName($trigger_name) {
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -113,6 +119,14 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
+	
+	function createTrigger(Trigger $trigger) {
+		$this->logger->trace("START");
+		$result = $this->runSql($trigger->getDdl());
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+	
 	function runSql($sql) {
 		$this->logger->trace("START");
 		$result = false;
