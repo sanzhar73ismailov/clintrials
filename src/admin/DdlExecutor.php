@@ -78,7 +78,14 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
-	//show tables like "clin_test_lab"
+	
+	function tableJournalExists($table_name) {
+		$this->logger->trace("START");
+		$result = $this->tableExists($table_name . "_jrnl");
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+	
 	function tableExists($table_name) {
 		$this->logger->trace("START");
 		$result = false;
@@ -176,6 +183,48 @@ class DdlExecutor {
 				echo "Database $table->name created successfully<br>";
 			}
 		}
+	}
+	
+	/**
+	 * Checks if table's metadata from XML and in DB are same
+	 */
+	function tableMatched(Table $table){
+		$this->logger->trace("START");
+		$result = true;
+		try {
+			$columnsFromDb = $this->getColumnsFromDb($this->db->getName(), $table->getName());
+			$this->logger->trace("count(\$table->getFields()=" . count($table->getFields()));
+			$this->logger->trace("count(\$columnsFromDb)=" . count($columnsFromDb));
+			if(count($table->getFields() != count($columnsFromDb))) {
+				$result = false;
+			}
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+		}
+		$this->logger->trace("FINISH, return count(\$columnsFromDb)" . count($columnsFromDb));
+		return $result;
+	}
+	
+	function getColumnsFromDb($dbName, $tableName){
+		$this->logger->trace("START");
+		$result = false;
+		try {
+			$query = "SELECT t.COLUMN_NAME, t.DATA_TYPE, t.COLUMN_COMMENT " .
+					" FROM INFORMATION_SCHEMA.columns t " .
+					" WHERE t.table_schema=:table_schema " .
+					" AND t.table_name=:table_name " .
+					" ORDER BY t.ordinal_position";
+			$stmt = $this->conn->prepare($query);
+			$parameters['table_schema'] = $dbName;
+			$parameters['table_name'] = $tableName;
+			$this->logger->trace("\$parameters=" . var_export($parameters, true));
+			$stmt->execute($parameters);
+			$result = $stmt->fetchAll ( PDO::FETCH_ASSOC );
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+		}
+		$this->logger->trace("FINISH, return count($result)" . count($result));
+		return $result;
 	}
 }
 

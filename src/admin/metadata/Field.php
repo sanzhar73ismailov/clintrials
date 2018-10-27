@@ -9,38 +9,6 @@ class Field extends MetaGeneral {
 	private $null = false; // null is possible
 	private $default = null;
 	
-	
-	
-	/*
-	                    case "date":
-							$ddl .= " DATE";
-							break;
-						case "float":
-							$ddl .= " float(11,2)";
-							break;
-						case "text":
-							$ddl .= " text";
-							break;
-						case "varchar":
-							$ddl .= " varchar(50)";
-							break;
-						default:
-							$ddl .= " INTEGER(11)";
-	 * */
-	
-	/*
-	 * $ddl .= "checked INTEGER(1) NOT NULL DEFAULT '0' COMMENT 'Проверено монитором',\n";
-			$ddl .= "user_insert VARCHAR(25) COMMENT 'Пользователь, создавший',\n";
-			$ddl .= "user_update VARCHAR(25) COMMENT 'Пользователь, обновивший',\n";
-			$ddl .= "insert_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
-			$ddl .= "update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n";
-	 * 
-	 * */
-	
-	//public function __construct(){
-		
-	//}
-	
 	public function __construct($name, $comment, $type){
 		$this->name = $name;
 		$this->comment = $comment;
