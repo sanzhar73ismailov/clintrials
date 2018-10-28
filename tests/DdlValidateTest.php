@@ -20,7 +20,7 @@ class DdlValidateTest extends TestCase {
 	public function setUp(){
 		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
 		$this->createDb();
-		$this->cretaeTablesAndTriggers();
+		$this->createTablesAndTriggers();
 		
 	}
 	
@@ -39,7 +39,7 @@ class DdlValidateTest extends TestCase {
 		$this->metadataCreator = null;
 	}
 
-	public function cretaeTablesAndTriggers() {
+	public function createTablesAndTriggers() {
 		$this->logger->debug("START");
 		$ddlExecutor = new DdlExecutor($this->db);
 		$db = $this->db;
