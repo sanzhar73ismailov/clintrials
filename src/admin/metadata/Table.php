@@ -54,6 +54,24 @@ class Table extends MetaGeneral {
 	public function setTriggerUpdate($triggerUpdate) {
 		$this->triggerUpdate = $triggerUpdate;
 	}
+	
+	public function getFieldsName(){
+		$columnNames = array();
+		foreach ( $this->fields as $field ) {
+			$columnNames [] = $field->getName ();
+		}
+		return $columnNames;
+	}
+	
+	public function getFieldNameTypeComments(){
+		$columnNames = array();
+		foreach ( $this->fields as $field ) {
+			if (0) $field = new Field(0, 0, 0);
+			$columnNames [] = sprintf("%s-%s-%s", 
+					strtolower($field->getName ()), strtolower($field->getType()), $field->getComment());
+		}
+		return $columnNames;
+	}
 
 }
 

@@ -67,7 +67,7 @@ class DdlValidateTest extends TestCase {
 	}
 	
 
-	public function testSomething() {
+	public function testValidate() {
 		$this->logger->debug("START");
 		$this->assertTrue(1 == 1);
 		$this->assertFalse(1 == 0);
@@ -76,9 +76,12 @@ class DdlValidateTest extends TestCase {
 		$tables = $db->getTables();
 		$this->assertTrue(count($tables) > 0);
 		$this->assertTrue($ddlExecutor->tableExists("clin_test_instrument"));
+		$this->logger->debug("test table " . $tables[0]->getName());
+		
 		$res = $ddlExecutor->tableMatched($tables[0]);
-		$this->logger->debug('count=' . count($res));
 		$this->logger->debug(var_export($res, true));
+		$this->assertTrue($res->passed);
+		$this->assertTrue(count($res->errors) == 0);
 		$this->logger->debug("FINISH");
 	}
 

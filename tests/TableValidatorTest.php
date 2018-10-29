@@ -67,7 +67,55 @@ class TableValidatorTest extends TestCase {
 		return $tableValidation;
 	}
 	
-	public function testSomething() {
+	public function getTableValidationColumnsMoreInXml() {
+		$table = new Table();
+		$field1 = new Field("f1", "comment1", "int");
+		$field2 = new Field("f2", "comment2", "int");
+		$field3 = new Field("f3", "comment3", "int");
+		$field4 = new Field("f4", "comment4", "int");
+		$field5 = new Field("f5", "comment5", "int");
+		$table->addField($field1);
+		$table->addField($field2);
+		$table->addField($field3);
+		$table->addField($field4);
+		$table->addField($field5);
+		
+		$tableMetaFromDb = new TableMetaFromDb();
+		$column1 = new FieldMetaFromDb("f1", "comment1", "int");
+		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
+		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
+		$column4 = new FieldMetaFromDb("f4", "comment4", "int");
+		$tableMetaFromDb->columns[] = $column1;
+		$tableMetaFromDb->columns[] = $column2;
+		$tableMetaFromDb->columns[] = $column3;
+		$tableMetaFromDb->columns[] = $column4;
+		
+		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		return $tableValidation;
+	}
+	
+	public function getTableValidationColumnsHasDiffType() {
+		$table = new Table();
+		$field1 = new Field("f1", "comment1", "int");
+		$field2 = new Field("f2", "comment2", "int");
+		$field3 = new Field("f3", "comment3", "varchar");
+		$table->addField($field1);
+		$table->addField($field2);
+		$table->addField($field3);
+		
+		$tableMetaFromDb = new TableMetaFromDb();
+		$column1 = new FieldMetaFromDb("f1", "comment1", "int");
+		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
+		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
+		$tableMetaFromDb->columns[] = $column1;
+		$tableMetaFromDb->columns[] = $column2;
+		$tableMetaFromDb->columns[] = $column3;
+		
+		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		return $tableValidation;
+	}
+	
+	public function testValidate() {
 		$this->logger->debug("START");
 		$this->assertTrue(1 == 1);
 		$this->assertFalse(1 == 0);
@@ -88,7 +136,21 @@ class TableValidatorTest extends TestCase {
 		
 		$this->assertFalse($validationResult->passed);
 		$this->assertTrue(count($validationResult->errors) > 0);
-		$this->logger->debug("errors: " . var_dump($validationResult->errors, true));
+		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
+		
+		$tableValidation = $this->getTableValidationColumnsMoreInXml();
+		$validationResult = $tableValidation->validate();
+		
+		$this->assertFalse($validationResult->passed);
+		$this->assertTrue(count($validationResult->errors) > 0);
+		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
+		
+		$tableValidation = $this->getTableValidationColumnsHasDiffType();
+		$validationResult = $tableValidation->validate();
+		
+		$this->assertFalse($validationResult->passed);
+		$this->assertTrue(count($validationResult->errors) > 0);
+		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
 		
 		$this->logger->debug("FINISH");
 	}

@@ -9,6 +9,8 @@ use PDOException;
 use clintrials\admin\metadata\DbSchema;
 use phpDocumentor\Reflection\Types\String_;
 use clintrials\admin\metadata\Trigger;
+use clintrials\admin\TableMetaFromDb;
+use clintrials\admin\TableValidation;
 
 //Logger::configure("configs/" . LOG_SET_FILE);
 //include_once 'config.php';
@@ -190,41 +192,45 @@ class DdlExecutor {
 	 */
 	function tableMatched(Table $table){
 		$this->logger->trace("START");
-		$result = true;
+		$resultValidation = null;
+		$tableMetaFromDb = new TableMetaFromDb();
+		$tableMetaFromDb->columns = $this->getColumnsFromDb($this->db->getName(), $table->getName());
 		try {
-			$columnsFromDb = $this->getColumnsFromDb($this->db->getName(), $table->getName());
-			$this->logger->trace("count(\$table->getFields()=" . count($table->getFields()));
-			$this->logger->trace("count(\$columnsFromDb)=" . count($columnsFromDb));
-			if(count($table->getFields() != count($columnsFromDb))) {
-				$result = false;
-			}
+			$tableValidation = new TableValidation($table, $tableMetaFromDb);
+			$resultValidation = $tableValidation->validate();
 		} catch ( PDOException $e ) {
 			$this->logger->error("error", $e);
 		}
-		$this->logger->trace("FINISH, return count(\$columnsFromDb)" . count($columnsFromDb));
-		return $result;
+		//$this->logger->trace("FINISH, return \$result" . var_export($resultValidation, true));
+		return $resultValidation;
 	}
 	
 	function getColumnsFromDb($dbName, $tableName){
 		$this->logger->trace("START");
-		$result = false;
+		$columns = array();
+		$tableMetaFromDb = new TableMetaFromDb();
 		try {
 			$query = "SELECT t.COLUMN_NAME, t.DATA_TYPE, t.COLUMN_COMMENT " .
 					" FROM INFORMATION_SCHEMA.columns t " .
 					" WHERE t.table_schema=:table_schema " .
 					" AND t.table_name=:table_name " .
 					" ORDER BY t.ordinal_position";
-			$stmt = $this->conn->prepare($query);
+			
 			$parameters['table_schema'] = $dbName;
 			$parameters['table_name'] = $tableName;
 			$this->logger->trace("\$parameters=" . var_export($parameters, true));
+			$stmt = $this->conn->prepare($query);
 			$stmt->execute($parameters);
-			$result = $stmt->fetchAll ( PDO::FETCH_ASSOC );
+			//$result = $stmt->fetchAll ( PDO::FETCH_ASSOC );
+			while ($row = $stmt->fetch()) {
+				$columns[] = 
+				new FieldMetaFromDb($row['COLUMN_NAME'], $row['COLUMN_COMMENT'], $row['DATA_TYPE']);
+			}
 		} catch ( PDOException $e ) {
 			$this->logger->error("error", $e);
 		}
-		$this->logger->trace("FINISH, return count($result)" . count($result));
-		return $result;
+		$this->logger->trace("FINISH, return \$columns" . var_export($columns, true));
+		return $columns;
 	}
 }
 
