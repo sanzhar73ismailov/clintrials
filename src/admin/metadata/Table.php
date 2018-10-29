@@ -67,8 +67,12 @@ class Table extends MetaGeneral {
 		$columnNames = array();
 		foreach ( $this->fields as $field ) {
 			if (0) $field = new Field(0, 0, 0);
+			$type = strtolower($field->getType());
+			if($type=='list' or $type=='boolean'){
+				$type = 'int';
+			}
 			$columnNames [] = sprintf("%s-%s-%s", 
-					strtolower($field->getName ()), strtolower($field->getType()), $field->getComment());
+					strtolower($field->getName ()), $type, $field->getComment());
 		}
 		return $columnNames;
 	}
