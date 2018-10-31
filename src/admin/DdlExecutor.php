@@ -107,6 +107,24 @@ class DdlExecutor {
 		return $result;
 	}
 	
+	function getRowsCount($table_name) {
+		$this->logger->trace("START");
+		$result = 0;
+		try {
+			$this->conn->exec('USE ' . $this->db->getName());
+			$query = "select count(1) from " . $table_name . "";
+			$stmt = $this->conn->prepare ( $query );
+			$stmt->execute ();
+			//$row = $stmt->fetchAll ( PDO::FETCH_ASSOC );
+			//$this->logger->trace("\$stmt->rowCount ()=" . $stmt->rowCount ());
+			$result = $stmt->rowCount ();
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+	
 	function triggerExists(Trigger $trigger) {
 		return $this->triggerExistsByName($trigger->getName());
 	}
@@ -144,7 +162,7 @@ class DdlExecutor {
 			$this->conn->exec('USE ' . $this->db->getName());
 			$result = $this->conn->exec ( $sql ) !== false;
 		} catch ( PDOException $e ) {
-			$this->logger->error("error", $e);
+			$this->logger->error($e->getMessage(), $e);
 		}
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
@@ -223,38 +241,59 @@ class DdlExecutor {
 			$stmt = $this->conn->prepare($query);
 			$stmt->execute($parameters);
 			//$result = $stmt->fetchAll ( PDO::FETCH_ASSOC );
-			while ($row = $stmt->fetch()) {
-				$columns[] = 
-				new FieldMetaFromDb($row['COLUMN_NAME'], $row['COLUMN_COMMENT'], $row['DATA_TYPE']);
+			while ($row = $stmt->fetch () ) {
+				$columns [] = new FieldMetaFromDb ( $row ['COLUMN_NAME'], $row ['COLUMN_COMMENT'], $row ['DATA_TYPE'] );
 			}
 		} catch ( PDOException $e ) {
-			$this->logger->error("error", $e);
+			$this->logger->error ( "error", $e );
 		}
-		$this->logger->trace("FINISH, return \$columns" . var_export($columns, true));
+		$this->logger->trace ( "FINISH, return \$columns" . var_export ( $columns, true ) );
 		return $columns;
 	}
-    
-	function backupTable(Table $table){
+	function backupTable(Table $table) {
 		$result = false;
-		//if(1) return 1;
-		$result = $this->createBackupTable($table);
-		if($result){
-			//$this->copyDataToBackupTable($table);
+		// if(1) return 1;
+		$bc_table_name = $this->createBackupTable ( $table );
+		if ($bc_table_name == null ) {
+			throw new \Exception ( "backup table " . $bc_table_name . "is not created" );
 		}
-		
+		if (! $this->copyDataToBackupTable($table, $bc_table_name)){
+			throw new \Exception("data into backup table " . $bc_table_name . "is not copied");
+		}
+		$bc_table_jrnl_name = $this->createBackupTable($table->getTableJrnj());
+		if($bc_table_jrnl_name == null){
+			throw new \Exception("backup table " . $bc_table_jrnl_name . "is not created");
+		}
+		if (! $this->copyDataToBackupTable($table->getTableJrnj(), $bc_table_jrnl_name)){
+			throw new \Exception("data into backup table " . $bc_table_jrnl_name . "is not copied");
+		}
+		$result = true;
 		return $result;
 	}
-	private function createBackupTable (Table $table) {
+	/**
+	 * 
+	 * @param Table $table
+	 * @return string - if success - name of created table,  null if tabel is not created 
+	 */
+	function createBackupTable (Table $table) {
 		$this->logger->trace("START");
-		$result = false;
+		$result = null;
 		$bc_table_name = "bc_" . $table->getName() . "_" . date('ymd_His');
 		$query = sprintf("create table %s like %s", $bc_table_name, $table->getName());
-		$result = $this->runSql($query);
+		if($this->runSql($query)){
+			$result = $bc_table_name;
+		}
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
-	private function copyDataToBackupTable (Table $table) {
+	
+	function copyDataToBackupTable (Table $table, $bc_table_name) {
+		$this->logger->trace("START");
 		$result = false;
+		$bc_table_name = "bc_" . $table->getName() . "_" . date('ymd_His');
+		$query = sprintf("INSERT INTO %s SELECT * FROM %s", $bc_table_name, $table->getName());
+		$result = $this->runSql($query);
+		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
 	
