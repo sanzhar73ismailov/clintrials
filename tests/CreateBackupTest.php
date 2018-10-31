@@ -5,10 +5,12 @@ use PHPUnit\Framework\TestCase;
 use clintrials\admin\MetadataCreator;
 use clintrials\admin\DdlExecutor;
 use clintrials\admin\metadata\Table;
-class DdlValidateTest extends TestCase {
+
+class CreateBackupTest extends TestCase {
 	private $logger;
 	private $metadataCreator;
 	private $db;
+
 	public function __construct() {
 		$this->logger = Logger::getLogger ( __CLASS__ );
 	}
@@ -16,6 +18,7 @@ class DdlValidateTest extends TestCase {
 		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
 		$this->createDb ();
 		$this->createTablesAndTriggers ();
+		
 	}
 	public function createDb() {
 		$this->db = $this->metadataCreator->getDb ();
@@ -26,9 +29,6 @@ class DdlValidateTest extends TestCase {
 		}
 		$this->assertFalse ( $ddlExecutor->dbExists () );
 		$this->assertTrue ( $ddlExecutor->createDb () );
-	}
-	public function tearDown() {
-		$this->metadataCreator = null;
 	}
 	public function createTablesAndTriggers() {
 		$this->logger->debug ( "START" );
@@ -56,25 +56,35 @@ class DdlValidateTest extends TestCase {
 		
 		$this->logger->debug ( "FINISH" );
 	}
-	public function testValidate() {
+	
+	private function insertRowTo_clin_test_patient(){
+		$ddlExecutor = new DdlExecutor ( $this->db );
+		$randPatId = rand(1,1000);
+		$randVisitId = rand(1,1000);
+		$query = "INSERT INTO   clin_test_patient( id, patient_id, visit_id, code, sex_id, doctor, checked, row_stat, user_insert, user_update)" 
+                 ." VALUE (null, $randPatId, $randVisitId, 'sdsds', 2, 'doctor fio', 0, 1, 'user1', 'user1')";
+        return $ddlExecutor->runSql($query);
+	}
+	
+	
+	public function testCreateBackup(){
 		$this->logger->debug ( "START" );
 		$ddlExecutor = new DdlExecutor ( $this->db );
+		
 		$db = $this->db;
 		$tables = $db->getTables ();
-		$this->assertNotNull($this->db->getTable('clin_test_patient'));
-		$this->assertNotNull($this->db->getTable('clin_test_lab'));
-		$this->assertNotNull($this->db->getTable('clin_test_instrument'));
-		$this->assertTrue ( count ( $tables ) > 0 );
-		foreach ( $tables as $table ) {
-			
-			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName() ) );
-			$this->logger->debug ( "test table " . $table->getName () );
-			
-			$res = $ddlExecutor->tableMatched ( $table );
-			$this->logger->debug ( var_export ( $res, true ) );
-			$this->assertTrue ( $res->passed );
-			$this->assertTrue ( count ( $res->errors ) == 0 );
-		}
+		$tablePatient = $this->db->getTable('clin_test_patient');
+		$this->assertNotNull($tablePatient);
+		$this->assertTrue($ddlExecutor->tableExists($tablePatient->getName()));
+		
+		//$this->assertTrue($this->insertRowTo_clin_test_patient());
+		//$this->assertTrue($this->insertRowTo_clin_test_patient());
+		//$this->assertTrue($this->insertRowTo_clin_test_patient());
+		//$this->assertTrue($this->insertRowTo_clin_test_patient());
+		
+		$ddlExecutor->backupTable($tablePatient);
+		
 		$this->logger->debug ( "FINISH" );
 	}
+	
 }

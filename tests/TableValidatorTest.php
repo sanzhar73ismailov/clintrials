@@ -5,10 +5,10 @@ require_once "configs/app_prop_test.php";
 use clintrials\admin\metadata\Table;
 use clintrials\admin\metadata\Field;
 
-use clintrials\admin\FieldMetaFromDb;
-use clintrials\admin\ValidationResult;
-use clintrials\admin\TableValidation;
-use clintrials\admin\TableMetaFromDb;
+use clintrials\admin\validation\FieldMetaFromDb;
+use clintrials\admin\validation\ValidationResult;
+use clintrials\admin\validation\TableValidation;
+use clintrials\admin\validation\TableMetaFromDb;
 
 use PHPUnit\Framework\TestCase;
 

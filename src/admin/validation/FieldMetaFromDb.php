@@ -1,5 +1,5 @@
 <?php
-namespace clintrials\admin;
+namespace clintrials\admin\validation;
 
 class FieldMetaFromDb {
 	// t.COLUMN_NAME, t.DATA_TYPE, t.COLUMN_COMMENT

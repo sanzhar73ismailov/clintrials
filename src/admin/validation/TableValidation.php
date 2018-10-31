@@ -1,6 +1,6 @@
 <?php
 
-namespace clintrials\admin;
+namespace clintrials\admin\validation;
 
 use clintrials\admin\metadata\Table;
 

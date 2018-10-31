@@ -1,5 +1,5 @@
 <?php
-namespace clintrials\admin;
+namespace clintrials\admin\validation;
 
 class ValidationResult {
 	public $passed = true;

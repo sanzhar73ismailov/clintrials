@@ -17,7 +17,7 @@ class Field extends MetaGeneral {
 	
 	/**
 	 *
-	 * @return the $type
+	 * @return $type
 	 */
 	public function getType() {
 		return $this->type;
@@ -25,7 +25,7 @@ class Field extends MetaGeneral {
 	
 	/**
 	 *
-	 * @param field_type $type
+	 * @param $type
 	 */
 	public function setType($type) {
 		$this->type = $type;

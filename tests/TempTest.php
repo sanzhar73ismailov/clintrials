@@ -6,6 +6,7 @@ use clintrials\admin\MetadataCreator;
 use clintrials\admin\metadata\DbSchema;
 use clintrials\admin\DdlExecutor;
 use clintrials\admin\metadata\Table;
+use clintrials\admin\metadata\Trigger;
 
 
 class TempTest extends TestCase {
@@ -81,6 +82,9 @@ class TempTest extends TestCase {
 		$this->assertTrue ( $result);
 		//$conn->error
 		
+		$trigger->setName("t1_after_upd_trig");
+		$this->assertTrue ( $ddlExecutor->triggerExists($trigger) );
+		
 		$this->logger->debug ( "result=" . $result );
 		
 		/*
@@ -103,7 +107,9 @@ class TempTest extends TestCase {
 			$db = new DbSchema ();
 		}
 		$ddlExecutor = new DdlExecutor ( $db );
-		$this->assertTrue ( $ddlExecutor->triggerExists("t1_after_ins_trig") );
+		$trigger = new Trigger();
+		$trigger->setName("t1_after_ins_trig");
+		$this->assertFalse ( $ddlExecutor->triggerExists($trigger) );
 		$this->logger->debug ( "FINISH" );
 	}
 }

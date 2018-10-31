@@ -7,10 +7,11 @@ use Logger;
 use PDO;
 use PDOException;
 use clintrials\admin\metadata\DbSchema;
-use phpDocumentor\Reflection\Types\String_;
+//use phpDocumentor\Reflection\Types\String_;
 use clintrials\admin\metadata\Trigger;
-use clintrials\admin\TableMetaFromDb;
-use clintrials\admin\TableValidation;
+use clintrials\admin\validation\TableMetaFromDb;
+use clintrials\admin\validation\TableValidation;
+use clintrials\admin\validation\FieldMetaFromDb;
 
 //Logger::configure("configs/" . LOG_SET_FILE);
 //include_once 'config.php';
@@ -232,6 +233,32 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return \$columns" . var_export($columns, true));
 		return $columns;
 	}
+    
+	function backupTable(Table $table){
+		$result = false;
+		//if(1) return 1;
+		$result = $this->createBackupTable($table);
+		if($result){
+			//$this->copyDataToBackupTable($table);
+		}
+		
+		return $result;
+	}
+	private function createBackupTable (Table $table) {
+		$this->logger->trace("START");
+		$result = false;
+		$bc_table_name = "bc_" . $table->getName() . "_" . date('ymd_His');
+		$query = sprintf("create table %s like %s", $bc_table_name, $table->getName());
+		$result = $this->runSql($query);
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+	private function copyDataToBackupTable (Table $table) {
+		$result = false;
+		return $result;
+	}
+	
+
 }
 
 ?>

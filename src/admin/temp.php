@@ -2,6 +2,11 @@
 //echo date("d/m/Y") . "<br>";
 //namespace clintrials\admin;
 
+echo ('<br/>extension_loaded (\'fileinfo\')=' . extension_loaded ('fileinfo'));
+
+echo ('<br/>extension_loaded (\'gd\')=' . extension_loaded ('gd'));
+
+/*
 $array = array('qqq', 'www', 'eee');
 $comma_separated = implode(",", $array);
 

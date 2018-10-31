@@ -6,7 +6,7 @@ class DbSchema extends MetaGeneral {
 	
 	private $tables = array ();
 	/**
-	 * @return the $tables
+	 * @return Table $tables
 	 */
 	public function getTables() {
 		return $this->tables;
@@ -30,6 +30,20 @@ class DbSchema extends MetaGeneral {
 	
 	public function addTable($table) {
 		$this->tables[] = $table;
+	}
+	
+	/**
+	 * 
+	 * @param $name - string name of table
+	 * @return Table: obj if exists or null if not exists
+	 */
+	public function getTable($name) {
+		$table = null;
+		foreach($this->tables as $t){
+			$table = $t;
+			break;
+		}
+		return $table;
 	}
 
 }
