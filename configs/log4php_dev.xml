@@ -25,6 +25,6 @@
 		<level value="TRACE" />
 		<appender_ref ref="echoAppender" />
 		<appender_ref ref="fileAppender" />
-		<!-- <appender_ref ref="htmlAppender" /> -->
+		<appender_ref ref="htmlAppender" />
 	</root>
 </configuration>

@@ -24,13 +24,13 @@ $log->debug("Hello World - debug!");
 //$xmlObj = \simplexml_load_file ( "clintrials.xml" ) or die ( "Error: Cannot create object" );
 
 $log->debug("defined(\"HOST\")=".defined("HOST"));
-$metadataCreator = new MetadataCreator ( "clintrials.xml" );
-$str = $metadataCreator->getDb()->getDdl();
+//$metadataCreator = new MetadataCreator ( "clintrials.xml" );
+//$str = $metadataCreator->getDb()->getDdl();
 // print_r($metadataCreator);
 //echo "<pre>dbDdl=$metadataCreator->getDb()->getDdl()</pre>";
 
 //echo "<pre>" . $metadataCreator->getDb()->getWholeDdl(). "</pre>";
-if (1) {
+if (0) {
 	$ddlExecutor = new DdlExecutor ( $metadataCreator->getDb () );
 	//$ddlExecutor->createDbWhole ();
 	$log->debug(( $ddlExecutor->dbExists () ));
