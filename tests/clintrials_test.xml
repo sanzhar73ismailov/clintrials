@@ -9,27 +9,7 @@
 	<visits_number>10</visits_number>
 	<data>
 		<investigations>
-			<investigation name="patient">
-				<title>Пациент</title>
-				<visits>1</visits>
-				<fields>
-					<field name="code">
-						<title>Номер пациента</title>
-						<type>varchar</type>
-						<required>true</required>
-					</field>
-					<field name="sex_id">
-						<title>Пол</title>
-						<type>list</type>
-						<required>true</required>
-					</field>
-					<field name="doctor">
-						<title>ФИО исследователя</title>
-						<type>varchar</type>
-						<required>true</required>
-					</field>
-				</fields>
-			</investigation>
+			
 			<investigation name="lab">
 				<title>Лабораторные исследования</title>
 				<visits>1,3,5</visits>
@@ -61,6 +41,29 @@
 					</field>
 				</fields>
 			</investigation>
+
+            <investigation name="patient">
+				<title>Пациент</title>
+				<visits>1</visits>
+				<fields>
+					<field name="code">
+						<title>Номер пациента</title>
+						<type>varchar</type>
+						<required>true</required>
+					</field>
+					<field name="sex_id">
+						<title>Пол</title>
+						<type>list</type>
+						<required>true</required>
+					</field>
+					<field name="doctor">
+						<title>ФИО исследователя</title>
+						<type>varchar</type>
+						<required>true</required>
+					</field>
+				</fields>
+			</investigation>
+
 			<investigation name="instrument">
 				<title>Инструментальные исследования</title>
 				<visits>1,3,5</visits>

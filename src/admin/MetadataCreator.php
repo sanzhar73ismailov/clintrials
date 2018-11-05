@@ -1,9 +1,10 @@
 <?php
-
+declare ( strict_types = 1 );
 namespace clintrials\admin;
 
 use Exception;
 use Logger;
+use SimpleXMLElement;
 use clintrials\admin\metadata\DbSchema;
 use clintrials\admin\metadata\Table;
 use clintrials\admin\metadata\Field;
@@ -15,7 +16,7 @@ class MetadataCreator {
 	private $logger;
 	private $xmlObj;
 	private $db;
-	function __construct($xml_file) {
+	function __construct(string $xml_file) {
 		$this->logger = Logger::getLogger ( __CLASS__ );
 		$this->logger->debug ( "START" );
 		$this->xmlObj = simplexml_load_file ( $xml_file ) or die ( "Error: Cannot create object" );
@@ -34,7 +35,7 @@ class MetadataCreator {
 	 *
 	 * @return the $xmlObj
 	 */
-	public function getXmlObj() {
+	public function getXmlObj() : SimpleXMLElement {
 		return $this->xmlObj;
 	}
 	
@@ -42,7 +43,7 @@ class MetadataCreator {
 	 *
 	 * @return the $db
 	 */
-	public function getDb() {
+	public function getDb() : DbSchema{
 		return $this->db;
 	}
 	
@@ -50,7 +51,7 @@ class MetadataCreator {
 	 *
 	 * @param SimpleXMLElement $xmlObj
 	 */
-	public function setXmlObj($xmlObj) {
+	public function setXmlObj(SimpleXMLElement $xmlObj) {
 		$this->xmlObj = $xmlObj;
 	}
 	
@@ -58,10 +59,10 @@ class MetadataCreator {
 	 *
 	 * @param Db $db
 	 */
-	public function setDb($db) {
+	public function setDb(DbSchema $db) : void {
 		$this->db = $db;
 	}
-	private function fillDb() {
+	private function fillDb() : void {
 		$this->db = new DbSchema ();
 		// $this->db->setName ( $this->xmlObj->prefix->__toString () );
 		$this->db->setName ( DB_NAME ); // db name from configs/config_env.php
@@ -78,7 +79,7 @@ class MetadataCreator {
 		}
 	}
 	
-	private function fillTable($investigation) {
+	private function fillTable($investigation) : Table {
 		$this->logger->debug ( "START" );
 		$table = new Table ();
 		$table->setName ( $this->getXmlObj ()->prefix . "_" . $investigation ['name'] );
@@ -98,7 +99,7 @@ class MetadataCreator {
 		$this->logger->debug ( "FINISH" );
 		return $table;
 	}
-	private function fillJrnlTable(Table $table) {
+	private function fillJrnlTable(Table $table) : TableJrnl {
 		$tableJrnl = new TableJrnl ( $table );
 		$tableJrnl->setName($table->getName() . '_jrnl');
 		$tableJrnl->addField ( $this->buildPkField ( "jrnl_id" ) );
@@ -115,21 +116,21 @@ class MetadataCreator {
 		$tableJrnl->addField ( $this->buildInsertField () );
 		return $tableJrnl;
 	}
-	private function fillFieldFromArray($fieldArray) {
+	private function fillFieldFromArray($fieldArray) : Field {
 		$name = $fieldArray ['name']->__toString ();
 		$title = $fieldArray->title->__toString ();
 		$type = $fieldArray->type->__toString ();
 		return $this->fillField ( $name, $title, $type );
 	}
-	private function fillField($name, $title, $type) {
+	private function fillField($name, $title, $type) : Field{
 		$field = new Field ( $name, $title, $type );
 		return $field;
 	}
-	private function buildCreateDb($db) {
+	private function buildCreateDb(DbSchema $db) : string {
 		$template = "CREATE DATABASE `%s` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
 		return sprintf ( $template, $db->getName () );
 	}
-	private function buildCreateTableDdl($table) {
+	private function buildCreateTableDdl(Table $table) : string {
 		// return $this->buildCreateTableHelp ( $table );
 		$this->logger->debug ( "START" );
 		if (0)
@@ -228,17 +229,14 @@ class MetadataCreator {
 		$this->logger->debug ( "FINISH, returned: " . $ddl );
 		return $ddl;
 	}
-	// private function buildCreateJournalTableDdl($table) {
-	// return $this->buildCreateTableHelp ( $table, true );
-	// }
-	// private function buildCreateTableHelp($table, $is_journal = false) {
-	// }
-	public function buildPkField($name) {
+
+	public function buildPkField(string $name) : Field {
 		$pkField = new Field ( $name, 'PK', "int" );
 		$pkField->setPk ( true );
 		return $pkField;
 	}
-	private function convertPkFieldToSimple($pkField) {
+
+	private function convertPkFieldToSimple(Field $pkField) : Field {
 		if (0) {
 			$pkField = new Field ( null, null, null );
 		}
@@ -248,7 +246,7 @@ class MetadataCreator {
 		$field->setNull ( false );
 		return $field;
 	}
-	public function buildServiceFields() {
+	public function buildServiceFields() : array {
 		/*
 		 * $ddl .= "checked INTEGER(1) NOT NULL DEFAULT '0' COMMENT 'Проверено монитором',\n";
 		 * $ddl .= "user_insert VARCHAR(25) COMMENT 'Пользователь, создавший',\n";
@@ -265,14 +263,14 @@ class MetadataCreator {
 		$serviceFields [] = $this->buildServiceField ( "update_date", 'Дата обновления записи', 'timestamp', 'CURRENT_TIMESTAMP' );
 		return $serviceFields;
 	}
-	private function buildServiceField($name, $comment, $type, $default = null) {
+	private function buildServiceField(string $name, string $comment, string $type, string $default = null) : Field {
 		$field = new Field ( $name, $comment, $type );
 		$field->setService ( true );
 		$field->setNull ( false );
 		$field->setDefault ( $default );
 		return $field;
 	}
-	public function buildInsertField() {
+	public function buildInsertField() : Field {
 		/*
 		 * $ddl .= "insert_ind INTEGER(11) NOT NULL DEFAULT '0' COMMENT 'Индикатор вставки',\n ";
 		 */
@@ -282,28 +280,28 @@ class MetadataCreator {
 		$field->setDefault ( '0' );
 		return $field;
 	}
-	private function buildTriggers(Table $table) {
+	private function buildTriggers(Table $table) : void {
 		$this->logger->debug ( "START" );
 		$this->buildInsertTrigger($table);
 		$this->buildUpdateTrigger($table);
 		$this->logger->debug ( "FINISH" );
 	}
 	
-	private function buildInsertTrigger(Table $table) {
+	private function buildInsertTrigger(Table $table) : void {
 		$this->logger->debug ( "START" );
 		$trigger = $this->buildTrigger($table, "insert");
 		$table->setTriggerInsert($trigger);
 		$this->logger->debug ( "FINISH" );
 	}
 	
-	private function buildUpdateTrigger(Table $table) {
+	private function buildUpdateTrigger(Table $table) : void {
 		$this->logger->debug ( "START" );
 		$trigger = $this->buildTrigger($table, "update");
 		$table->setTriggerUpdate($trigger);
 		$this->logger->debug ( "FINISH" );
 	}
 	
-	private function buildTrigger(Table $table, $typeTrigger='insert') {
+	private function buildTrigger(Table $table, $typeTrigger='insert') : Trigger {
 		$this->logger->debug ( "START" );
 		$trigger = new Trigger();
 		$trigger_name = "after_insert";
@@ -315,7 +313,6 @@ class MetadataCreator {
 			$operation = "UPDATE";
 		}
 		$trigger->setName($table->getName() . $trigger_name);
-		//$sql = "CREATE TRIGGER `t1_after_upd_trig` AFTER UPDATE ON `t1` FOR EACH ROW BEGIN\n"
 		
 		$ddl = sprintf("CREATE TRIGGER %s AFTER " . $operation . " ON %s", $trigger->getName(), $table->getName());
 		$ddl .= sprintf("\n FOR EACH ROW BEGIN\n insert into %s (", $table->getTableJrnj()->getName());

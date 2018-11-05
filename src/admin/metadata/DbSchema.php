@@ -1,5 +1,5 @@
 <?php
-
+declare ( strict_types = 1 );
 namespace clintrials\admin\metadata;
 
 class DbSchema extends MetaGeneral {
@@ -8,18 +8,18 @@ class DbSchema extends MetaGeneral {
 	/**
 	 * @return Table $tables
 	 */
-	public function getTables() {
+	public function getTables() : array {
 		return $this->tables;
 	}
 
 	/**
 	 * @param multitype: $tables
 	 */
-	public function setTables($tables) {
+	public function setTables(array $tables) : void {
 		$this->tables = $tables;
 	}
 	
-	public function getWholeDdl() {
+	public function getWholeDdl() : string {
 		$ddlWhole = "";
 		$ddlWhole .= $this->ddl . PHP_EOL;
 		foreach ( $this->tables as $table ) {
@@ -37,11 +37,13 @@ class DbSchema extends MetaGeneral {
 	 * @param $name - string name of table
 	 * @return Table: obj if exists or null if not exists
 	 */
-	public function getTable($name) {
+	public function getTable(string $table_name) : Table {
 		$table = null;
 		foreach($this->tables as $t){
-			$table = $t;
-			break;
+			if($t->getName() == $table_name){
+				$table = $t;
+				break;
+			}
 		}
 		return $table;
 	}

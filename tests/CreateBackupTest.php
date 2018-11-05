@@ -75,6 +75,7 @@ class CreateBackupTest extends TestCase {
 		$tables = $db->getTables ();
 		$tablePatient = $this->db->getTable('clin_test_patient');
 		$this->assertNotNull($tablePatient);
+		$this->assertSame('clin_test_patient', $tablePatient->getName());
 		$this->assertTrue($ddlExecutor->tableExists($tablePatient->getName()));
 		
 		$this->assertTrue($this->insertRowTo_clin_test_patient());

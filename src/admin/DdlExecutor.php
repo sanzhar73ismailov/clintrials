@@ -1,5 +1,5 @@
 <?php
-
+declare ( strict_types = 1 );
 namespace clintrials\admin;
 
 use clintrials\admin\metadata\Table;
@@ -35,7 +35,7 @@ class DdlExecutor {
 		}
 		$this->logger->trace("FINISH");
 	}
-	function createDb() {
+	function createDb() : bool {
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -50,7 +50,7 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function dropDb() {
+	function dropDb() : bool {
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -65,7 +65,7 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function dbExists() {
+	function dbExists() : bool {
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -82,14 +82,14 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function tableJournalExists($table_name) {
+	function tableJournalExists(string $table_name) : bool {
 		$this->logger->trace("START");
 		$result = $this->tableExists($table_name . "_jrnl");
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
 	
-	function tableExists($table_name) {
+	function tableExists(string $table_name) : bool {
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -107,7 +107,7 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function getRowsCount($table_name) {
+	function getRowsCount(string $table_name) : int {
 		$this->logger->trace("START");
 		$result = 0;
 		try {
@@ -125,11 +125,11 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function triggerExists(Trigger $trigger) {
+	function triggerExists(Trigger $trigger) : bool {
 		return $this->triggerExistsByName($trigger->getName());
 	}
 	
-	function triggerExistsByName($trigger_name) {
+	function triggerExistsByName($trigger_name) : bool {
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -148,14 +148,14 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function createTrigger(Trigger $trigger) {
+	function createTrigger(Trigger $trigger) : bool {
 		$this->logger->trace("START");
 		$result = $this->runSql($trigger->getDdl());
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
 	
-	function runSql($sql) {
+	function runSql($sql) : bool {
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -168,15 +168,15 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function createTable(Table $table) {
+	function createTable(Table $table) : bool {
 		return $this->createTableFromDdl($table->getDdl());
 	}
 	
-	function createTableJrnl(Table $table) {
+	function createTableJrnl(Table $table) : bool {
 		return $this->createTableFromDdl($table->getTableJrnj()->getDdl());
 	}
 	
-	function createTableFromDdl($ddl) {
+	function createTableFromDdl(string $ddl) : bool{
 		$this->logger->trace("START");
 		$result = false;
 		try {
@@ -192,7 +192,7 @@ class DdlExecutor {
 		return $result;
 	}
 	
-	function createDbWhole() {
+	function createDbWhole() : void {
 		if ($this->createDb ()) {
 			echo "Database " . $this->db->name . " created successfully<br>";
 		} else {

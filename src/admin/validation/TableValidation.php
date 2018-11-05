@@ -1,5 +1,5 @@
 <?php
-
+declare ( strict_types = 1 );
 namespace clintrials\admin\validation;
 
 use clintrials\admin\metadata\Table;
@@ -7,11 +7,11 @@ use clintrials\admin\metadata\Table;
 class TableValidation {
 		private $table;
 		private $tableMetaFromDb;
-		public function __construct($table, $tableMetaFromDb) {
+		public function __construct(Table $table, TableMetaFromDb $tableMetaFromDb) {
 			$this->table = $table;
 			$this->tableMetaFromDb = $tableMetaFromDb;
 		}
-		public function validate() {
+		public function validate() : ValidationResult {
 			$validationResult = new ValidationResult ();
 			$table = $this->table;
 			$tableMetaFromDb = $this->tableMetaFromDb;

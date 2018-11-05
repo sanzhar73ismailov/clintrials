@@ -1,5 +1,5 @@
 <?php
-
+declare ( strict_types = 1 );
 namespace clintrials\admin\metadata;
 
 class Field extends MetaGeneral {
@@ -9,7 +9,7 @@ class Field extends MetaGeneral {
 	private $null = false; // null is possible
 	private $default = null;
 	
-	public function __construct($name, $comment, $type){
+	public function __construct(string $name, string $comment, string $type){
 		$this->name = $name;
 		$this->comment = $comment;
 		$this->type = $type;
@@ -19,7 +19,7 @@ class Field extends MetaGeneral {
 	 *
 	 * @return $type
 	 */
-	public function getType() {
+	public function getType() : string {
 		return $this->type;
 	}
 	
@@ -27,19 +27,19 @@ class Field extends MetaGeneral {
 	 *
 	 * @param $type
 	 */
-	public function setType($type) {
+	public function setType(string $type) {
 		$this->type = $type;
 	}
 	
-	public function getPk() {
+	public function getPk() : bool {
 		return $this->pk;
 	}
 
-	public function getService() {
+	public function getService() : bool {
 		return $this->service;
 	}
 
-	public function getNull() {
+	public function getNull() : bool {
 		return $this->null;
 	}
 
@@ -47,23 +47,23 @@ class Field extends MetaGeneral {
 		return $this->default;
 	}
 
-	public function setPk($pk) {
+	public function setPk(bool $pk) : void {
 		$this->pk = $pk;
 	}
 
-	public function setService($service) {
+	public function setService(bool $service) : void{
 		$this->service = $service;
 	}
 
-	public function setNull($null) {
+	public function setNull(bool $null) : void {
 		$this->null = $null;
 	}
 
-	public function setDefault($default) {
+	public function setDefault(string $default) : void {
 		$this->default = $default;
 	}
 
-	public function cloneField(){
+	public function cloneField() : Field {
 		$field = new Field($this->name, $this->comment, $this->type);
 		$field->ddl = $this->ddl;
 		$field->pk = $this->pk;
