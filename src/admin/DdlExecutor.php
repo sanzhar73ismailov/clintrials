@@ -2,20 +2,20 @@
 declare ( strict_types = 1 );
 namespace clintrials\admin;
 
-use clintrials\admin\metadata\Table;
 use Logger;
 use PDO;
 use PDOException;
-use clintrials\admin\metadata\DbSchema;
-//use phpDocumentor\Reflection\Types\String_;
-use clintrials\admin\metadata\Trigger;
-use clintrials\admin\validation\TableMetaFromDb;
-use clintrials\admin\validation\TableValidation;
-use clintrials\admin\validation\FieldMetaFromDb;
+use clintrials\admin\metadata\ {
+	DbSchema,
+	Table,
+	Trigger
+};
+use clintrials\admin\validation\ {
+	TableMetaFromDb,
+    TableValidation,
+    FieldMetaFromDb
+};
 
-//Logger::configure("configs/" . LOG_SET_FILE);
-//include_once 'config.php';
-//include_once 'DbSchema.php';
 class DdlExecutor {
 	private $logger;
 	private $db;
@@ -296,8 +296,5 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
-	
-
 }
-
 ?>

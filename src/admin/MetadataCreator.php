@@ -5,11 +5,13 @@ namespace clintrials\admin;
 use Exception;
 use Logger;
 use SimpleXMLElement;
-use clintrials\admin\metadata\DbSchema;
-use clintrials\admin\metadata\Table;
-use clintrials\admin\metadata\Field;
-use clintrials\admin\metadata\TableJrnl;
-use clintrials\admin\metadata\Trigger;
+use clintrials\admin\metadata\{
+	DbSchema,
+	Table,
+	Field,
+	TableJrnl,
+	Trigger
+};
 
 libxml_use_internal_errors ( true );
 class MetadataCreator {

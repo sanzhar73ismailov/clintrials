@@ -11,10 +11,11 @@ class CreateBackupTest extends TestCase {
 	private $metadataCreator;
 	private $db;
 
-	public function __construct() {
-		$this->logger = Logger::getLogger ( __CLASS__ );
-	}
+	//public function __construct() {
+		
+	//}
 	public function setUp() {
+		$this->logger = Logger::getLogger ( __CLASS__ );
 		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
 		$this->createDb ();
 		$this->createTablesAndTriggers ();
@@ -66,8 +67,7 @@ class CreateBackupTest extends TestCase {
         return $ddlExecutor->runSql($query);
 	}
 	
-	
-	public function testCreateBackup(){
+	public function testCreateBackup() : void{
 		$this->logger->debug ( "START" );
 		$ddlExecutor = new DdlExecutor ( $this->db );
 		

@@ -20,8 +20,7 @@ class DbSchema extends MetaGeneral {
 	}
 	
 	public function getWholeDdl() : string {
-		$ddlWhole = "";
-		$ddlWhole .= $this->ddl . PHP_EOL;
+		$ddlWhole = $this->ddl . PHP_EOL;
 		foreach ( $this->tables as $table ) {
 			$ddlWhole .= $table->getDdl() . PHP_EOL . PHP_EOL;
 		}
