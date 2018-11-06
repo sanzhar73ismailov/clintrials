@@ -13,12 +13,9 @@ class TempTest extends TestCase {
 	private $logger;
 	private $metadataCreator;
 	
-	public function __construct() {
-		$this->logger = Logger::getLogger(__CLASS__);
-	}
-	
 	public function setUp(){
-		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
+		$this->logger = Logger::getLogger(__CLASS__);
+		$this->metadataCreator = new MetadataCreator ( ClinTrialsTestHelper::TEST_XML );
 	}
 	public function tearDown() {
 		$this->metadataCreator = null;
@@ -86,16 +83,6 @@ class TempTest extends TestCase {
 		$this->assertTrue ( $ddlExecutor->triggerExists($trigger) );
 		
 		$this->logger->debug ( "result=" . $result );
-		
-		/*
-		if ($result->num_rows > 0) {
-				while($row = $result->fetch_assoc()) {
-				$this->logger->debug (  "id: " . $row["id"] . " - f1: " . $row["f1"] . "<br>" . PHP_EOL);
-			}
-		} else {
-			echo "0 results";
-		}
-		*/
 		$conn->close();
 		$this->logger->debug ( "FINISH" );
 	}

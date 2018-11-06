@@ -11,12 +11,9 @@ class CreateBackupTest extends TestCase {
 	private $metadataCreator;
 	private $db;
 
-	//public function __construct() {
-		
-	//}
 	public function setUp() {
 		$this->logger = Logger::getLogger ( __CLASS__ );
-		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
+		$this->metadataCreator = new MetadataCreator ( ClinTrialsTestHelper::TEST_XML );
 		$this->createDb ();
 		$this->createTablesAndTriggers ();
 		
@@ -62,8 +59,8 @@ class CreateBackupTest extends TestCase {
 		$ddlExecutor = new DdlExecutor ( $this->db );
 		$randPatId = rand(1,100);
 		$randVisitId = rand(100,500);
-		$query = "INSERT INTO   clin_test_patient( id, patient_id, visit_id, code, sex_id, doctor, checked, row_stat, user_insert, user_update)" 
-                 ." VALUE (null, $randPatId, $randVisitId, 'sdsds', 2, 'doctor fio', 0, 1, 'user1', 'user1')";
+		$query = "INSERT INTO   clin_test_patient( id, code, sex_id, doctor, checked, row_stat, user_insert, user_update)" 
+                 ." VALUE (null, $randPatId, 2, 'doctor fio', 0, 1, 'user1', 'user1')";
         return $ddlExecutor->runSql($query);
 	}
 	

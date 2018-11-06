@@ -15,12 +15,8 @@ use PHPUnit\Framework\TestCase;
 class TableValidatorTest extends TestCase {
 	private $logger;
 	
-	public function __construct() {
-		$this->logger = Logger::getLogger(__CLASS__);
-	}
-	
 	public function setUp(){
-		
+		$this->logger = Logger::getLogger(__CLASS__);
 	}
 	
 	public function getTableValidationEqual() {

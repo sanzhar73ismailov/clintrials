@@ -9,14 +9,14 @@ class DdlValidateTest extends TestCase {
 	private $logger;
 	private $metadataCreator;
 	private $db;
-	public function __construct() {
-		$this->logger = Logger::getLogger ( __CLASS__ );
-	}
+	
 	public function setUp() {
-		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
+		$this->logger = Logger::getLogger ( __CLASS__ );
+		$this->metadataCreator = new MetadataCreator ( ClinTrialsTestHelper::TEST_XML );
 		$this->createDb ();
 		$this->createTablesAndTriggers ();
 	}
+
 	public function createDb() {
 		$this->db = $this->metadataCreator->getDb ();
 		$ddlExecutor = new DdlExecutor ( $this->db );
@@ -27,9 +27,11 @@ class DdlValidateTest extends TestCase {
 		$this->assertFalse ( $ddlExecutor->dbExists () );
 		$this->assertTrue ( $ddlExecutor->createDb () );
 	}
+
 	public function tearDown() {
 		$this->metadataCreator = null;
 	}
+
 	public function createTablesAndTriggers() {
 		$this->logger->debug ( "START" );
 		$ddlExecutor = new DdlExecutor ( $this->db );
@@ -56,6 +58,7 @@ class DdlValidateTest extends TestCase {
 		
 		$this->logger->debug ( "FINISH" );
 	}
+	
 	public function testValidate() {
 		$this->logger->debug ( "START" );
 		$ddlExecutor = new DdlExecutor ( $this->db );

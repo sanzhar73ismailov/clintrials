@@ -5,16 +5,11 @@ use clintrials\admin\metadata\DbSchema;
 
 require_once "configs/app_prop_test.php";
 
-class A{
-	public $field1;
-	
-}
-
 class MetadataCreatorTest extends TestCase {
 	private $logger;
 	
-	public function __construct() {
-		$this->logger = Logger::getLogger(__CLASS__);
+	public function setUp() {
+		$this->logger = Logger::getLogger ( __CLASS__ );
 	}
 	
 	public function testCreateDb() {
@@ -26,7 +21,7 @@ class MetadataCreatorTest extends TestCase {
 		
 		$this->assertTrue(strpos(DB_NAME, "test") !== false);
 		
-		$metadataCreator = new MetadataCreator ("tests/clintrials_test.xml");
+		$metadataCreator = new MetadataCreator (ClinTrialsTestHelper::TEST_XML);
 		$this->assertNotNull($metadataCreator);
 		$this->assertNotNull($metadataCreator->getXmlObj());
 		$this->assertNotNull($metadataCreator->getDb());

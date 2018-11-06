@@ -87,8 +87,14 @@ class MetadataCreator {
 		$table->setName ( $this->getXmlObj ()->prefix . "_" . $investigation ['name'] );
 		$table->setComment ( $investigation->title->__toString () );
 		$table->addField ( $this->buildPkField ( 'id' ) );
-		$table->addField ( $this->fillField ( 'patient_id', 'Пациент', 'int' ) );
-		$table->addField ( $this->fillField ( 'visit_id', 'Визит', 'int' ) );
+		if($investigation ['name'] == 'patient') {
+			$table->setPatient(true);
+		}
+		if(!$table->isPatient()) {
+			$table->addField ( $this->fillField ( 'patient_id', 'Пациент', 'int' ) );
+			$table->addField ( $this->fillField ( 'visit_id', 'Визит', 'int' ) );
+		}
+		
 		foreach ( $investigation->fields->children () as $fieldArray ) {
 			$table->addField ( $this->fillFieldFromArray ( $fieldArray ) );
 		}
@@ -103,6 +109,7 @@ class MetadataCreator {
 	}
 	private function fillJrnlTable(Table $table) : TableJrnl {
 		$tableJrnl = new TableJrnl ( $table );
+		$tableJrnl->setPatient($table->isPatient());
 		$tableJrnl->setName($table->getName() . '_jrnl');
 		$tableJrnl->addField ( $this->buildPkField ( "jrnl_id" ) );
 		foreach ( $table->getFields () as $field ) {
@@ -221,10 +228,14 @@ class MetadataCreator {
 		
 		// UNIQUE KEY `patient_visit_uniq` (`patient_id`, `visit_id`),
 		if (!$table instanceof TableJrnl){
-			$ddl .= ",\n UNIQUE KEY `patient_visit_uniq` (patient_id, visit_id)";
+			if (!$table->isPatient()){
+				$ddl .= ",\n UNIQUE KEY `patient_visit_uniq` (patient_id, visit_id)";
+			}
 		}
-		$ddl .=  ",\n KEY `patient_id` (patient_id)";
-		$ddl .=  ",\n KEY `visit_id` (visit_id)";
+		if(!$table->isPatient()) {
+			$ddl .=  ",\n KEY `patient_id` (patient_id)";
+			$ddl .=  ",\n KEY `visit_id` (visit_id)";
+		}
 		
 		$ddl .= "\n) ENGINE=InnoDB\n";
 		$ddl .= "AUTO_INCREMENT=1 CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";

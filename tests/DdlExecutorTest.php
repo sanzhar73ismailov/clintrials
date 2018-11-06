@@ -12,24 +12,12 @@ class DdlExecutorTest extends TestCase {
 	private $logger;
 	private $metadataCreator;
 	
-	public function __construct() {
-		$this->logger = Logger::getLogger(__CLASS__);
-	}
-	
 	public function setUp(){
-		$this->metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
+		$this->logger = Logger::getLogger(__CLASS__);
+		$this->metadataCreator = new MetadataCreator ( ClinTrialsTestHelper::TEST_XML );
 	}
 	public function tearDown() {
 		$this->metadataCreator = null;
-	}
-	public function testPropsOfMetadataCreator() {
-		$this->logger->debug("START");
-		$this->assertNotNull($this->metadataCreator);
-		$this->assertNotNull($this->metadataCreator->getXmlObj());
-		$this->assertNotNull($this->metadataCreator->getDb());
-		$this->assertInstanceOf('SimpleXMLElement', $this->metadataCreator->getXmlObj());
-		$this->assertInstanceOf(DbSchema::class, $this->metadataCreator->getDb());
-		$this->logger->debug ( "FINISH" );
 	}
 	
 	public function testCreateDrobDb() {

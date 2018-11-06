@@ -10,6 +10,7 @@ use clintrials\admin\metadata\ {
 
 class Table extends MetaGeneral {
 	protected $fields = array ();
+	private $patient = false;
 	private $tableJrnj;
 	private $triggerInsert;
 	private $triggerUpdate;
@@ -35,6 +36,12 @@ class Table extends MetaGeneral {
 		foreach ( $fields as $field ) {
 			$this->fields [] = $field;
 		}
+	}
+	public function isPatient() : bool {
+		return $this->patient;
+	}
+	public function setPatient(bool $patient) : void {
+		$this->patient = $patient;
 	}
 	public function getFields() : array {
 		return $this->fields;

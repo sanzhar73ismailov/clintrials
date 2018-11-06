@@ -7,10 +7,8 @@ require_once "configs/app_prop_test.php";
 class HelloWorldTest extends TestCase {
 	private static $logger;
 	
-	public function __construct() {
-		// The __CLASS__ constant holds the class name, in our case "Foo".
-		// Therefore this creates a logger named "Foo" (which we configured in the config file)
-		$this->logger = Logger::getLogger(__CLASS__);
+	public function setUp() {
+		$this->logger = Logger::getLogger ( __CLASS__ );
 	}
 	
 	public function testSayHello() {
