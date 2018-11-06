@@ -23,24 +23,24 @@ $smarty->setCompileDir('templates_c/');
 $smarty->setConfigDir('configs/');
 $smarty->setCacheDir('cache/');
 
-$smarty->assign('name','Ned');
+
 
 //** un-comment the following line to show the debug console
 //$smarty->debugging = true;
 
-$smarty->display('index.tpl');
+
 
 //echo "<h1>Hi</h1>";
 //$log->debug("Hello World 2 - debug!");
 
 
-//include_once 'MetadataCreator.php';
-//include_once 'DdlExecutor.php';
-//$xmlObj = \simplexml_load_file ( "clintrials.xml" ) or die ( "Error: Cannot create object" );
+$metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
+$db = $metadataCreator->getDb();
 
-//$log->debug("defined(\"HOST\")=".defined("HOST"));
-//$metadataCreator = new MetadataCreator ( "clintrials.xml" );
-//$str = $metadataCreator->getDb()->getDdl();
+$smarty->assign('name','Ned');
+$smarty->assign('db',$db);
+
+
 // print_r($metadataCreator);
 //echo "<pre>dbDdl=$metadataCreator->getDb()->getDdl()</pre>";
 
@@ -50,4 +50,5 @@ $smarty->display('index.tpl');
 	//$ddlExecutor->createDbWhole ();
 //	$log->debug(( $ddlExecutor->dbExists () ));
 //}
-//$log->trace("FINISH");
+$smarty->display('index.tpl');
+$log->trace("FINISH");

@@ -14,6 +14,7 @@ use clintrials\admin\metadata\{
 };
 
 libxml_use_internal_errors ( true );
+
 class MetadataCreator {
 	private $logger;
 	private $xmlObj;
