@@ -4,6 +4,11 @@ namespace clintrials\admin;
 
 use Logger;
 use clintrials\admin\validation\ValidationResult;
+use clintrials\admin\metadata\ {
+	DbSchema,
+	Table,
+	Trigger
+};
 
 class ReportTable {
 	private $logger;
@@ -16,6 +21,7 @@ class ReportTable {
 	private $triggerUpdateExist= false;
 	private $tableValidationResult;
 	private $tableJrnlValidationResult;
+	private $reportTableValid = false;
 
 
 	function __construct() {
@@ -30,11 +36,11 @@ class ReportTable {
 		$this->logger = $logger;
 	}
 
-	public function getTable() {
+	public function getTable() : Table {
 		return $this->table;
 	}
 
-	public function setTable($table) {
+	public function setTable(Table $table) {
 		$this->table = $table;
 	}
 
@@ -101,5 +107,14 @@ class ReportTable {
 	public function setTableJrnlValidationResult($tableJrnlValidationResult) {
 		$this->tableJrnlValidationResult = $tableJrnlValidationResult;
 	}
+	public function getReportTableValid() {
+		return $this->reportTableValid;
+	}
 
+	public function setReportTableValid($reportTableValid) {
+		$this->reportTableValid = $reportTableValid;
+	}
+
+
+	
 }

@@ -2,9 +2,18 @@
 //echo date("d/m/Y") . "<br>";
 //namespace clintrials\admin;
 
-echo ('<br/>extension_loaded (\'fileinfo\')=' . extension_loaded ('fileinfo'));
 
-echo ('<br/>extension_loaded (\'gd\')=' . extension_loaded ('gd'));
+//echo ('<br/>extension_loaded (\'fileinfo\')=' . extension_loaded ('fileinfo'));
+
+//echo ('<br/>extension_loaded (\'gd\')=' . extension_loaded ('gd'));
+
+class A {
+	public $field1 = "";
+}
+
+$a = new A();
+var_dump($a);
+var_dump($a->field1);
 
 /*
 $array = array('qqq', 'www', 'eee');

@@ -16,7 +16,7 @@ class ReportDbTest extends TestCase {
 		$this->logger = Logger::getLogger ( __CLASS__ );
 		$this->metadataCreator = new MetadataCreator ( ClinTrialsTestHelper::TEST_XML );
 		$this->createDb ();
-		$this->createTablesAndTriggers ();
+		//$this->createTablesAndTriggers ();
 	}
 
 	public function tearDown() {
@@ -67,6 +67,10 @@ class ReportDbTest extends TestCase {
 		$this->logger->debug ( "START" );
 		$reportDb = new ReportDb();
 		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$reportTables = $reportDb->getReportTables();
+		foreach ($reportTables as $reportTable) {
+			$assertNotNull($reportTable->getTable());
+		}
 		$this->assertTrue(1==1);
 		$this->logger->debug ( "FINISH" );
 	}
