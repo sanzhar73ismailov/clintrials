@@ -13,7 +13,8 @@ use clintrials\admin\metadata\ {
 use clintrials\admin\validation\ {
 	TableMetaFromDb,
     TableValidation,
-    FieldMetaFromDb
+    FieldMetaFromDb,
+    ValidationResult
 };
 
 class DdlExecutor {
@@ -209,7 +210,7 @@ class DdlExecutor {
 	/**
 	 * Checks if table's metadata from XML and in DB are same
 	 */
-	function tableMatched(Table $table){
+	function tableMatched(Table $table) : ValidationResult {
 		$this->logger->trace("START");
 		$resultValidation = null;
 		$tableMetaFromDb = new TableMetaFromDb();

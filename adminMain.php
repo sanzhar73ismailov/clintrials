@@ -41,6 +41,8 @@ $smarty->assign('name','Ned');
 $smarty->assign('db',$db);
 
 
+
+
 // print_r($metadataCreator);
 //echo "<pre>dbDdl=$metadataCreator->getDb()->getDdl()</pre>";
 

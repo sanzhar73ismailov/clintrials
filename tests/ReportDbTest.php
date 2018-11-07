@@ -4,8 +4,10 @@ require_once "configs/app_prop_test.php";
 use PHPUnit\Framework\TestCase;
 use clintrials\admin\MetadataCreator;
 use clintrials\admin\DdlExecutor;
+use clintrials\admin\ReportDb;
 use clintrials\admin\metadata\Table;
-class DdlValidateTest extends TestCase {
+
+class ReportDbTest extends TestCase {
 	private $logger;
 	private $metadataCreator;
 	private $db;
@@ -21,8 +23,8 @@ class DdlValidateTest extends TestCase {
 		$this->metadataCreator = null;
 	}
 
-
-	public function createDb() {
+	public function createDb() : void {
+		$this->logger->debug ( "START" );
 		$this->db = $this->metadataCreator->getDb ();
 		$ddlExecutor = new DdlExecutor ( $this->db );
 		$this->logger->debug ( "\$this->metadataCreator->getDb()->getName()=" . $this->db->getName () );
@@ -31,10 +33,10 @@ class DdlValidateTest extends TestCase {
 		}
 		$this->assertFalse ( $ddlExecutor->dbExists () );
 		$this->assertTrue ( $ddlExecutor->createDb () );
+		$this->logger->debug ( "FINISH" );
 	}
 
-
-	public function createTablesAndTriggers() {
+	public function createTablesAndTriggers() : void {
 		$this->logger->debug ( "START" );
 		$ddlExecutor = new DdlExecutor ( $this->db );
 		$db = $this->db;
@@ -60,26 +62,18 @@ class DdlValidateTest extends TestCase {
 		
 		$this->logger->debug ( "FINISH" );
 	}
-	
-	public function testValidate() {
+
+	public function testCreateReport() : void {
 		$this->logger->debug ( "START" );
-		$ddlExecutor = new DdlExecutor ( $this->db );
-		$db = $this->db;
-		$tables = $db->getTables ();
-		$this->assertNotNull($this->db->getTable('clin_test_patient'));
-		$this->assertNotNull($this->db->getTable('clin_test_lab'));
-		$this->assertNotNull($this->db->getTable('clin_test_instrument'));
-		$this->assertTrue ( count ( $tables ) > 0 );
-		foreach ( $tables as $table ) {
-			
-			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName() ) );
-			$this->logger->debug ( "test table " . $table->getName () );
-			
-			$res = $ddlExecutor->tableMatched ( $table );
-			$this->logger->debug ( var_export ( $res, true ) );
-			$this->assertTrue ( $res->passed );
-			$this->assertTrue ( count ( $res->errors ) == 0 );
-		}
+		$reportDb = new ReportDb();
+		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$this->assertTrue(1==1);
 		$this->logger->debug ( "FINISH" );
 	}
+
+
+		//public static function createReport(MetadataCreator $metadataCreator, DdlExecutor $ddlExecutor) : ReportDb {
+
+	
+
 }
