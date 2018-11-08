@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use clintrials\admin\MetadataCreator;
 use clintrials\admin\DdlExecutor;
 use clintrials\admin\ReportDb;
+use clintrials\admin\ReportTable;
 use clintrials\admin\metadata\Table;
 
 class ReportDbTest extends TestCase {
@@ -63,21 +64,55 @@ class ReportDbTest extends TestCase {
 		$this->logger->debug ( "FINISH" );
 	}
 
-	public function testCreateReport() : void {
+	public function testCreateReportIfDbEmpty() : void {
 		$this->logger->debug ( "START" );
 		$reportDb = new ReportDb();
 		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
 		$reportTables = $reportDb->getReportTables();
 		foreach ($reportTables as $reportTable) {
-			$assertNotNull($reportTable->getTable());
+			$this->assertNotNull($reportTable->getTable());
+			$this->assertInstanceOf(ReportTable::class, $reportTable);
+			$this->assertFalse($reportTable->getTableExist());
+			$this->assertFalse($reportTable->getTableValid());
+			$this->assertFalse($reportTable->getTableJrnlExist());
+			$this->assertFalse($reportTable->getTableJrnlVaild());
+			$this->assertFalse($reportTable->getTriggerInsertExist());
+			$this->assertFalse($reportTable->getTriggerUpdateExist());
+			$this->assertNull($reportTable->getTableValidationResult());
+			$this->assertNull($reportTable->getTableJrnlValidationResult());
+			$this->assertFalse($reportTable->getReportTableValid());
+			
 		}
-		$this->assertTrue(1==1);
 		$this->logger->debug ( "FINISH" );
 	}
 
-
-		//public static function createReport(MetadataCreator $metadataCreator, DdlExecutor $ddlExecutor) : ReportDb {
-
-	
+	public function testCreateReportIfDbWithTables() : void {
+		$this->logger->debug ( "START" );
+		$this->createTablesAndTriggers ();
+		$reportDb = new ReportDb();
+		$this->logger->debug ( "start ReportDb::createReport" );
+		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$this->logger->debug ( "finish ReportDb::createReport" );
+		$reportTables = $reportDb->getReportTables();
+		foreach ($reportTables as $reportTable) {
+			//if($reportTable->getTable()->getName() != 'clin_test_lab') {
+			//	continue;
+			//}
+			$this->logger->debug ("reportTable for table: " . $reportTable->getTable()->getName() );
+			$this->assertNotNull($reportTable->getTable());
+			$this->assertInstanceOf(ReportTable::class, $reportTable);
+			$this->assertTrue($reportTable->getTableExist());
+			$this->assertTrue($reportTable->getTableValid());
+			$this->assertTrue($reportTable->getTableJrnlExist());
+			$this->assertTrue($reportTable->getTableJrnlVaild());
+			$this->assertTrue($reportTable->getTriggerInsertExist());
+			$this->assertTrue($reportTable->getTriggerUpdateExist());
+			$this->assertNotNull($reportTable->getTableValidationResult());
+			$this->assertNotNull($reportTable->getTableJrnlValidationResult());
+			$this->assertTrue($reportTable->getReportTableValid());
+			
+		}
+		$this->logger->debug ( "FINISH" );
+	}
 
 }
