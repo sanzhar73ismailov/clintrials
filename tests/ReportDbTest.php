@@ -81,7 +81,6 @@ class ReportDbTest extends TestCase {
 			$this->assertNull($reportTable->getTableValidationResult());
 			$this->assertNull($reportTable->getTableJrnlValidationResult());
 			$this->assertFalse($reportTable->getReportTableValid());
-			
 		}
 		$this->logger->debug ( "FINISH" );
 	}
