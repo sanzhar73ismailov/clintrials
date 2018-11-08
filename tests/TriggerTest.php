@@ -81,7 +81,7 @@ class TriggerTest extends TestCase{
     			continue;
     		}
     		$query .= $field->getName();
-    		$this->logger->debug ( "index=$index" );
+    		//$this->logger->debug ( "index=$index" );
     		$query .=  ($index+1) < count($fields) ? ',' : ''; 
     	}
     	$query .=") VALUE (";
@@ -128,7 +128,7 @@ class TriggerTest extends TestCase{
 		$randPatId = rand(1,100);
 		$randVisitId = rand(100,500);
 		$query = $this->buildInsertRow($table);;
-        return $ddlExecutor->runSql($query);
+        return $ddlExecutor->insertSql($query);
 	}
 
 	public function testTest() : void {
@@ -140,7 +140,7 @@ class TriggerTest extends TestCase{
 			$this->assertStringMatchesFormat("insert into %s(%s", $insertQuery);
 			$this->logger->debug ( '$insertQuery=' . $insertQuery );
 			$resInsert = $this->insertRowToTable($tables[0]);
-			$this->assertTrue($resInsert);
+			$this->assertTrue($resInsert > 0);
 		}
 		
 		

@@ -169,6 +169,26 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
+
+	function insertSql($sql) : int {
+		$this->logger->trace("START");
+		$lastInsertId = 0;
+		$this->conn->exec('USE ' . $this->db->getName());
+		$stmt = $this->conn->prepare($sql); 
+	    try { 
+	        $this->conn->beginTransaction(); 
+	        $stmt->execute( ); 
+	        $lastInsertId = (int) $this->conn->lastInsertId(); 
+	        $this->conn->commit(); 
+	       
+	    } catch(PDOExecption $e) { 
+	    	$lastInsertId = 0;
+	        $this->conn->rollback(); 
+	        $this->logger->error($e->getMessage(), $e);
+	    } 
+		$this->logger->trace("FINISH, return lastInsertId = " . $lastInsertId);
+		return $lastInsertId;
+	}
 	
 	function createTable(Table $table) : bool {
 		return $this->createTableFromDdl($table->getDdl());
