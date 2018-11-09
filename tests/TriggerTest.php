@@ -15,18 +15,21 @@ class TriggerTest extends TestCase{
 	private $logger;
 	private $metadataCreator;
 	private $db;
+	private $ddlExecutor;
 
     public function setUp() {
 		$this->logger = Logger::getLogger ( __CLASS__ );
 		$this->metadataCreator = new MetadataCreator ( ClinTrialsTestHelper::TEST_XML );
+		$this->ddlExecutor = new DdlExecutor ( $this->metadataCreator->getDb () );
 		$this->createDb ();
 		$this->createTablesAndTriggers ();
+		
 	}
 
 	public function createDb() : void {
 		$this->logger->debug ( "START" );
 		$this->db = $this->metadataCreator->getDb ();
-		$ddlExecutor = new DdlExecutor ( $this->db );
+		$ddlExecutor = $this->ddlExecutor;
 		$this->logger->debug ( "\$this->metadataCreator->getDb()->getName()=" . $this->db->getName () );
 		if ($ddlExecutor->dbExists ()) {
 			$ddlExecutor->dropDb ();
@@ -38,7 +41,7 @@ class TriggerTest extends TestCase{
 
 	public function createTablesAndTriggers() : void {
 		$this->logger->debug ( "START" );
-		$ddlExecutor = new DdlExecutor ( $this->db );
+		$ddlExecutor = $this->ddlExecutor;
 		$db = $this->db;
 		$tables = $db->getTables ();
 		foreach ( $tables as $table ) {
@@ -123,29 +126,144 @@ class TriggerTest extends TestCase{
     	return $query;
     }	
 
+    private function buildUpdateRow (Table $table, $id) : string {
+    	$query = "update " . $table->getName() . " set ";
+    	$fields = $table->getFields();
+    	foreach ($fields as $index=>$field) {
+    		if($field->getPk()) {
+    			continue;
+    		}
+    		//$query .= $field->getName();
+    		$val = "";
+    		switch ($field->getType ()) {
+				case "date" :
+					$val .= sprintf("%s-%s-%s", rand(1900,2018),rand(1,12),rand(1,28));
+					break;
+				case "float" :
+					$val .= sprintf("%s.%s", rand(1,200),rand(1,9));
+					break;
+				case "text" :
+					$val .= $this->generateRandomString(100) ;
+					break;
+				case "varchar" :
+					$val .= $this->generateRandomString(50) ;
+					break;
+				case "timestamp" :
+					$val .= date('Y-m-d H:i:s', strtotime('now'));
+					break;
+				case "int" :
+				case "integer" :
+				case "list" :
+				case "boolean" :
+					$val .= rand(1,100000);
+					break;
+				default :
+					throw new Exception ( "type of field is unknown: " . $field->getType () );
+			}
+    		$query .= $field->getName() . "='" . $val . "'";
+    		$query .=  ($index+1) < count($fields) ? ',' : ''; 
+    	}
+    	$query .=" where id='$id'";
+    	return $query;
+    }	
+
     private function insertRowToTable(Table $table){
-		$ddlExecutor = new DdlExecutor ( $this->db );
+		
 		$randPatId = rand(1,100);
 		$randVisitId = rand(100,500);
 		$query = $this->buildInsertRow($table);;
-        return $ddlExecutor->insertSql($query);
+        return $this->ddlExecutor->insertSql($query);
 	}
 
-	public function testTest() : void {
+	public function testInsertTriggers() : void {
 		$this->logger->debug ( "START" );
 		$db = $this->db;
 		$tables = $db->getTables ();
-		for ($i=0; $i < 10; $i++) { 
-			$insertQuery = $this->buildInsertRow($tables[0]);
-			$this->assertStringMatchesFormat("insert into %s(%s", $insertQuery);
-			$this->logger->debug ( '$insertQuery=' . $insertQuery );
-			$resInsert = $this->insertRowToTable($tables[0]);
-			$this->assertTrue($resInsert > 0);
-		}
-		
-		
 		foreach ( $tables as $table ) {
+			for ($i=0; $i < 10; $i++) { 
+				//$table = $tables[0];
+				$insertQuery = $this->buildInsertRow($table);
+				$this->assertStringMatchesFormat("insert into %s(%s", $insertQuery);
+				$this->logger->debug ( '$insertQuery=' . $insertQuery );
+				$insertId = $this->insertRowToTable($table);
 
+				$this->assertTrue($insertId > 0);
+
+				$row = $this->ddlExecutor->getRowById($table->getName(), 'id', $insertId);
+				$this->assertNotNull($row);
+				$this->assertTrue(is_array($row));
+				$this->assertGreaterThan(0, $row);
+
+		        $rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnj()->getName(), $insertId);
+		        $this->assertNotNull($rowJrnl);
+		        $this->assertEquals(1, $rowJrnl['insert_ind']);
+				$this->assertTrue(is_array($rowJrnl));
+				$this->assertGreaterThan(0, $rowJrnl);
+				foreach ($row as $key => $value) {
+					$this->assertEquals($value, $rowJrnl[$key]);
+					//$this->logger->debug ( " $key => $value" );
+				}
+			}
+		}
+		$this->logger->debug ( "FINISH" );
+	}
+
+	public function testUpdateTriggers() : void {
+		$this->logger->debug ( "START" );
+		$db = $this->db;
+		$tables = $db->getTables ();
+		foreach ( $tables as $table ) {
+			for ($i=0; $i < 10; $i++) { 
+				
+				$insertQuery = $this->buildInsertRow($table);
+				$insertId = $this->insertRowToTable($table);
+				$this->assertTrue($insertId > 0);
+
+				$row = $this->ddlExecutor->getRowById($table->getName(), 'id', $insertId);
+				$this->assertNotNull($row);
+				$this->assertTrue(is_array($row));
+				$this->assertGreaterThan(0, $row);
+				
+				
+				$updateQuery = $this->buildUpdateRow($table, $insertId);
+				$this->logger->debug ( '$updateQuery=' . $updateQuery );
+				$this->assertStringMatchesFormat("update %s set %s where id='%i'", $updateQuery);
+				
+				$this->assertTrue($this->ddlExecutor->runSql($updateQuery));
+
+				$row = $this->ddlExecutor->getRowById($table->getName(), 'id', $insertId);
+				$this->assertNotNull($row);
+				$this->assertTrue(is_array($row));
+				$this->assertGreaterThan(0, $row);
+
+				$rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnj()->getName(), $insertId);
+		        $this->assertNotNull($rowJrnl);
+		        $this->assertEquals(0, $rowJrnl['insert_ind']);
+				$this->assertTrue(is_array($rowJrnl));
+				$this->assertGreaterThan(0, $rowJrnl);
+				foreach ($row as $key => $value) {
+					$this->assertEquals($value, $rowJrnl[$key]);
+					//$this->logger->debug ( " $key => $value" );
+				}
+
+				/*
+
+                $updateResult = $this->ddlExecutor->updateValue($table->getName(), {''}, $insertId);
+                updateValue(string $table_name, array $parameters, array $id_param) {
+
+
+		        $rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnj()->getName(), $insertId);
+		        $this->assertNotNull($rowJrnl);
+		        $this->assertEquals(1, $rowJrnl['insert_ind']);
+				$this->assertTrue(is_array($rowJrnl));
+				$this->assertGreaterThan(0, $rowJrnl);
+				foreach ($row as $key => $value) {
+					$this->assertEquals($value, $rowJrnl[$key]);
+					//$this->logger->debug ( " $key => $value" );
+				}
+
+				*/
+			}
 		}
 		
 		$this->assertTrue(1==1);

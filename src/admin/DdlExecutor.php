@@ -178,11 +178,10 @@ class DdlExecutor {
 	    try { 
 	        $this->conn->beginTransaction(); 
 	        $stmt->execute( ); 
-	        $lastInsertId = (int) $this->conn->lastInsertId(); 
+	        $result = (int) $this->conn->lastInsertId(); 
 	        $this->conn->commit(); 
-	       
+	        $lastInsertId = $result;
 	    } catch(PDOExecption $e) { 
-	    	$lastInsertId = 0;
 	        $this->conn->rollback(); 
 	        $this->logger->error($e->getMessage(), $e);
 	    } 
@@ -316,6 +315,62 @@ class DdlExecutor {
 		$query = sprintf("INSERT INTO %s SELECT * FROM %s", $bc_table_name, $table->getName());
 		$result = $this->runSql($query);
 		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+
+	function getRowById(string $table_name, string $pk_columns_name, $id) {
+		$query = "SELECT * FROM $table_name WHERE $pk_columns_name = :id ";
+		$parameters['id'] = $id;
+		$this->logger->trace("id=" . $id);
+		return $this->getSingleRow($query, $parameters);
+	}
+
+	function getLastRowFromJrnlById(string $table_name, $main_table_id) {
+		$query = "SELECT * FROM $table_name WHERE id = :id order by jrnl_id desc";
+		$parameters['id'] = $main_table_id;
+		$this->logger->trace("id=" . $id);
+		return $this->getSingleRow($query, $parameters);
+	}
+
+	function getSingleRow(string $query, array $parameters) {
+		$this->logger->trace("START");
+		$this->logger->trace("query: $query");
+		$this->logger->trace("parameters: " . var_export($parameters, true));
+		$result = false;
+		try {
+			$stmt = $this->conn->prepare($query);
+			$stmt->execute($parameters);
+			$result = $stmt->fetch (PDO::FETCH_ASSOC ) ;
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+			throw $e;
+		}
+		$this->logger->trace("FINISH, return " . var_export($result, true));
+		return $result;
+	}
+
+	function updateValue(string $table_name, array $parameters, array $id_param) {
+		$this->logger->trace("START");
+		$result = false;
+		$query = "UPDATE $table_name SET ";
+		$i = 0;
+		foreach ($parameters as $key => $value) {
+			$query .= sprintf("%s=':%s'", $key, $key);
+			if ($i < (count($parameters) - 1)) {
+				$query .= ',';
+			}
+			$i++;
+		}
+		$this->logger->trace("query: $query");
+		$this->logger->trace("parameters: " . var_export($parameters, true));
+		try {
+			$stmt = $this->conn->prepare($query);
+			$result = $stmt->execute($parameters);
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+			throw $e;
+		}
+		$this->logger->trace("FINISH, return " . $result );
 		return $result;
 	}
 }
