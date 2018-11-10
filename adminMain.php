@@ -3,8 +3,12 @@
 require __DIR__ . '/vendor/autoload.php';
 require_once "configs/app_prop.php";
 
-use clintrials\admin\DdlExecutor;
-use clintrials\admin\MetadataCreator;
+use clintrials\admin\{
+	DdlExecutor,
+    MetadataCreator,
+    ReportDb,
+    ReportTables
+};
 
 
 //$log = Logger::getRootLogger();
@@ -37,8 +41,11 @@ $smarty->setCacheDir('cache/');
 $metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
 $db = $metadataCreator->getDb();
 
-$smarty->assign('name','Ned');
-$smarty->assign('db',$db);
+$reportDb = ReportDb::createReport($metadataCreator, new DdlExecutor ( $db ));
+//$reportTables = $reportDb->getReportTables();
+
+//$smarty->assign('name','Ned');
+$smarty->assign('reportDb',$reportDb);
 
 
 

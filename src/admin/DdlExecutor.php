@@ -149,6 +149,30 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
+
+	function getTriggerStatementByName($trigger_name) : string {
+		$this->logger->trace("START");
+		$result = "";
+		try {
+			$this->conn->exec('USE ' . $this->db->getName());
+			//show triggers where `Trigger` like '%ns%' and `table`='T1'
+			$query = "show triggers where `Trigger` = '" . $trigger_name . "'";
+			$this->logger->trace("query=" . $query);
+			$stmt = $this->conn->prepare ( $query );
+			$stmt->execute ();
+			if ($row = $stmt->fetch ( PDO::FETCH_ASSOC )){
+				$this->logger->trace("in if !!!!!!!!!!!!: ");
+				$this->logger->trace("row=" . var_export($row, true));
+				$result = $row['Statement'];
+			}else{
+				$this->logger->trace("not in if ------");
+			}
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
 	
 	function createTrigger(Trigger $trigger) : bool {
 		$this->logger->trace("START");

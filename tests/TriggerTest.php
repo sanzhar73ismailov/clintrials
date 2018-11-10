@@ -175,7 +175,7 @@ class TriggerTest extends TestCase{
         return $this->ddlExecutor->insertSql($query);
 	}
 
-	public function testInsertTriggers() : void {
+	public function t_estInsertTriggers() : void {
 		$this->logger->debug ( "START" );
 		$db = $this->db;
 		$tables = $db->getTables ();
@@ -208,7 +208,7 @@ class TriggerTest extends TestCase{
 		$this->logger->debug ( "FINISH" );
 	}
 
-	public function testUpdateTriggers() : void {
+	public function t_estUpdateTriggers() : void {
 		$this->logger->debug ( "START" );
 		$db = $this->db;
 		$tables = $db->getTables ();
@@ -270,4 +270,39 @@ class TriggerTest extends TestCase{
 		$this->logger->debug ( "FINISH" );
 
 	}
+
+	public function testUpdateTriggers() : void {
+		$this->logger->debug ( "START" );
+		$this->assertTrue(true);
+		$tables = $this->db->getTables ();
+		foreach ( $tables as $table ) {
+			$this->checkTrigger($table->getTriggerInsert());
+			$this->checkTrigger($table->getTriggerUpdate());
+		
+		}
+		$this->logger->debug ( "FINISH" );
+	}
+
+	private function checkTrigger($trigger) : void {
+		    $triggerName = $trigger->getName();
+			$this->logger->debug ( "triggerName = " . $triggerName );
+			$this->assertNotNull($triggerName);
+			$statement = $this->ddlExecutor->getTriggerStatementByName($triggerName);
+			$this->logger->debug ( "Statement = " . $statement );
+			$this->assertNotEmpty($statement);
+			$this->assertNotNull($statement);
+			$this->logger->debug ('ddl: ' .  $trigger->getDdl() );
+
+			$this->logger->debug ( "Statement substr = " . $this->getBeginEndSubstr($statement) );
+			$ddlTrigSubstr = $this->getBeginEndSubstr($trigger->getDdl());
+			$this->logger->debug ( "Ddl substr = " . $ddlTrigSubstr );
+
+			$this->assertEquals($ddlTrigSubstr, $statement);
+	}
+
+	private function getBeginEndSubstr($str){
+		$pos = strpos($str, "BEGIN");
+		return trim(substr($str, $pos));
+	}
+
 }
