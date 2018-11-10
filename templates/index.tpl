@@ -18,6 +18,7 @@
 			<th>Comment</th>
 			<th>DDL</th>
 			<th>Valid</th>
+			<th>Valid Rusults</th>
 		</tr>
 	{foreach from=$reportDb->getReportTables() item=reportTable}
         <tr>
@@ -35,8 +36,8 @@
 				$tableJrnlVaild= {$reportTable->getTableJrnlVaild()};
 				$triggerInsertExist= {$reportTable->getTriggerInsertExist()};
 				$triggerUpdateExist= {$reportTable->getTriggerUpdateExist()};
-				$tableValidationResult= {$reportTable->getTableValidationResult()};
-				$tableJrnlValidationResult= {$reportTable->getTableJrnlValidationResult()};
+				$tableValidationResult= {$reportTable->getTableValidationResult()->errors};
+				$tableJrnlValidationResult= {$reportTable->getTableJrnlValidationResult()->errors};
 				$reportTableValid = {$reportTable->getReportTableValid()};
 			    </pre>
 	    	</td>    

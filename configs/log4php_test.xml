@@ -3,13 +3,13 @@
 	<appender name="echoAppender" class="LoggerAppenderEcho">
 		<!-- <layout class="LoggerLayoutSimple" /> -->
 		<layout class="LoggerLayoutPattern">
-			<param name="conversionPattern" value="%-5level %date [%logger] %-5level %l %message%newline" />
+			<param name="conversionPattern" value="%-5level %date [%logger] %-5level %l %message%newline%ex" />
 		</layout>
 	</appender>
 
 	<appender name="fileAppender" class="LoggerAppenderFile">
 		<layout class="LoggerLayoutPattern">
-			<param name="conversionPattern" value="%-5level %date [%logger] %-5level %l %message%newline" />
+			<param name="conversionPattern" value="%-5level %date [%logger] %-5level %l %message%newline%ex" />
 		</layout>
 		<param name="file" value="logs/testsLog.log" />
 	</appender>

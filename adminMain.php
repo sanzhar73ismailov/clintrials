@@ -11,14 +11,14 @@ use clintrials\admin\{
 };
 
 
-//$log = Logger::getRootLogger();
+//$logger = Logger::getRootLogger();
 
-$log = Logger::getLogger('adminMain.php');
-$log->trace("START");
+$logger = Logger::getLogger('adminMain.php');
+$logger->trace("START");
 
 
-$log->debug("hoster_var=" . $hoster_var);
-$log->debug("Hello World - debug!");
+$logger->debug("hoster_var=" . $hoster_var);
+$logger->debug("Hello World - debug!");
 
 $smarty = new Smarty();
 
@@ -35,13 +35,15 @@ $smarty->setCacheDir('cache/');
 
 
 //echo "<h1>Hi</h1>";
-//$log->debug("Hello World 2 - debug!");
+//$logger->debug("Hello World 2 - debug!");
 
 
 $metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
 $db = $metadataCreator->getDb();
-
-$reportDb = ReportDb::createReport($metadataCreator, new DdlExecutor ( $db ));
+$ddlExecutor = new DdlExecutor ( $db );
+//$logger->trace("ddlExecutor=" . var_export($ddlExecutor, true));
+$reportDb = ReportDb::createReport($metadataCreator, $ddlExecutor);
+//$logger->debug(var_export($reportDb, true) );
 //$reportTables = $reportDb->getReportTables();
 
 //$smarty->assign('name','Ned');
@@ -57,7 +59,7 @@ $smarty->assign('reportDb',$reportDb);
 //if (0) {
 //	$ddlExecutor = new DdlExecutor ( $metadataCreator->getDb () );
 	//$ddlExecutor->createDbWhole ();
-//	$log->debug(( $ddlExecutor->dbExists () ));
+//	$logger->debug(( $ddlExecutor->dbExists () ));
 //}
 $smarty->display('index.tpl');
-$log->trace("FINISH");
+$logger->trace("FINISH");

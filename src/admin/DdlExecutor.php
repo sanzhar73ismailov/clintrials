@@ -94,9 +94,12 @@ class DdlExecutor {
 		$this->logger->trace("START");
 		$result = false;
 		try {
+			$this->logger->trace("***** 1");
 			$this->conn->exec('USE ' . $this->db->getName());
+			$this->logger->trace("***** 2");
 			$query = "show tables like '" . $table_name . "'";
-			$this->logger->trace("\$$query=" . $query);
+			$this->logger->trace("***** 3");
+			$this->logger->trace("\query=" . $query);
 			$stmt = $this->conn->prepare ( $query );
 			$stmt->execute ();
 			$row = $stmt->fetchAll ( PDO::FETCH_ASSOC );

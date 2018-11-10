@@ -41,35 +41,35 @@ class ReportDb {
 	        $reportTable->setTableExist($ddlExecutor->tableExists ($table->getName()));
 	        if (!$reportTable->getTableExist()) {
 	        	$reportTableValid  = false;
-	        	$logger->trace ( "reportTableValid  = false in 1" );
+	        	$logger->trace ( "reportTableValid  = false in 1) getTableExist" );
 	        } else {
 	        	$validationResult = $ddlExecutor->tableMatched ( $table );
 	        	$reportTable->setTableValidationResult($validationResult);
 	           	$reportTable->setTableValid($validationResult->passed);
 	           	if (!$validationResult->passed) {
 	           		$reportTableValid  = false;	
-	           		$logger->trace ( "reportTableValid  = false in 2" );
+	           		$logger->trace ( "reportTableValid  = false in 2) validationResult->passed" );
 	           	}
 	           	if ($ddlExecutor->triggerExists($table->getTriggerInsert())) {
 	           	  $reportTable->setTriggerInsertExist(true);
 	           	} else {
 	           	  	$reportTable->setTriggerInsertExist(false);
 	           	  	$reportTableValid  = false;	
-	           	  	$logger->trace ( "reportTableValid  = false in 3" );
+	           	  	$logger->trace ( "reportTableValid  = false in 3) getTriggerInsertExist" );
 	           	}
 	           	if ($ddlExecutor->triggerExists($table->getTriggerUpdate())) {
 	           		$reportTable->setTriggerUpdateExist(true);
 	           	} else {
 	           		$reportTable->setTriggerUpdateExist(false);
 	           		$reportTableValid  = false;	
-	           		$logger->trace ( "reportTableValid  = false in 4" );
+	           		$logger->trace ( "reportTableValid  = false in 4) getTriggerUpdateExist" );
 	           	}
 	        }
 
 	        $reportTable->setTableJrnlExist($ddlExecutor->tableExists ($table->getTableJrnj()->getName()));
 	        if (!$reportTable->getTableJrnlExist()) {
 	        	$reportTableValid  = false;	
-	        	$logger->trace ( "reportTableValid  = false in 5" );
+	        	$logger->trace ( "reportTableValid  = false in 5) getTableJrnlExist" );
 	        } else {
 	        	$validationResult = $ddlExecutor->tableMatched ( $table->getTableJrnj() );
 	        	$reportTable->setTableJrnlValidationResult($validationResult);
