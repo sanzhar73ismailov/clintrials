@@ -82,4 +82,5 @@ class DdlValidateTest extends TestCase {
 		}
 		$this->logger->debug ( "FINISH" );
 	}
+
 }

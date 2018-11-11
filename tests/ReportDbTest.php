@@ -114,4 +114,71 @@ class ReportDbTest extends TestCase {
 		$this->logger->debug ( "FINISH" );
 	}
 
+	public function testCreateReportIfDbIfColumnsInJournalTablesWasChanged() : void {
+		$this->logger->debug ( "START" );
+		$this->createTablesAndTriggers ();
+		$ddlExecutor = new DdlExecutor ( $this->db );
+		$reportDb = new ReportDb();
+		$this->logger->debug ( "start ReportDb::createReport" );
+		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$this->logger->debug ( "finish ReportDb::createReport" );
+		$reportTables = $reportDb->getReportTables();
+		$reportTable = $reportDb->getReportTableByTableName("clin_test_lab");
+		$this->assertNotNull($reportTable);
+		$this->assertNotNull($reportTable->getTable());
+		$this->assertInstanceOf(ReportTable::class, $reportTable);
+		$this->assertTrue($reportTable->getTableExist());
+		$this->assertTrue($reportTable->getTableValid());
+		$this->assertTrue($reportTable->getTableJrnlExist());
+		$this->assertTrue($reportTable->getTableJrnlVaild());
+		$this->assertTrue($reportTable->getTriggerInsertExist());
+		$this->assertTrue($reportTable->getTriggerUpdateExist());
+		$this->assertNotNull($reportTable->getTableValidationResult());
+		$this->assertNotNull($reportTable->getTableJrnlValidationResult());
+		$this->assertTrue($reportTable->getReportTableValid());
+
+		$updateQuery = "ALTER TABLE clin_test_lab_jrnl MODIFY COLUMN erythrocytes int(11) NOT NULL COMMENT 'Эритроциты'";
+		$this->logger->debug ('$updateQuery=' . $updateQuery);
+		$this->assertTrue($ddlExecutor->runSql($updateQuery));
+
+		$this->logger->debug ( "start ReportDb::createReport after column change in table: " . $reportTable->getTable()->getName()  );
+	    $reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$this->logger->debug ( "finish ReportDb::createReport after column change" );
+		$reportTables = $reportDb->getReportTables();
+		$reportTable = $reportDb->getReportTableByTableName("clin_test_lab");
+		$this->assertNotNull($reportTable);
+		$this->assertNotNull($reportTable->getTable());
+		$this->assertInstanceOf(ReportTable::class, $reportTable);
+		$this->assertTrue($reportTable->getTableExist());
+		$this->assertTrue($reportTable->getTableValid());
+		$this->assertTrue($reportTable->getTableJrnlExist());
+		$this->assertFalse($reportTable->getTableJrnlVaild());
+		$this->assertTrue($reportTable->getTriggerInsertExist());
+		$this->assertTrue($reportTable->getTriggerUpdateExist());
+		$this->assertNotNull($reportTable->getTableValidationResult());
+		$this->assertTrue($reportTable->getTableValidationResult()->passed);
+
+		$this->assertNotNull($reportTable->getTableJrnlValidationResult());
+		$this->assertFalse($reportTable->getTableJrnlValidationResult()->passed);
+		$this->assertTrue(count($reportTable->getTableJrnlValidationResult()->errors)>0);
+
+		$this->assertFalse($reportTable->getReportTableValid());
+		/*
+		$reprtTableFor_clin_test_lab_jrnl_Found = false;
+		foreach ($reportTables as $reportTable) {
+			if($reportTable->getTable()->getName() != 'clin_test_lab_jrnl') {
+				continue;
+			}
+			$reprtTableFor_clin_test_lab_jrnl_Found = true;
+			$this->logger->debug ("reportTable for table: " . $reportTable->getTable()->getName() );
+			
+
+			
+			
+		}
+		$tgis-assertTrue($reprtTableFor_clin_test_lab_jrnl_Found);
+		*/
+		$this->logger->debug ( "FINISH" );
+	}
+
 }

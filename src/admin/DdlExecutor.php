@@ -82,7 +82,24 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
-	
+
+	//select count(*) from information_schema.TABLES where TABLE_SCHEMA = <database-name>
+	function getTablesNumber() : int {
+		$this->logger->trace("START");
+		$result = 0;
+		try {
+			$query = "SELECT count(1) num FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" . $this->db->getName() . "'";
+			$stmt = $this->conn->prepare ( $query );
+			$stmt->execute ();
+			$row = $stmt->fetch( PDO::FETCH_ASSOC );
+			$result = (int) $row[num];
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+			throw $e;
+		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
 	function tableJournalExists(string $table_name) : bool {
 		$this->logger->trace("START");
 		$result = $this->tableExists($table_name . "_jrnl");

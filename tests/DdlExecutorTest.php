@@ -57,7 +57,15 @@ class DdlExecutorTest extends TestCase {
 		$this->assertTrue ($ddlExecutor->runSql($sql));
 		
 		$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
-		
+		$this->logger->debug ( "ddlExecutor->getTablesNumber()=".$ddlExecutor->getTablesNumber() );
+		$this->assertTrue ($ddlExecutor->getTablesNumber()==1);
+
+		$sql = "create table t2 (id int, name varchar(20))";
+		$this->assertTrue ($ddlExecutor->runSql($sql));
+		$sql = "create table t3 (id int, name varchar(20))";
+		$this->assertTrue ($ddlExecutor->runSql($sql));
+
+		$this->assertTrue ($ddlExecutor->getTablesNumber()==3);
 		$this->logger->debug ( "FINISH" );
 	}
 	

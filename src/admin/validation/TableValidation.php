@@ -3,8 +3,10 @@ declare ( strict_types = 1 );
 namespace clintrials\admin\validation;
 
 use clintrials\admin\metadata\Table;
+use Logger;
 
 class TableValidation {
+		private $logger;
 		private $table;
 		private $tableMetaFromDb;
 		public function __construct(Table $table, TableMetaFromDb $tableMetaFromDb) {
@@ -12,6 +14,7 @@ class TableValidation {
 			$this->tableMetaFromDb = $tableMetaFromDb;
 		}
 		public function validate() : ValidationResult {
+			$this->logger = Logger::getLogger(__CLASS__);
 			$validationResult = new ValidationResult ();
 			$table = $this->table;
 			$tableMetaFromDb = $this->tableMetaFromDb;
@@ -43,8 +46,19 @@ class TableValidation {
 			}
 			$columnsNameTypeCommentsXml = $table->getFieldNameTypeComments();
 			$columnsNameTypeCommentsDb = $tableMetaFromDb->getFieldNameTypeComments();
-			
+
+			$this->logger->debug("show columnsNameTypeCommentsXml for table " . $table->getName() );
+			foreach ($columnsNameTypeCommentsXml as $key => $value) {
+				$this->logger->trace("$key => $value");
+			}
+			$this->logger->debug("show columnsNameTypeCommentsXml end");
+			$this->logger->debug("show columnsNameTypeCommentsDb for table " . $table->getName() );
+			foreach ($columnsNameTypeCommentsDb as $key => $value) {
+				$this->logger->trace("$key => $value");
+			}
+			$this->logger->debug("show columnsNameTypeCommentsDb end");
 			$resultDiff = array_diff($columnsNameTypeCommentsXml, $columnsNameTypeCommentsDb);
+			$this->logger->debug('resultDiff=' . var_export($resultDiff,true));
 			if(count($resultDiff)){
 				$validationResult->passed = false;
 				$validationResult->errors [] = sprintf ( "XML has columns with types and comments %s that are not available in DB", implode(",", $resultDiff));
