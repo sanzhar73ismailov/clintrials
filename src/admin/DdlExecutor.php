@@ -238,6 +238,8 @@ class DdlExecutor {
 	}
 	
 	function createTableJrnl(Table $table) : bool {
+		$this->logger->trace("START ::: " . $table->getTableJrnj()->getName());
+		$this->logger->trace("Jrnl DDL ::: " . $table->getTableJrnj()->getDdl());
 		return $this->createTableFromDdl($table->getTableJrnj()->getDdl());
 	}
 	
@@ -417,5 +419,29 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result );
 		return $result;
 	}
+
+	public function addColumn(string $table_name, Field $field, string $after_column) : bool {
+		$this->logger->trace("START");
+		$result = false;
+		$query = sprintf("ALTER TABLE %s ADD %s AFTER %s", $table_name, $field);
+		$this->logger->trace("FINISH, return " . $result );
+		return $result;
+	}
+
+	public function changeColumn(string $table_name, string $column, Field $field) : bool {
+		$this->logger->trace("START");
+		$result = false;
+		$this->logger->trace("FINISH, return " . $result );
+		return $result;
+	}
+
+	public function dropColumn(string $table_name, string $column) : bool {
+		$this->logger->trace("START");
+		$result = false;
+		$this->logger->trace("FINISH, return " . $result );
+		return $result;
+	}
+
+
 }
 ?>

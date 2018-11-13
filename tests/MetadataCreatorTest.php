@@ -28,6 +28,10 @@ class MetadataCreatorTest extends TestCase {
 		$this->assertEquals(DB_NAME, $metadataCreator->getDb()->getName());
 		$this->assertInstanceOf('SimpleXMLElement', $metadataCreator->getXmlObj());
 		$this->assertInstanceOf(DbSchema::class, $metadataCreator->getDb());
+
+        
+
+
 		$this->logger->debug("FINISH");
 	}
 }

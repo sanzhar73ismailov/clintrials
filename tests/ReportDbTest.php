@@ -103,7 +103,19 @@ class ReportDbTest extends TestCase {
 			$this->assertTrue($reportTable->getTableExist());
 			$this->assertTrue($reportTable->getTableValid());
 			$this->assertTrue($reportTable->getTableJrnlExist());
+			
+
+			if(!$reportTable->getTableJrnlVaild()){
+				$this->logger->debug ("start show errors for: " . $reportTable->getTable()->getTableJrnj()->getName());
+				$this->logger->debug (var_export($reportTable->getTableJrnlValidationResult()->errors,true));
+				$this->logger->debug ("finish show errors for: " . $reportTable->getTable()->getTableJrnj()->getName());
+			}
 			$this->assertTrue($reportTable->getTableJrnlVaild());
+
+
+
+
+
 			$this->assertTrue($reportTable->getTriggerInsertExist());
 			$this->assertTrue($reportTable->getTriggerUpdateExist());
 			$this->assertNotNull($reportTable->getTableValidationResult());

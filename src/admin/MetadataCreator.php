@@ -113,16 +113,20 @@ class MetadataCreator {
 		$tableJrnl->setPatient($table->isPatient());
 		$tableJrnl->setName($table->getName() . '_jrnl');
 		$tableJrnl->addField ( $this->buildPkField ( "jrnl_id" ) );
+		$this->logger->trace ( "start clone fields from " . $table->getName() . " to " .  $tableJrnl->getName());
 		foreach ( $table->getFields () as $field ) {
-			if (0) {
-				$field = new Field ();
-			}
+			$jrnl_field = "";
+			$this->logger->trace ("clone " . $field->getName());
 			if ($field->getPk ()) {
-				$tableJrnl->addField ( $this->convertPkFieldToSimple ( $field ) );
+				$this->logger->trace ('is PK');
+				$jrnl_field = $this->convertPkFieldToSimple ( $field ) ;
 			} else {
-				$tableJrnl->addField ( $field->cloneField () );
+				$jrnl_field = $field->cloneField ();
 			}
+			$this->logger->trace ( var_export($jrnl_field, true) );
+			$tableJrnl->addField ( $jrnl_field);
 		}
+		$this->logger->trace ( "finish clone fields" );
 		$tableJrnl->addField ( $this->buildInsertField () );
 		return $tableJrnl;
 	}
@@ -174,6 +178,7 @@ class MetadataCreator {
 				continue;
 			}
 			$this->logger->debug ( "field=" . var_export ( $field, true ) );
+			/*
 			$ddl .= $field->getName () . "";
 			switch ($field->getType ()) {
 				case "date" :
@@ -212,7 +217,9 @@ class MetadataCreator {
 				}
 			}
 			$ddl .= " COMMENT '" . $field->getComment () . "',\n";
-		}
+			*/
+			$ddl .= $field->getDdl() . ",\n";
+			}
 		
 		/*
 		 * $ddl .= "checked INTEGER(1) NOT NULL DEFAULT '0' COMMENT 'Проверено монитором',\n";
@@ -258,6 +265,7 @@ class MetadataCreator {
 		$field->setComment( 'PK of src table' );
 		$field->setPk ( false );
 		$field->setNull ( false );
+		//$this->logger->trace ( var_export($field, true) );
 		return $field;
 	}
 	public function buildServiceFields() : array {
