@@ -47,20 +47,39 @@ class AlterTableTest extends TestCase {
 		
 		$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
 
-        $fieldNew = new Field("n1", "comment1", "int");
-        $fieldNew->setNull(false);
-		$this->assertTrue ( $ddlExecutor->addColumn ("t1", $fieldNew, "id" ) );
+        
 
-		$columnsFromDb = $ddlExecutor->getColumnsFromDb($this->db->getName(), 't1');
-		$this->assertTrue (is_array($columnsFromDb));
-		$this->assertTrue (count($columnsFromDb) > 0);
-		$this->logger->debug ( var_export($columnsFromDb, true) );
+        
 
-		$newColumn = $ddlExecutor->getColumnFromDb($this->db->getName(), 't1', 'n1');
-		$this->assertNotNull ($newColumn);
-        $this->assertEquals ((string) $fieldNew, (string) $newColumn);
 
-		//$this->logger->debug ( var_export($newColumn, true) );
+        for ($i=0; $i < 20; $i++) { 
+        	$this->assertContains(ClinTrialsTestHelper::getRandomType(), ['date', 'float', 'text', 'varchar', 'int', 'list', 'boolean', 'timestamp']);
+        }
+		
+
+        $prev_col = "id";
+        for ($i=0; $i < 10; $i++) { 
+        	$col_name = "n1" . ClinTrialsTestHelper::generateRandomString(10);
+	        $col_type = ClinTrialsTestHelper::getRandomType();
+	        $col_comment = "comment_" . ClinTrialsTestHelper::generateRandomString(rand(10, 100));
+	        $fieldNew = new Field($col_name, $col_comment, $col_type);
+
+	        $fieldNew->setNull(ClinTrialsTestHelper::getTrueOrFalse());
+			$this->assertTrue ( $ddlExecutor->addColumn ("t1", $fieldNew, $prev_col ) );
+
+
+			$columnsFromDb = $ddlExecutor->getColumnsFromDb($this->db->getName(), 't1');
+			$this->assertTrue (is_array($columnsFromDb));
+			$this->assertTrue (count($columnsFromDb) > 0);
+			$this->logger->debug ( var_export($columnsFromDb, true) );
+
+			$newColumn = $ddlExecutor->getColumnFromDb($this->db->getName(), 't1', $fieldNew->getName());
+			$this->assertNotNull ($newColumn);
+	        $this->assertEquals ((string) $fieldNew, (string) $newColumn);
+	        $prev_col = $fieldNew->getName();
+			//$this->logger->debug ( var_export($newColumn, true) );
+		 }
+		
 		$this->logger->debug ( "FINISH" );
 	}
 }

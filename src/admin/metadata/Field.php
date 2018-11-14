@@ -2,8 +2,10 @@
 declare ( strict_types = 1 );
 namespace clintrials\admin\metadata;
 
+use Exception;
+
 class Field extends MetaGeneral {
-	private $type; //date|float|text|varchar|int
+	private $type; //date|float|text|varchar|int|list|boolean|timestamp
 	private $pk = false;
 	private $service = false; // служенбное поле (типа user_insert или user_update, которое в каждой таблице есть)
 	private $null = true; // null is possible

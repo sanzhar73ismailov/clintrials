@@ -66,15 +66,7 @@ class TriggerTest extends TestCase{
 		$this->logger->debug ( "FINISH" );
 	}
 
-	private function generateRandomString($length = 10) {
-	    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	    $charactersLength = strlen($characters);
-	    $randomString = '';
-	    for ($i = 0; $i < $length; $i++) {
-	        $randomString .= $characters[rand(0, $charactersLength - 1)];
-	    }
-	    return $randomString;
-	}
+	
 
     private function buildInsertRow (Table $table) : string {
     	$query = "insert into " . $table->getName() . "(";
@@ -102,10 +94,10 @@ class TriggerTest extends TestCase{
 					$val .= sprintf("%s.%s", rand(1,200),rand(1,9));
 					break;
 				case "text" :
-					$val .= $this->generateRandomString(100) ;
+					$val .= $this->ClinTrialsTestHelper::generateRandomString(100) ;
 					break;
 				case "varchar" :
-					$val .= $this->generateRandomString(50) ;
+					$val .= $this->ClinTrialsTestHelper::generateRandomString(50) ;
 					break;
 				case "timestamp" :
 					$val .= date('Y-m-d H:i:s', strtotime('now'));
