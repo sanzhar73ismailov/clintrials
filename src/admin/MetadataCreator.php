@@ -254,6 +254,7 @@ class MetadataCreator {
 	public function buildPkField(string $name) : Field {
 		$pkField = new Field ( $name, 'PK', "int" );
 		$pkField->setPk ( true );
+		$pkField->setNull ( false );
 		return $pkField;
 	}
 

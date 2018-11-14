@@ -76,13 +76,7 @@ class Table extends MetaGeneral {
 	public function getFieldNameTypeComments() : array{
 		$columnNames = array();
 		foreach ( $this->fields as $field ) {
-			if (0) $field = new Field(0, 0, 0);
-			$type = strtolower($field->getType());
-			if($type=='list' or $type=='boolean'){
-				$type = 'int';
-			}
-			$columnNames [] = sprintf("%s-%s-%s", 
-					strtolower($field->getName ()), $type, $field->getComment());
+			$columnNames [] = (string) $field;
 		}
 		return $columnNames;
 	}

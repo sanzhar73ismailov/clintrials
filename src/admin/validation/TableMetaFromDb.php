@@ -16,9 +16,7 @@ class TableMetaFromDb {
 	public function getFieldNameTypeComments() : array {
 		$columnNames = array();
 		foreach ( $this->columns as $field ) {
-			if (0) $field = new FieldMetaFromDb(0, 0, 0);
-			$columnNames [] = sprintf("%s-%s-%s",
-					strtolower($field->column_name), strtolower($field->data_type), $field->column_comment);
+			$columnNames [] = (string) $field;
 		}
 		return $columnNames;
 	}

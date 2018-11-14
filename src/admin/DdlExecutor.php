@@ -8,7 +8,8 @@ use PDOException;
 use clintrials\admin\metadata\ {
 	DbSchema,
 	Table,
-	Trigger
+	Trigger,
+	Field
 };
 use clintrials\admin\validation\ {
 	TableMetaFromDb,
@@ -296,7 +297,7 @@ class DdlExecutor {
 		$columns = array();
 		$tableMetaFromDb = new TableMetaFromDb();
 		try {
-			$query = "SELECT t.COLUMN_NAME, t.DATA_TYPE, t.COLUMN_COMMENT " .
+			$query = "SELECT t.COLUMN_NAME, t.DATA_TYPE, t.COLUMN_COMMENT, t.IS_NULLABLE " .
 					" FROM INFORMATION_SCHEMA.columns t " .
 					" WHERE t.table_schema=:table_schema " .
 					" AND t.table_name=:table_name " .
@@ -309,7 +310,7 @@ class DdlExecutor {
 			$stmt->execute($parameters);
 			//$result = $stmt->fetchAll ( PDO::FETCH_ASSOC );
 			while ($row = $stmt->fetch () ) {
-				$columns [] = new FieldMetaFromDb ( $row ['COLUMN_NAME'], $row ['COLUMN_COMMENT'], $row ['DATA_TYPE'] );
+				$columns [] = new FieldMetaFromDb ( $row ['COLUMN_NAME'], $row ['COLUMN_COMMENT'], $row ['DATA_TYPE'], $row ['IS_NULLABLE'] == 'YES' );
 			}
 		} catch ( PDOException $e ) {
 			$this->logger->error ( "error", $e );
@@ -317,6 +318,18 @@ class DdlExecutor {
 		$this->logger->trace ( "FINISH, return \$columns" . var_export ( $columns, true ) );
 		return $columns;
 	}
+
+
+    function getColumnFromDb(string $dbName, string $tableName, string $columnName) {
+       $columns = $this->getColumnsFromDb($dbName, $tableName);
+       foreach ($columns as $column) {
+       	if($column->column_name == $columnName){
+       		return $column;
+       	}
+       }
+       return null;
+    }
+
 	function backupTable(Table $table) {
 		$result = false;
 		// if(1) return 1;
@@ -423,7 +436,9 @@ class DdlExecutor {
 	public function addColumn(string $table_name, Field $field, string $after_column) : bool {
 		$this->logger->trace("START");
 		$result = false;
-		$query = sprintf("ALTER TABLE %s ADD %s AFTER %s", $table_name, $field);
+		$query = sprintf("ALTER TABLE %s ADD %s AFTER %s", $table_name, $field->getDdl(), $after_column);
+		$this->logger->trace("query=" . $query );
+		$result = $this->runSql($query);
 		$this->logger->trace("FINISH, return " . $result );
 		return $result;
 	}

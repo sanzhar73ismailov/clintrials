@@ -6,7 +6,7 @@ class Field extends MetaGeneral {
 	private $type; //date|float|text|varchar|int
 	private $pk = false;
 	private $service = false; // служенбное поле (типа user_insert или user_update, которое в каждой таблице есть)
-	private $null = false; // null is possible
+	private $null = true; // null is possible
 	private $default = null;
 	
 	public function __construct(string $name, string $comment, string $type){
@@ -16,41 +16,41 @@ class Field extends MetaGeneral {
 	}
 
 	private function buildDdl() : string {
-		$ddl = $this->getName () . "";
+		$ddl = $this->getName () . " ";
 			switch ($this->getType ()) {
 				case "date" :
-					$ddl .= " DATE";
+					$ddl .= "DATE";
 					break;
 				case "float" :
-					$ddl .= " float(11,2)";
+					$ddl .= "FLOAT(11,2)";
 					break;
 				case "text" :
-					$ddl .= " text";
+					$ddl .= "TEXT";
 					break;
 				case "varchar" :
-					$ddl .= " varchar(50)";
+					$ddl .= "VARCHAR(50)";
 					break;
 				case "timestamp" :
-					$ddl .= " timestamp";
+					$ddl .= "TIMESTAMP";
 					break;
 				case "int" :
 				case "integer" :
 				case "list" :
 				case "boolean" :
-					$ddl .= " INTEGER(11)";
+					$ddl .= "INTEGER(11)";
 					break;
 				default :
 					throw new Exception ( "type of field is unknown: " . $this->getType () );
 			}
 			
 			if (! $this->getNull ()) {
-				$ddl .= " NOT NULL ";
+				$ddl .= " NOT NULL";
 			}
 			if ($this->getDefault () != null) {
 				if ($this->getType () == 'timestamp') {
-					$ddl .= " DEFAULT " . $this->getDefault () . " ";
+					$ddl .= " DEFAULT " . $this->getDefault () . "";
 				} else {
-					$ddl .= " DEFAULT '" . $this->getDefault () . "' ";
+					$ddl .= " DEFAULT '" . $this->getDefault () . "'";
 				}
 			}
 			$ddl .= " COMMENT '" . $this->getComment () . "'";
@@ -117,6 +117,16 @@ class Field extends MetaGeneral {
 		$field->null = $this->null;
 		$field->default = $this->default;
 		return $field;
+	}
+
+	public function __toString() {
+		$isNull =  $this->null ? 'is_nullable=YES' : 'is_nullable=NO';
+		$type = strtolower($this->type);
+		if($type=='list' or $type=='boolean'){
+				$type = 'int';
+		}
+		return sprintf("%s-%s-%s-%s", 
+					strtolower($this->name), $type, $this->comment, $isNull);
 	}
 	
 	

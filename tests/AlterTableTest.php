@@ -6,6 +6,7 @@ use clintrials\admin\MetadataCreator;
 use clintrials\admin\metadata\DbSchema;
 use clintrials\admin\DdlExecutor;
 use clintrials\admin\metadata\Table;
+use clintrials\admin\metadata\Field;
 
 
 class AlterTableTest extends TestCase {
@@ -45,7 +46,21 @@ class AlterTableTest extends TestCase {
 		$this->assertTrue ($ddlExecutor->runSql($sql));
 		
 		$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
-		
+
+        $fieldNew = new Field("n1", "comment1", "int");
+        $fieldNew->setNull(false);
+		$this->assertTrue ( $ddlExecutor->addColumn ("t1", $fieldNew, "id" ) );
+
+		$columnsFromDb = $ddlExecutor->getColumnsFromDb($this->db->getName(), 't1');
+		$this->assertTrue (is_array($columnsFromDb));
+		$this->assertTrue (count($columnsFromDb) > 0);
+		$this->logger->debug ( var_export($columnsFromDb, true) );
+
+		$newColumn = $ddlExecutor->getColumnFromDb($this->db->getName(), 't1', 'n1');
+		$this->assertNotNull ($newColumn);
+        $this->assertEquals ((string) $fieldNew, (string) $newColumn);
+
+		//$this->logger->debug ( var_export($newColumn, true) );
 		$this->logger->debug ( "FINISH" );
 	}
 }
