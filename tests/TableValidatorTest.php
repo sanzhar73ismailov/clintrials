@@ -110,6 +110,29 @@ class TableValidatorTest extends TestCase {
 		$tableValidation = new TableValidation($table, $tableMetaFromDb);
 		return $tableValidation;
 	}
+
+	public function getTableValidationColumnsOrderIsDifferent() {
+		$table = new Table();
+		$field1 = new Field("f1", "comment1", "int");
+		$field2 = new Field("f2", "comment2", "int");
+		$field3 = new Field("f3", "comment3", "int");
+
+		$table->addField($field1);
+		$table->addField($field2);
+		$table->addField($field3);
+		
+		$tableMetaFromDb = new TableMetaFromDb();
+		$column1 = new FieldMetaFromDb("f1", "comment1", "int");
+		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
+		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
+
+		$tableMetaFromDb->columns[] = $column1;
+		$tableMetaFromDb->columns[] = $column3;
+		$tableMetaFromDb->columns[] = $column2;
+		
+		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		return $tableValidation;
+	}
 	
 	public function testValidate() {
 		$this->logger->debug("START");
@@ -147,6 +170,15 @@ class TableValidatorTest extends TestCase {
 		$this->assertFalse($validationResult->passed);
 		$this->assertTrue(count($validationResult->errors) > 0);
 		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
+
+		
+		$tableValidation = $this->getTableValidationColumnsOrderIsDifferent();
+		$this->logger->trace("start check when getTableValidationColumnsOrderIsDifferent");
+		$validationResult = $tableValidation->validate();
+		$this->logger->trace("finish check when getTableValidationColumnsOrderIsDifferent");
+		$this->assertFalse($validationResult->passed);
+		$this->assertTrue(count($validationResult->errors) > 0);
+		$this->logger->debug("getTableValidationColumnsOrderIsDifferent errors: " . var_export($validationResult->errors, true));
 		
 		$this->logger->debug("FINISH");
 	}

@@ -68,6 +68,25 @@ class TableValidation {
 				$validationResult->passed = false;
 				$validationResult->errors [] = sprintf ( "Table '%s' - DB has columns with types and comments %s that are not available in XML", $table->getName(), implode(",", $resultDiff));
 			}
+			if($validationResult->passed){
+				$this->logger->trace("1");
+				for ($i=0; $i < count($columnsNameTypeCommentsXml); $i++) { 
+					$this->logger->trace("2-" . $i);
+					 $colInXml = $columnsNameTypeCommentsXml[$i];
+					 $colInDb = $columnsNameTypeCommentsDb[$i];
+					 $this->logger->trace(var_export($colInXml, true));
+					 $this->logger->trace(var_export($colInDb, true));
+					 $this->logger->trace(var_export($colInXml==$colInDb, true));
+					 $this->logger->trace(var_export($colInXml===$colInDb, true));
+					 if($colInXml != $colInDb){
+					 	$this->logger->trace("3");
+					 	$validationResult->passed = false;
+					 	$validationResult->errors [] = sprintf ( "Table '%s' - the order of columns in XML is different than in DB. In XML on position '%s' is column '%s', in DB is '%s'", $table->getName(), $i+1, $colInXml, $colInDb);
+					 	break;
+					 }
+				}
+				$this->logger->trace("4");
+			}
 			
 			return $validationResult;
 		}

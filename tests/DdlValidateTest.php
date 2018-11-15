@@ -80,6 +80,31 @@ class DdlValidateTest extends TestCase {
 			$this->assertTrue ( $res->passed );
 			$this->assertTrue ( count ( $res->errors ) == 0 );
 		}
+
+		$this->logger->debug ( "FINISH" );
+	}
+
+	public function testValidateOrderOfColumnIsDifferent() {
+		$this->logger->debug ( "START" );
+		$ddlExecutor = new DdlExecutor ( $this->db );
+		$db = $this->db;
+		$tables = $db->getTables ();
+		$table = $this->db->getTable('clin_test_lab');
+		$this->assertNotNull($table);
+		$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName() ) );
+		$this->logger->debug ( "test table " . $table->getName () );
+		
+		$res = $ddlExecutor->tableMatched ( $table );
+		$this->logger->debug ( var_export ( $res, true ) );
+		$this->assertTrue ( $res->passed );
+		$this->assertTrue ( count ( $res->errors ) == 0 );
+		$query = "ALTER TABLE `clin_test_lab` MODIFY COLUMN `visit_id` INTEGER(11) DEFAULT NULL COMMENT 'Визит' AFTER `id`";
+		$this->assertTrue ($ddlExecutor->runSql($query));
+		$res = $ddlExecutor->tableMatched ( $table );
+		$this->assertFalse ( $res->passed );
+		$this->assertTrue ( count ( $res->errors ) == 1 );
+		$this->logger->debug ( var_export ( $res->errors, true ) );
+		//$this->assertTrue ( count ( $res->errors ) == 1 );
 		$this->logger->debug ( "FINISH" );
 	}
 
