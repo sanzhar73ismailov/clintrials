@@ -78,7 +78,7 @@ class TableValidation {
 					 $this->logger->trace(var_export($colInDb, true));
 					 $this->logger->trace(var_export($colInXml==$colInDb, true));
 					 $this->logger->trace(var_export($colInXml===$colInDb, true));
-					 if($colInXml != $colInDb){
+					 if($colInXml !== $colInDb){
 					 	$this->logger->trace("3");
 					 	$validationResult->passed = false;
 					 	$validationResult->errors [] = sprintf ( "Table '%s' - the order of columns in XML is different than in DB. In XML on position '%s' is column '%s', in DB is '%s'", $table->getName(), $i+1, $colInXml, $colInDb);

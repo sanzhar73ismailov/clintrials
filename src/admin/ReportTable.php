@@ -19,6 +19,8 @@ class ReportTable {
 	private $tableJrnlVaild= false;
 	private $triggerInsertExist= false;
 	private $triggerUpdateExist= false;
+	private $triggerInsertValid= false;
+	private $triggerUpdateValid= false;
 	private $tableValidationResult;
 	private $tableJrnlValidationResult;
 	private $reportTableValid = false;
@@ -90,6 +92,22 @@ class ReportTable {
 
 	public function setTriggerUpdateExist($triggerUpdateExist) {
 		$this->triggerUpdateExist = $triggerUpdateExist;
+	}
+
+	public function getTriggerInsertValid() {
+		return $this->triggerInsertValid;
+	}
+	
+	public function setTriggerInsertValid($triggerInsertValid) {
+		$this->triggerInsertValid = $triggerInsertValid;
+	}
+	
+	public function getTriggerUpdateValid() {
+		return $this->triggerUpdateValid;
+	}
+	
+	public function setTriggerUpdateValid($triggerUpdateValid) {
+		$this->triggerUpdateValid = $triggerUpdateValid;
 	}
 
 	public function getTableValidationResult() {
