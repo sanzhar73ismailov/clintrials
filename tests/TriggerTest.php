@@ -94,10 +94,10 @@ class TriggerTest extends TestCase{
 					$val .= sprintf("%s.%s", rand(1,200),rand(1,9));
 					break;
 				case "text" :
-					$val .= $this->ClinTrialsTestHelper::generateRandomString(100) ;
+					$val .= ClinTrialsTestHelper::generateRandomString(100) ;
 					break;
 				case "varchar" :
-					$val .= $this->ClinTrialsTestHelper::generateRandomString(50) ;
+					$val .= ClinTrialsTestHelper::generateRandomString(50) ;
 					break;
 				case "timestamp" :
 					$val .= date('Y-m-d H:i:s', strtotime('now'));
@@ -135,10 +135,10 @@ class TriggerTest extends TestCase{
 					$val .= sprintf("%s.%s", rand(1,200),rand(1,9));
 					break;
 				case "text" :
-					$val .= $this->generateRandomString(100) ;
+					$val .= ClinTrialsTestHelper::generateRandomString(100) ;
 					break;
 				case "varchar" :
-					$val .= $this->generateRandomString(50) ;
+					$val .= ClinTrialsTestHelper::generateRandomString(50) ;
 					break;
 				case "timestamp" :
 					$val .= date('Y-m-d H:i:s', strtotime('now'));
@@ -167,7 +167,7 @@ class TriggerTest extends TestCase{
         return $this->ddlExecutor->insertSql($query);
 	}
 
-	public function t_estInsertTriggers() : void {
+	public function testInsertTriggers() : void {
 		$this->logger->debug ( "START" );
 		$db = $this->db;
 		$tables = $db->getTables ();
@@ -200,7 +200,7 @@ class TriggerTest extends TestCase{
 		$this->logger->debug ( "FINISH" );
 	}
 
-	public function t_estUpdateTriggers() : void {
+	public function testUpdateTriggers() : void {
 		$this->logger->debug ( "START" );
 		$db = $this->db;
 		$tables = $db->getTables ();
@@ -263,7 +263,7 @@ class TriggerTest extends TestCase{
 
 	}
 
-	public function testUpdateTriggers() : void {
+	public function testTriggers() : void {
 		$this->logger->debug ( "START" );
 		$this->assertTrue(true);
 		$tables = $this->db->getTables ();
