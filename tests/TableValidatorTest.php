@@ -9,6 +9,9 @@ use clintrials\admin\validation\FieldMetaFromDb;
 use clintrials\admin\validation\ValidationResult;
 use clintrials\admin\validation\TableValidation;
 use clintrials\admin\validation\TableMetaFromDb;
+use clintrials\admin\metadata\Trigger;
+use clintrials\admin\validation\TableValidator;
+		
 
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +20,8 @@ class TableValidatorTest extends TestCase {
 	
 	public function setUp(){
 		$this->logger = Logger::getLogger(__CLASS__);
+		//$validator = new TableValidator();
+		//$validator->validate(new Field("","",""));
 	}
 	
 	public function getTableValidationEqual() {

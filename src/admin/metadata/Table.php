@@ -11,7 +11,7 @@ use clintrials\admin\metadata\ {
 class Table extends MetaGeneral {
 	protected $fields = array ();
 	private $patient = false;
-	private $tableJrnj;
+	private $tableJrnl;
 	private $triggerInsert;
 	private $triggerUpdate;
 	
@@ -21,13 +21,13 @@ class Table extends MetaGeneral {
 		if (empty ( $this->fields )) {
 			throw new \Exception ( "no fields in table" );
 		}
-		$this->tableJrnj = new TableJrnl ( $this );
+		$this->tableJrnl = new TableJrnl ( $this );
 	}
-	public function getTableJrnj() : TableJrnl {
-		return $this->tableJrnj;
+	public function getTableJrnl() : TableJrnl {
+		return $this->tableJrnl;
 	}
-	public function setTableJrnj(TableJrnl $tableJrnj) : void {
-		$this->tableJrnj = $tableJrnj;
+	public function setTableJrnl(TableJrnl $tableJrnl) : void {
+		$this->tableJrnl = $tableJrnl;
 	}
 	public function addField(Field $field) {
 		$this->fields [] = $field;

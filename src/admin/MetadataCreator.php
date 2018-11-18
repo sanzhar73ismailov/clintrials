@@ -338,7 +338,7 @@ class MetadataCreator {
 		$trigger->setName($table->getName() . $trigger_name);
 		
 		$ddl = sprintf("CREATE TRIGGER %s AFTER " . $operation . " ON %s", $trigger->getName(), $table->getName());
-		$ddl .= sprintf("\n FOR EACH ROW BEGIN\n insert into %s (", $table->getTableJrnj()->getName());
+		$ddl .= sprintf("\n FOR EACH ROW BEGIN\n insert into %s (", $table->getTableJrnl()->getName());
 		
 		foreach ($table->getFields() as $field){
 			if (0) $field = new Field(null, null, null);

@@ -52,7 +52,7 @@ class TriggerTest extends TestCase{
 			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName () ) );
 			
 			$this->assertTrue ( $ddlExecutor->createTableJrnl ( $table ) );
-			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getTableJrnj ()->getName () ) );
+			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getTableJrnl ()->getName () ) );
 			
 			$this->assertFalse ( $ddlExecutor->triggerExists ( $table->getTriggerInsert () ) );
 			$this->assertTrue ( $ddlExecutor->createTrigger ( $table->getTriggerInsert () ) );
@@ -186,7 +186,7 @@ class TriggerTest extends TestCase{
 				$this->assertTrue(is_array($row));
 				$this->assertGreaterThan(0, $row);
 
-		        $rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnj()->getName(), $insertId);
+		        $rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnl()->getName(), $insertId);
 		        $this->assertNotNull($rowJrnl);
 		        $this->assertEquals(1, $rowJrnl['insert_ind']);
 				$this->assertTrue(is_array($rowJrnl));
@@ -228,7 +228,7 @@ class TriggerTest extends TestCase{
 				$this->assertTrue(is_array($row));
 				$this->assertGreaterThan(0, $row);
 
-				$rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnj()->getName(), $insertId);
+				$rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnl()->getName(), $insertId);
 		        $this->assertNotNull($rowJrnl);
 		        $this->assertEquals(0, $rowJrnl['insert_ind']);
 				$this->assertTrue(is_array($rowJrnl));
@@ -244,7 +244,7 @@ class TriggerTest extends TestCase{
                 updateValue(string $table_name, array $parameters, array $id_param) {
 
 
-		        $rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnj()->getName(), $insertId);
+		        $rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnl()->getName(), $insertId);
 		        $this->assertNotNull($rowJrnl);
 		        $this->assertEquals(1, $rowJrnl['insert_ind']);
 				$this->assertTrue(is_array($rowJrnl));

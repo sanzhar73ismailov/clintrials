@@ -8,6 +8,6 @@ class TableJrnl extends Table {
 	
 	public function __construct(Table $table) {
 		$this->table = $table;
-		$table->setTableJrnj($this);
+		$table->setTableJrnl($this);
 	}
 }

@@ -50,7 +50,7 @@ class ReportDbTest extends TestCase {
 			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName () ) );
 			
 			$this->assertTrue ( $ddlExecutor->createTableJrnl ( $table ) );
-			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getTableJrnj ()->getName () ) );
+			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getTableJrnl ()->getName () ) );
 			
 			$this->assertFalse ( $ddlExecutor->triggerExists ( $table->getTriggerInsert () ) );
 			$this->assertTrue ( $ddlExecutor->createTrigger ( $table->getTriggerInsert () ) );
@@ -106,9 +106,9 @@ class ReportDbTest extends TestCase {
 			
 
 			if(!$reportTable->getTableJrnlVaild()){
-				$this->logger->debug ("start show errors for: " . $reportTable->getTable()->getTableJrnj()->getName());
+				$this->logger->debug ("start show errors for: " . $reportTable->getTable()->getTableJrnl()->getName());
 				$this->logger->debug (var_export($reportTable->getTableJrnlValidationResult()->errors,true));
-				$this->logger->debug ("finish show errors for: " . $reportTable->getTable()->getTableJrnj()->getName());
+				$this->logger->debug ("finish show errors for: " . $reportTable->getTable()->getTableJrnl()->getName());
 			}
 			$this->assertTrue($reportTable->getTableJrnlVaild());
 

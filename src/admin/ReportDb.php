@@ -132,12 +132,12 @@ class ReportDb {
 	           	}
 	        }
 
-	        $reportTable->setTableJrnlExist($ddlExecutor->tableExists ($table->getTableJrnj()->getName()));
+	        $reportTable->setTableJrnlExist($ddlExecutor->tableExists ($table->getTableJrnl()->getName()));
 	        if (!$reportTable->getTableJrnlExist()) {
 	        	$reportTableValid  = false;	
 	        	$logger->trace ( "reportTableValid  = false in 5) getTableJrnlExist" );
 	        } else {
-	        	$validationResult = $ddlExecutor->tableMatched ( $table->getTableJrnj() );
+	        	$validationResult = $ddlExecutor->tableMatched ( $table->getTableJrnl() );
 	        	$reportTable->setTableJrnlValidationResult($validationResult);
 	           	$reportTable->setTableJrnlVaild($validationResult->passed);
 	           	if (!$validationResult->passed) {

@@ -41,7 +41,7 @@ class CreateBackupTest extends TestCase {
 			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName () ) );
 			
 			$this->assertTrue ( $ddlExecutor->createTableJrnl ( $table ) );
-			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getTableJrnj ()->getName () ) );
+			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getTableJrnl ()->getName () ) );
 			
 			$this->assertFalse ( $ddlExecutor->triggerExists ( $table->getTriggerInsert () ) );
 			$this->assertTrue ( $ddlExecutor->createTrigger ( $table->getTriggerInsert () ) );
@@ -96,7 +96,7 @@ class CreateBackupTest extends TestCase {
 		$this->assertEquals($ddlExecutor->getRowsCount($table_src->getName()), $ddlExecutor->getRowsCount($bc_table_name));
 		
 		// copy table of patient_jrnl
-		$table_src = $tablePatient->getTableJrnj();
+		$table_src = $tablePatient->getTableJrnl();
 		$bc_table_name = $ddlExecutor->createBackupTable ( $table_src );
 		$this->assertNotNull($bc_table_name);
 		$this->assertTrue($ddlExecutor->tableExists($bc_table_name));

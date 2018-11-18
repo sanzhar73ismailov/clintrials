@@ -239,9 +239,9 @@ class DdlExecutor {
 	}
 	
 	function createTableJrnl(Table $table) : bool {
-		$this->logger->trace("START ::: " . $table->getTableJrnj()->getName());
-		$this->logger->trace("Jrnl DDL ::: " . $table->getTableJrnj()->getDdl());
-		return $this->createTableFromDdl($table->getTableJrnj()->getDdl());
+		$this->logger->trace("START ::: " . $table->getTableJrnl()->getName());
+		$this->logger->trace("Jrnl DDL ::: " . $table->getTableJrnl()->getDdl());
+		return $this->createTableFromDdl($table->getTableJrnl()->getDdl());
 	}
 	
 	function createTableFromDdl(string $ddl) : bool{
@@ -340,11 +340,11 @@ class DdlExecutor {
 		if (! $this->copyDataToBackupTable($table, $bc_table_name)){
 			throw new \Exception("data into backup table " . $bc_table_name . "is not copied");
 		}
-		$bc_table_jrnl_name = $this->createBackupTable($table->getTableJrnj());
+		$bc_table_jrnl_name = $this->createBackupTable($table->getTableJrnl());
 		if($bc_table_jrnl_name == null){
 			throw new \Exception("backup table " . $bc_table_jrnl_name . "is not created");
 		}
-		if (! $this->copyDataToBackupTable($table->getTableJrnj(), $bc_table_jrnl_name)){
+		if (! $this->copyDataToBackupTable($table->getTableJrnl(), $bc_table_jrnl_name)){
 			throw new \Exception("data into backup table " . $bc_table_jrnl_name . "is not copied");
 		}
 		$result = true;
