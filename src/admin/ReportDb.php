@@ -16,8 +16,6 @@ class ReportDb {
 	private $numberDbTables = 0;
     private $validationResult;
 
-
-
 	function __construct() {
 		$this->logger = Logger::getLogger ( __CLASS__ );
 		$this->validationResult = new ValidationResult();
@@ -66,15 +64,13 @@ class ReportDb {
 		$logger = Logger::getLogger ( __CLASS__ );
 		$logger->trace ( "START" );
 		$reportDb = new ReportDb();
-
-		
-
         $tables = $metadataCreator->getDb()->getTables();
 
         $reportDb->dbSchema = $metadataCreator->getDb();
 		$reportDb->numberXmlTables = count($tables);
 		$reportDb->numberDbTables = $ddlExecutor->getTablesNumber();
 		$reportDb->validationResult = new ValidationResult();
+
 		if (!$ddlExecutor->dbExists()) {
 			$reportDb->validationResult->errors[] = "Db is not exist";
 			$reportDb->validationResult->passed = false;
@@ -94,9 +90,6 @@ class ReportDb {
 			$reportDb->validationResult->errors[] = "Number tables in XML less than in Db";
 			$reportDb->validationResult->passed = false;
 		}
-
-
-
 
 		foreach ($tables as $table) {
 			$logger->trace ( "start report for table: " . $table->getName());
@@ -166,14 +159,13 @@ class ReportDb {
 	           		$logger->trace ( "reportTableValid  = false in 6) validationResult->passed for Jrnl table" );
 	           	}
 	        }
+	        
 	        $reportTable->setReportTableValid($reportTableValid);
 	        $reportDb->addReportTable($reportTable);
             if (!$reportTableValid) {
 	        	$reportDb->validationResult->errors[] = "See table's report";
 				$reportDb->validationResult->passed = false;
 			}
-
-
 
 	        $logger->trace ( "finish report for table: " . $table->getName());
 		}
