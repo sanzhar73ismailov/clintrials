@@ -78,6 +78,8 @@ class ReportDbTest extends TestCase {
 			$this->assertFalse($reportTable->getTableJrnlVaild());
 			$this->assertFalse($reportTable->getTriggerInsertExist());
 			$this->assertFalse($reportTable->getTriggerUpdateExist());
+			$this->assertFalse($reportTable->getTriggerInsertValid());
+			$this->assertFalse($reportTable->getTriggerUpdateValid());
 			$this->assertNull($reportTable->getTableValidationResult());
 			$this->assertNull($reportTable->getTableJrnlValidationResult());
 			$this->assertFalse($reportTable->getReportTableValid());
@@ -112,12 +114,12 @@ class ReportDbTest extends TestCase {
 			}
 			$this->assertTrue($reportTable->getTableJrnlVaild());
 
-
-
-
-
 			$this->assertTrue($reportTable->getTriggerInsertExist());
 			$this->assertTrue($reportTable->getTriggerUpdateExist());
+
+            $this->assertTrue($reportTable->getTriggerInsertValid());
+			$this->assertTrue($reportTable->getTriggerUpdateValid());
+
 			$this->assertNotNull($reportTable->getTableValidationResult());
 			$this->assertNotNull($reportTable->getTableJrnlValidationResult());
 			$this->assertTrue($reportTable->getReportTableValid());
@@ -126,7 +128,7 @@ class ReportDbTest extends TestCase {
 		$this->logger->debug ( "FINISH" );
 	}
 
-	public function testCreateReportIfDbIfColumnsInJournalTablesWasChanged() : void {
+	public function testCreateReportIfDbIfColumnsInJournalTablesWereChanged() : void {
 		$this->logger->debug ( "START" );
 		$this->createTablesAndTriggers ();
 		$ddlExecutor = new DdlExecutor ( $this->db );
@@ -173,23 +175,144 @@ class ReportDbTest extends TestCase {
 		$this->assertNotNull($reportTable->getTableJrnlValidationResult());
 		$this->assertFalse($reportTable->getTableJrnlValidationResult()->passed);
 		$this->assertTrue(count($reportTable->getTableJrnlValidationResult()->errors)>0);
+		$this->assertFalse($reportTable->getReportTableValid());
+		$this->logger->debug ( "FINISH" );
+	}
+
+	public function testCreateReportIfTriggersWereDropped() : void {
+		$this->logger->debug ( "START" );
+		$this->createTablesAndTriggers ();
+		$ddlExecutor = new DdlExecutor ( $this->db );
+		$reportDb = new ReportDb();
+		$this->logger->debug ( "start ReportDb::createReport" );
+		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$this->logger->debug ( "finish ReportDb::createReport" );
+		$reportTables = $reportDb->getReportTables();
+		$reportTable = $reportDb->getReportTableByTableName("clin_test_lab");
+		$this->assertNotNull($reportTable);
+		$this->assertNotNull($reportTable->getTable());
+		$this->assertInstanceOf(ReportTable::class, $reportTable);
+		$this->assertTrue($reportTable->getTableExist());
+		$this->assertTrue($reportTable->getTableValid());
+		$this->assertTrue($reportTable->getTableJrnlExist());
+		$this->assertTrue($reportTable->getTableJrnlVaild());
+		
+		$this->assertTrue($reportTable->getTriggerInsertExist());
+		$this->assertTrue($reportTable->getTriggerUpdateExist());
+		$this->assertTrue($reportTable->getTriggerInsertValid());
+		$this->assertTrue($reportTable->getTriggerUpdateValid());
+
+		$this->assertNotNull($reportTable->getTableValidationResult());
+		$this->assertNotNull($reportTable->getTableJrnlValidationResult());
+		$this->assertTrue($reportTable->getReportTableValid());
+
+
+        $insertTrigName = $reportTable->getTable()->getTriggerInsert()->getName();
+        $updateTrigName = $reportTable->getTable()->getTriggerUpdate()->getName();
+        $tableName = $reportTable->getTable()->getName();
+        $tableJrnlName = $reportTable->getTable()->getTableJrnl()->getName();
+
+        $reportDb = null;
+		$reportTable = null;
+
+		$this->assertTrue($ddlExecutor->runSql("drop trigger if exists " . $insertTrigName));
+		$this->assertTrue($ddlExecutor->runSql("drop trigger if exists " . $updateTrigName));
+		
+		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$reportTable = $reportDb->getReportTableByTableName("clin_test_lab");
+
+        $this->assertNotNull($reportTable);
+		$this->assertNotNull($reportTable->getTable());
+		$this->assertInstanceOf(ReportTable::class, $reportTable);
+		$this->assertTrue($reportTable->getTableExist());
+		$this->assertTrue($reportTable->getTableValid());
+		$this->assertTrue($reportTable->getTableJrnlExist());
+		$this->assertTrue($reportTable->getTableJrnlVaild());
+
+		$this->assertFalse($reportTable->getTriggerInsertExist());
+		$this->assertFalse($reportTable->getTriggerInsertValid());
+
+		$this->assertFalse($reportTable->getTriggerUpdateValid());
+		$this->assertFalse($reportTable->getTriggerUpdateExist());
+
 
 		$this->assertFalse($reportTable->getReportTableValid());
-		/*
-		$reprtTableFor_clin_test_lab_jrnl_Found = false;
-		foreach ($reportTables as $reportTable) {
-			if($reportTable->getTable()->getName() != 'clin_test_lab_jrnl') {
-				continue;
-			}
-			$reprtTableFor_clin_test_lab_jrnl_Found = true;
-			$this->logger->debug ("reportTable for table: " . $reportTable->getTable()->getName() );
-			
+		$this->logger->debug ( "FINISH" );
+	}
 
-			
-			
-		}
-		$tgis-assertTrue($reprtTableFor_clin_test_lab_jrnl_Found);
-		*/
+	public function testCreateReportIfTriggersWereChanged() : void {
+		$this->logger->debug ( "START" );
+		$this->createTablesAndTriggers ();
+		$ddlExecutor = new DdlExecutor ( $this->db );
+		$reportDb = new ReportDb();
+		$this->logger->debug ( "start ReportDb::createReport" );
+		$reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$this->logger->debug ( "finish ReportDb::createReport" );
+		$reportTables = $reportDb->getReportTables();
+		$reportTable = $reportDb->getReportTableByTableName("clin_test_lab");
+		$this->assertNotNull($reportTable);
+		$this->assertNotNull($reportTable->getTable());
+		$this->assertInstanceOf(ReportTable::class, $reportTable);
+		$this->assertTrue($reportTable->getTableExist());
+		$this->assertTrue($reportTable->getTableValid());
+		$this->assertTrue($reportTable->getTableJrnlExist());
+		$this->assertTrue($reportTable->getTableJrnlVaild());
+		
+		$this->assertTrue($reportTable->getTriggerInsertExist());
+		$this->assertTrue($reportTable->getTriggerUpdateExist());
+		$this->assertTrue($reportTable->getTriggerInsertValid());
+		$this->assertTrue($reportTable->getTriggerUpdateValid());
+
+		$this->assertNotNull($reportTable->getTableValidationResult());
+		$this->assertNotNull($reportTable->getTableJrnlValidationResult());
+		$this->assertTrue($reportTable->getReportTableValid());
+
+
+        $insertTrigName = $reportTable->getTable()->getTriggerInsert()->getName();
+        $updateTrigName = $reportTable->getTable()->getTriggerUpdate()->getName();
+        $tableName = $reportTable->getTable()->getName();
+        $tableJrnlName = $reportTable->getTable()->getTableJrnl()->getName();
+
+        $reportDb = null;
+		$reportTable = null;
+
+		$this->assertTrue($ddlExecutor->runSql("drop trigger if exists " . $insertTrigName));
+		$this->assertTrue($ddlExecutor->runSql("drop trigger if exists " . $updateTrigName));
+	    $triggerCreateQuery = sprintf("create trigger %s after insert on %s " .
+                                     " for each row insert into %s (id, patient_id, visit_id) " .
+                                     " values (new.id, new.patient_id, new.visit_id)", 
+                                     $insertTrigName, $tableName, $tableJrnlName);
+	    $this->assertTrue($ddlExecutor->runSql($triggerCreateQuery));
+	    $triggerCreateQuery = sprintf("create trigger %s after update on %s " .
+                                     " for each row insert into %s (id, patient_id, visit_id) " .
+                                     " values (new.id, new.patient_id, new.visit_id)", 
+                                     $updateTrigName, $tableName, $tableJrnlName);
+	    $this->assertTrue($ddlExecutor->runSql($triggerCreateQuery));
+
+		$this->logger->debug ( "start ReportDb::createReport after triggers changed in table: " . $tableName);
+	    $reportDb = ReportDb::createReport($this->metadataCreator, new DdlExecutor ( $this->db ));
+		$this->logger->debug ( "finish ReportDb::createReport after triggers change" );
+		$reportTable = $reportDb->getReportTableByTableName("clin_test_lab");
+
+		$this->assertNotNull($reportTable);
+		$this->assertNotNull($reportTable->getTable());
+		$this->assertInstanceOf(ReportTable::class, $reportTable);
+		$this->assertTrue($reportTable->getTableExist());
+		$this->assertTrue($reportTable->getTableValid());
+		$this->assertTrue($reportTable->getTableJrnlExist());
+		$this->assertTrue($reportTable->getTableJrnlVaild());
+		$this->assertTrue($reportTable->getTriggerInsertExist());
+		$this->assertTrue($reportTable->getTriggerUpdateExist());
+		
+		$this->assertFalse($reportTable->getTriggerInsertValid());
+		$this->assertFalse($reportTable->getTriggerUpdateValid());
+		
+		$this->assertNotNull($reportTable->getTableValidationResult());
+		$this->assertTrue($reportTable->getTableValidationResult()->passed);
+
+		$this->assertNotNull($reportTable->getTableJrnlValidationResult());
+		$this->assertTrue($reportTable->getTableJrnlValidationResult()->passed);
+		$this->assertFalse($reportTable->getReportTableValid());
 		$this->logger->debug ( "FINISH" );
 	}
 

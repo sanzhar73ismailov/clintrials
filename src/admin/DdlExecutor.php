@@ -159,6 +159,7 @@ class DdlExecutor {
 			$this->conn->exec('USE ' . $this->db->getName());
 			//show triggers where `Trigger` like '%ns%' and `table`='T1'
 			$query = "show triggers where `Trigger` = '" . $trigger_name . "'";
+			$this->logger->trace("query=" . $query);
 			$stmt = $this->conn->prepare ( $query );
 			$stmt->execute ();
 			$row = $stmt->fetchAll ( PDO::FETCH_ASSOC );
@@ -207,6 +208,7 @@ class DdlExecutor {
 		$result = false;
 		try {
 			$this->conn->exec('USE ' . $this->db->getName());
+			$this->logger->trace("sql=" . $sql);
 			$result = $this->conn->exec ( $sql ) !== false;
 		} catch ( PDOException $e ) {
 			$this->logger->error($e->getMessage(), $e);

@@ -5,6 +5,7 @@ namespace clintrials\admin;
 use Logger;
 use clintrials\admin\validation\ValidationResult;
 use clintrials\admin\metadata\DbSchema;
+use clintrials\admin\validation\TriggerValidation;
 
 class ReportDb {
 	private $logger;
@@ -116,8 +117,19 @@ class ReportDb {
 	           		$reportTableValid  = false;	
 	           		$logger->trace ( "reportTableValid  = false in 2) validationResult->passed" );
 	           	}
+
 	           	if ($ddlExecutor->triggerExists($table->getTriggerInsert())) {
-	           	  $reportTable->setTriggerInsertExist(true);
+	           		$logger->trace ( "in ddlExecutor->triggerExists($table->getTriggerInsert() !!!" );
+	           	   $reportTable->setTriggerInsertExist(true);
+	           	   $triggerValidation = new TriggerValidation($ddlExecutor, $table->getTriggerInsert());
+	           	   $triggerValidationResult = $triggerValidation->validate();
+	           	   if (! $triggerValidationResult->passed){
+	           	  	  $reportTableValid  = false;
+	           	  	  $reportTable->setTriggerInsertValid(false);
+	           	  	  $logger->trace ( "reportTableValid  = false in 2.1) getTriggerInsert triggerValidationResult->passed" );
+	           	   } else {
+	           	   	 $reportTable->setTriggerInsertValid(true);
+	           	   }
 	           	} else {
 	           	  	$reportTable->setTriggerInsertExist(false);
 	           	  	$reportTableValid  = false;	
@@ -125,6 +137,15 @@ class ReportDb {
 	           	}
 	           	if ($ddlExecutor->triggerExists($table->getTriggerUpdate())) {
 	           		$reportTable->setTriggerUpdateExist(true);
+	           		$triggerValidation = new TriggerValidation($ddlExecutor, $table->getTriggerUpdate());
+	           	    $triggerValidationResult = $triggerValidation->validate();
+	           		if (! $triggerValidationResult->passed){
+	           	  	  $reportTableValid = false;
+	           	  	  $reportTable->setTriggerUpdateValid(false);
+	           	  	  $logger->trace ( "reportTableValid  = false in 3.1) getTriggerUpdate triggerValidationResult->passed" );
+	           	  } else {
+	           	  	$reportTable->setTriggerUpdateValid(true);
+	           	  }
 	           	} else {
 	           		$reportTable->setTriggerUpdateExist(false);
 	           		$reportTableValid  = false;	
@@ -158,6 +179,9 @@ class ReportDb {
 		}
         $logger->trace ( "FINISH" );
 		return $reportDb;
+
+	
+    
 
 	}
 	

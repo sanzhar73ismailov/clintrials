@@ -12,9 +12,9 @@ class TableValidation {
 		public function __construct(Table $table, TableMetaFromDb $tableMetaFromDb) {
 			$this->table = $table;
 			$this->tableMetaFromDb = $tableMetaFromDb;
+			$this->logger = Logger::getLogger(__CLASS__);
 		}
 		public function validate() : ValidationResult {
-			$this->logger = Logger::getLogger(__CLASS__);
 			$validationResult = new ValidationResult ();
 			$table = $this->table;
 			$tableMetaFromDb = $this->tableMetaFromDb;
