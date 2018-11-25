@@ -4,6 +4,7 @@ namespace clintrials\admin\validation;
 
 class ValidationResult {
 	
-	public $passed = true;
+	public $objectExists = false;
+	public $passed = false;
 	public $errors = array (); // array of error messages
 }

@@ -278,6 +278,7 @@ class DdlExecutor {
 	
 	/**
 	 * Checks if table's metadata from XML and in DB are same
+	 @deprecared
 	 */
 	function tableMatched(Table $table) : ValidationResult {
 		$this->logger->trace("START");
@@ -292,6 +293,14 @@ class DdlExecutor {
 		}
 		//$this->logger->trace("FINISH, return \$result" . var_export($resultValidation, true));
 		return $resultValidation;
+	}
+
+	function getTableMetaFromDb(Table $table) : TableMetaFromDb {
+		$this->logger->trace("START");
+		$resultValidation = null;
+		$tableMetaFromDb = new TableMetaFromDb();
+		$tableMetaFromDb->columns = $this->getColumnsFromDb($this->db->getName(), $table->getName());
+		return $tableMetaFromDb;
 	}
 	
 	function getColumnsFromDb($dbName, $tableName){

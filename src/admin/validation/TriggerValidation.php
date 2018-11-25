@@ -20,6 +20,7 @@ class TriggerValidation {
 		public function validate() : ValidationResult {
             $this->logger->trace("START");
 			$validationResult = new ValidationResult ();
+			$validationResult->passed = true;
 			$trigger = $this->trigger;
 
 		    $triggerName = $trigger->getName();
