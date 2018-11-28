@@ -5,7 +5,7 @@ namespace clintrials\admin;
 use Logger;
 use clintrials\admin\validation\ValidationResult;
 use clintrials\admin\metadata\DbSchema;
-use clintrials\admin\validation\TriggerValidation;
+use clintrials\admin\validation\Validator;
 
 class ReportDb {
 	private $logger;
@@ -95,71 +95,20 @@ class ReportDb {
 			$logger->trace ( "start report for table: " . $table->getName());
 
 			$reportTable = new ReportTable();
+			$reportTable->setTable($table);
+	        $reportTableValid  = false;
 
-			$reportTableValid = true;
-	        $reportTable->setTable($table);
-	        $reportTable->setTableExist($ddlExecutor->tableExists ($table->getName()));
-	        if (!$reportTable->getTableExist()) {
-	        	$reportTableValid  = false;
-	        	$logger->trace ( "reportTableValid  = false in 1) getTableExist" );
-	        } else {
-	        	$validationResult = $ddlExecutor->tableMatched ( $table );
-	        	$reportTable->setTableValidationResult($validationResult);
-	           	$reportTable->setTableValid($validationResult->passed);
-	           	if (!$validationResult->passed) {
-	           		$reportTableValid  = false;	
-	           		$logger->trace ( "reportTableValid  = false in 2) validationResult->passed" );
-	           	}
+	        $validator = new Validator($ddlExecutor);
+	        $reportTable->setTableValidationResult($validator->validate($table));
+	        $reportTable->setTableJrnlValidationResult($validator->validate($table->getTableJrnl()));
+	        $reportTable->setTriggerInsertValidationResult($validator->validate($table->getTriggerInsert()));
+	        $reportTable->setTriggerUpdateValidationResult($validator->validate($table->getTriggerUpdate()));
 
-	           	if ($ddlExecutor->triggerExists($table->getTriggerInsert())) {
-	           		$logger->trace ( "in ddlExecutor->triggerExists($table->getTriggerInsert() !!!" );
-	           	   $reportTable->setTriggerInsertExist(true);
-	           	   $triggerValidation = new TriggerValidation($ddlExecutor, $table->getTriggerInsert());
-	           	   $triggerValidationResult = $triggerValidation->validate();
-	           	   if (! $triggerValidationResult->passed){
-	           	  	  $reportTableValid  = false;
-	           	  	  $reportTable->setTriggerInsertValid(false);
-	           	  	  $logger->trace ( "reportTableValid  = false in 2.1) getTriggerInsert triggerValidationResult->passed" );
-	           	   } else {
-	           	   	 $reportTable->setTriggerInsertValid(true);
-	           	   }
-	           	} else {
-	           	  	$reportTable->setTriggerInsertExist(false);
-	           	  	$reportTableValid  = false;	
-	           	  	$logger->trace ( "reportTableValid  = false in 3) getTriggerInsertExist" );
-	           	}
-	           	if ($ddlExecutor->triggerExists($table->getTriggerUpdate())) {
-	           		$reportTable->setTriggerUpdateExist(true);
-	           		$triggerValidation = new TriggerValidation($ddlExecutor, $table->getTriggerUpdate());
-	           	    $triggerValidationResult = $triggerValidation->validate();
-	           		if (! $triggerValidationResult->passed){
-	           	  	  $reportTableValid = false;
-	           	  	  $reportTable->setTriggerUpdateValid(false);
-	           	  	  $logger->trace ( "reportTableValid  = false in 3.1) getTriggerUpdate triggerValidationResult->passed" );
-	           	  } else {
-	           	  	$reportTable->setTriggerUpdateValid(true);
-	           	  }
-	           	} else {
-	           		$reportTable->setTriggerUpdateExist(false);
-	           		$reportTableValid  = false;	
-	           		$logger->trace ( "reportTableValid  = false in 4) getTriggerUpdateExist" );
-	           	}
-	        }
+	        $reportTableValid  = $reportTable->getTableValid() 
+	                             && $reportTable->getTableJrnlVaild()
+	                             && $reportTable->getTriggerInsertValid()
+	                             && $reportTable->getTriggerUpdateValid();
 
-	        $reportTable->setTableJrnlExist($ddlExecutor->tableExists ($table->getTableJrnl()->getName()));
-	        if (!$reportTable->getTableJrnlExist()) {
-	        	$reportTableValid  = false;	
-	        	$logger->trace ( "reportTableValid  = false in 5) getTableJrnlExist" );
-	        } else {
-	        	$validationResult = $ddlExecutor->tableMatched ( $table->getTableJrnl() );
-	        	$reportTable->setTableJrnlValidationResult($validationResult);
-	           	$reportTable->setTableJrnlVaild($validationResult->passed);
-	           	if (!$validationResult->passed) {
-	           		$reportTableValid  = false;	
-	           		$logger->trace ( "reportTableValid  = false in 6) validationResult->passed for Jrnl table" );
-	           	}
-	        }
-	        
 	        $reportTable->setReportTableValid($reportTableValid);
 	        $reportDb->addReportTable($reportTable);
             if (!$reportTableValid) {

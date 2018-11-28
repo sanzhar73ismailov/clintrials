@@ -80,8 +80,8 @@ class ReportDbTest extends TestCase {
 			$this->assertFalse($reportTable->getTriggerUpdateExist());
 			$this->assertFalse($reportTable->getTriggerInsertValid());
 			$this->assertFalse($reportTable->getTriggerUpdateValid());
-			$this->assertNull($reportTable->getTableValidationResult());
-			$this->assertNull($reportTable->getTableJrnlValidationResult());
+			$this->assertNotNull($reportTable->getTableValidationResult());
+			$this->assertNotNull($reportTable->getTableJrnlValidationResult());
 			$this->assertFalse($reportTable->getReportTableValid());
 		}
 		$this->logger->debug ( "FINISH" );
@@ -175,6 +175,20 @@ class ReportDbTest extends TestCase {
 		$this->assertNotNull($reportTable->getTableJrnlValidationResult());
 		$this->assertFalse($reportTable->getTableJrnlValidationResult()->passed);
 		$this->assertTrue(count($reportTable->getTableJrnlValidationResult()->errors)>0);
+		
+        $reportTableValid  = ($reportTable->getTableValid() and $reportTable->getTableJrnlVaild() and $reportTable->getTriggerInsertValid() and $reportTable->getTriggerUpdateValid());
+	    $this->logger->debug ( "** table: " . $reportTable->getTable()->getName());
+	    $this->logger->debug ( "*** reportTableValid in test =". var_export($reportTableValid, true) );
+	    $this->logger->debug ( "*** getTableValid in test =". var_export($reportTable->getTableValid(), true)  );
+	    $this->logger->debug ( "*** getTableJrnlVaild in test =". var_export($reportTable->getTableJrnlVaild(), true)  );
+	    $this->logger->debug ( "*** getTriggerInsertValid in test =". var_export($reportTable->getTriggerInsertValid(), true)  );
+	    $this->logger->debug ( "*** getTriggerUpdateValid in test =". var_export($reportTable->getTriggerUpdateValid(), true)  );
+	    $trfalse = true and false and true and true; // будет true - так как '= имеет больший приоритет, чем 'and'
+	    $trfalse = (true and false and true and true); // будет false
+	     $trfalse = true && false && true && true; // будет false - так как '&&' имеет больший приоритет, чем '='
+	    $this->logger->debug ( "*** true and true and false and true =". var_export($trfalse, true)  );
+	    $this->assertFalse($reportTableValid);              
+
 		$this->assertFalse($reportTable->getReportTableValid());
 		$this->logger->debug ( "FINISH" );
 	}

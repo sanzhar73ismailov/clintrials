@@ -29,6 +29,7 @@ class Validator {
 	}
 
 	private function validateTable(Table $table) : ValidationResult{
+		$this->logger->trace("START");
 		$validationResult = new ValidationResult();
 		if(!$this->ddlExecutor->tableExists ($table->getName())) {
 	        $validationResult->objectExists = false;
@@ -107,13 +108,40 @@ class Validator {
 
 	     }
 
-		
+		$this->logger->trace("FINISH return: " . var_export($validationResult, true));
 		return $validationResult;
 
 	}
 
-	private function validateTrigger(Trigger $entity) : ValidationResult {
-		throw new Exception("method validateTrigger is not implemented");
+	private function validateTrigger(Trigger $trigger) : ValidationResult {
+		 $this->logger->trace("START");
+			$validationResult = new ValidationResult ();
+
+			$triggerName = $trigger->getName();
+
+			if(!$this->ddlExecutor->triggerExists($trigger)) {
+			   $validationResult->objectExists = false;
+	           $validationResult->errors [] = "Trigger " . $trigger->getName(). " is not exist"; 
+			} else {
+				$validationResult->objectExists = true;
+				$statement = $this->ddlExecutor->getTriggerStatementByName($triggerName);
+				$this->logger->debug ( "Statement = " . $statement );
+				$this->logger->debug ('ddl: ' .  $trigger->getDdl() );
+				$this->logger->debug ( "Statement substr = " . $this->getBeginEndSubstr($statement) );
+				$ddlTrigSubstr = $this->getBeginEndSubstr($trigger->getDdl());
+				$this->logger->debug ( "Ddl substr = " . $ddlTrigSubstr );
+				if($ddlTrigSubstr !== $statement) {
+					$validationResult->errors [] = sprintf("statements for trigger %s in XML and DB are not equal. In XML: <%s>, in DB: <%s>", $triggerName, $ddlTrigSubstr,$statement);
+				}
+			}
+			$validationResult->passed = count($validationResult->errors) == 0;
+			$this->logger->trace("FINISH return: " . var_export($validationResult, true));
+			return $validationResult;
+	}
+
+	private function getBeginEndSubstr($str){
+			$pos = (int) strpos($str, "BEGIN");
+			return trim(substr($str, $pos));
 	}
 
 

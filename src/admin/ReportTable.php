@@ -13,16 +13,21 @@ use clintrials\admin\metadata\ {
 class ReportTable {
 	private $logger;
 	private $table;
-	private $tableExist = false;
-	private $tableValid= false;
-	private $tableJrnlExist= false;
-	private $tableJrnlVaild= false;
-	private $triggerInsertExist= false;
-	private $triggerUpdateExist= false;
-	private $triggerInsertValid= false;
-	private $triggerUpdateValid= false;
+
+	//private $tableExist = false;
+	//private $tableValid= false;
+	//private $tableJrnlExist= false;
+	//private $tableJrnlVaild= false;
+	//private $triggerInsertExist= false;
+	//private $triggerUpdateExist= false;
+	//private $triggerInsertValid= false;
+	//private $triggerUpdateValid= false;
+	
+
 	private $tableValidationResult;
 	private $tableJrnlValidationResult;
+	private $triggerInsertValidationResult;
+	private $triggerUpdateValidationResult;
 	private $reportTableValid = false;
 
 
@@ -47,69 +52,37 @@ class ReportTable {
 	}
 
 	public function getTableExist() {
-		return $this->tableExist;
-	}
-
-	public function setTableExist($tableExist) {
-		$this->tableExist = $tableExist;
+		return $this->tableValidationResult->objectExists;
 	}
 
 	public function getTableValid() {
-		return $this->tableValid;
-	}
-
-	public function setTableValid($tableValid) {
-		$this->tableValid = $tableValid;
+		return $this->tableValidationResult->passed;
 	}
 
 	public function getTableJrnlExist() {
-		return $this->tableJrnlExist;
-	}
-
-	public function setTableJrnlExist($tableJrnlExist) {
-		$this->tableJrnlExist = $tableJrnlExist;
+		return $this->tableJrnlValidationResult->objectExists;
 	}
 
 	public function getTableJrnlVaild() {
-		return $this->tableJrnlVaild;
-	}
-
-	public function setTableJrnlVaild($tableJrnlVaild) {
-		$this->tableJrnlVaild = $tableJrnlVaild;
+		return $this->tableJrnlValidationResult->passed;
 	}
 
 	public function getTriggerInsertExist() {
-		return $this->triggerInsertExist;
-	}
-
-	public function setTriggerInsertExist($triggerInsertExist) {
-		$this->triggerInsertExist = $triggerInsertExist;
+		return $this->triggerInsertValidationResult->objectExists;
 	}
 
 	public function getTriggerUpdateExist() {
-		return $this->triggerUpdateExist;
-	}
-
-	public function setTriggerUpdateExist($triggerUpdateExist) {
-		$this->triggerUpdateExist = $triggerUpdateExist;
+		return $this->triggerUpdateValidationResult->objectExists;
 	}
 
 	public function getTriggerInsertValid() {
-		return $this->triggerInsertValid;
-	}
-	
-	public function setTriggerInsertValid($triggerInsertValid) {
-		$this->triggerInsertValid = $triggerInsertValid;
+		return $this->triggerInsertValidationResult->passed;
 	}
 	
 	public function getTriggerUpdateValid() {
-		return $this->triggerUpdateValid;
+		return $this->triggerUpdateValidationResult->passed;
 	}
 	
-	public function setTriggerUpdateValid($triggerUpdateValid) {
-		$this->triggerUpdateValid = $triggerUpdateValid;
-	}
-
 	public function getTableValidationResult() {
 		return $this->tableValidationResult;
 	}
@@ -125,6 +98,23 @@ class ReportTable {
 	public function setTableJrnlValidationResult($tableJrnlValidationResult) {
 		$this->tableJrnlValidationResult = $tableJrnlValidationResult;
 	}
+
+	public function getTriggerInsertValidationResult() {
+		return $this->triggerInsertValidationResult;
+	}
+	
+	public function setTriggerInsertValidationResult($triggerInsertValidationResult) {
+		$this->triggerInsertValidationResult = $triggerInsertValidationResult;
+	}
+	
+	public function getTriggerUpdateValidationResult() {
+		return $this->triggerUpdateValidationResult;
+	}
+	
+	public function setTriggerUpdateValidationResult($triggerUpdateValidationResult) {
+		$this->triggerUpdateValidationResult = $triggerUpdateValidationResult;
+	}
+	
 	public function getReportTableValid() {
 		return $this->reportTableValid;
 	}
@@ -132,7 +122,6 @@ class ReportTable {
 	public function setReportTableValid($reportTableValid) {
 		$this->reportTableValid = $reportTableValid;
 	}
-
 
 	
 }

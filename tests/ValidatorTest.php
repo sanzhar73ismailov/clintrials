@@ -1,4 +1,4 @@
-<?
+<?php
 require_once "configs/app_prop_test.php";
 
 use PHPUnit\Framework\TestCase;
@@ -112,6 +112,31 @@ class ValidatorTest extends TestCase {
 			$this->logger->debug ( "validRes->errors=" . var_export($validRes->errors, true) );
 			$this->assertCount(0, $validRes->errors);
 		}
+		$this->logger->debug ( "FINISH" );
+	}
+
+	public function testValidateColumnNameIsDifferent() {
+		$this->logger->debug ( "START" );
+		$ddlExecutor = new DdlExecutor ( $this->db );
+		$table = $this->db->getTable('clin_test_lab');
+		$validator = new Validator($ddlExecutor);
+
+		$validRes = $validator->validate($table);
+		$this->assertNotNull($table);
+		$this->assertTrue($validRes->objectExists);
+		$this->assertTrue($validRes->passed);
+		$this->logger->debug ( "validRes->errors=" . var_export($validRes->errors, true) );
+		$this->assertCount(0, $validRes->errors);
+
+
+
+		$query = "ALTER TABLE `clin_test_lab` MODIFY COLUMN `visit_id` INTEGER(11) DEFAULT NULL COMMENT 'Визит' AFTER `id`";
+		$this->assertTrue($ddlExecutor->runSql($query));
+		$validRes = $validator->validate($table);
+		$this->assertTrue($validRes->objectExists);
+		$this->assertFalse($validRes->passed);
+		$this->logger->debug ( "validRes->errors=" . var_export($validRes->errors, true) );
+		$this->assertTrue(count($validRes->errors) > 0);
 		$this->logger->debug ( "FINISH" );
 	}
 
