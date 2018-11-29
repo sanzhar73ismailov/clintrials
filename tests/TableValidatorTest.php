@@ -1,5 +1,4 @@
 <?php
-
 require_once "configs/app_prop_test.php";
 
 use clintrials\admin\metadata\Table;
@@ -11,21 +10,22 @@ use clintrials\admin\validation\TableValidation;
 use clintrials\admin\validation\TableMetaFromDb;
 use clintrials\admin\metadata\Trigger;
 use clintrials\admin\validation\TableValidator;
+use clintrials\admin\validation\Validator;
 		
 
 use PHPUnit\Framework\TestCase;
+use clintrials\admin\DdlExecutor;
 
 class TableValidatorTest extends TestCase {
 	private $logger;
 	
 	public function setUp(){
 		$this->logger = Logger::getLogger(__CLASS__);
-		//$validator = new TableValidator();
-		//$validator->validate(new Field("","",""));
 	}
 	
 	public function getTableValidationEqual() {
 		$table = new Table();
+		$table->setName("t1");
 		$field1 = new Field("f1", "comment1", "int");
 		$field2 = new Field("f2", "comment2", "int");
 		$field3 = new Field("f3", "comment3", "int");
@@ -41,12 +41,13 @@ class TableValidatorTest extends TestCase {
 		$tableMetaFromDb->columns[] = $column2;
 		$tableMetaFromDb->columns[] = $column3;
 		
-		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
 	}
 
 	public function getTableValidationColumnsMoreInDb() {
 		$table = new Table();
+		$table->setName("t1");
 		$field1 = new Field("f1", "comment1", "int");
 		$field2 = new Field("f2", "comment2", "int");
 		$field3 = new Field("f3", "comment3", "int");
@@ -64,12 +65,13 @@ class TableValidatorTest extends TestCase {
 		$tableMetaFromDb->columns[] = $column3;
 		$tableMetaFromDb->columns[] = $column4;
 		
-		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
 	}
 	
 	public function getTableValidationColumnsMoreInXml() {
 		$table = new Table();
+		$table->setName("t1");
 		$field1 = new Field("f1", "comment1", "int");
 		$field2 = new Field("f2", "comment2", "int");
 		$field3 = new Field("f3", "comment3", "int");
@@ -91,12 +93,13 @@ class TableValidatorTest extends TestCase {
 		$tableMetaFromDb->columns[] = $column3;
 		$tableMetaFromDb->columns[] = $column4;
 		
-		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
 	}
 	
 	public function getTableValidationColumnsHasDiffType() {
 		$table = new Table();
+		$table->setName("t1");
 		$field1 = new Field("f1", "comment1", "int");
 		$field2 = new Field("f2", "comment2", "int");
 		$field3 = new Field("f3", "comment3", "varchar");
@@ -112,12 +115,13 @@ class TableValidatorTest extends TestCase {
 		$tableMetaFromDb->columns[] = $column2;
 		$tableMetaFromDb->columns[] = $column3;
 		
-		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
 	}
 
 	public function getTableValidationColumnsOrderIsDifferent() {
 		$table = new Table();
+		$table->setName("t1");
 		$field1 = new Field("f1", "comment1", "int");
 		$field2 = new Field("f2", "comment2", "int");
 		$field3 = new Field("f3", "comment3", "int");
@@ -135,56 +139,116 @@ class TableValidatorTest extends TestCase {
 		$tableMetaFromDb->columns[] = $column3;
 		$tableMetaFromDb->columns[] = $column2;
 		
-		$tableValidation = new TableValidation($table, $tableMetaFromDb);
+		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
 	}
 	
-	public function testValidate() {
+	/**
+     * @dataProvider getTableValidationEqual
+     */
+	public function testValidateTableEqual($table, $tableMetaFromDb) {
 		$this->logger->debug("START");
-		$this->assertTrue(1 == 1);
-		$this->assertFalse(1 == 0);
-	
-		$tableValidation = $this->getTableValidationEqual();
-		if(0){
-		  $tableValidation = new TableValidation(null, null);
-		}
-		$validationResult = $tableValidation->validate();
-		if(0){
-			$validationResult = new ValidationResult();
-		}
+		$stub = $this->createMock(DdlExecutor::class);
+        $stub->method("getTableMetaFromDb")->willReturn($tableMetaFromDb);     
+        $stub->method("tableExists")->willReturn(true); 
+
+        $this->assertTrue($tableMetaFromDb == $stub->getTableMetaFromDb(new Table()));
+        $this->assertEquals(true, $stub->tableExists($table->getName()));
+
+        $validator = new Validator($stub);
+        $validationResult = $validator->validate($table);
+
 		$this->assertTrue($validationResult->passed);
 		$this->assertTrue(count($validationResult->errors) == 0);
-		
-		$tableValidation = $this->getTableValidationColumnsMoreInDb();
-		$validationResult = $tableValidation->validate();
-		
-		$this->assertFalse($validationResult->passed);
-		$this->assertTrue(count($validationResult->errors) > 0);
-		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
-		
-		$tableValidation = $this->getTableValidationColumnsMoreInXml();
-		$validationResult = $tableValidation->validate();
-		
-		$this->assertFalse($validationResult->passed);
-		$this->assertTrue(count($validationResult->errors) > 0);
-		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
-		
-		$tableValidation = $this->getTableValidationColumnsHasDiffType();
-		$validationResult = $tableValidation->validate();
-		
-		$this->assertFalse($validationResult->passed);
-		$this->assertTrue(count($validationResult->errors) > 0);
-		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
+		$this->logger->debug("FINISH");
+	}
 
-		
-		$tableValidation = $this->getTableValidationColumnsOrderIsDifferent();
-		$this->logger->trace("start check when getTableValidationColumnsOrderIsDifferent");
-		$validationResult = $tableValidation->validate();
-		$this->logger->trace("finish check when getTableValidationColumnsOrderIsDifferent");
+	/**
+     * @dataProvider getTableValidationColumnsMoreInDb
+     */
+	public function testTableValidationColumnsMoreInDb($table, $tableMetaFromDb) {
+		$this->logger->debug("START");
+		$stub = $this->createMock(DdlExecutor::class);
+        $stub->method("getTableMetaFromDb")->willReturn($tableMetaFromDb);     
+        $stub->method("tableExists")->willReturn(true); 
+
+        $this->assertTrue($tableMetaFromDb == $stub->getTableMetaFromDb(new Table()));
+        $this->assertEquals(true, $stub->tableExists($table->getName()));
+
+        $validator = new Validator($stub);
+        $validationResult = $validator->validate($table);
+
 		$this->assertFalse($validationResult->passed);
 		$this->assertTrue(count($validationResult->errors) > 0);
-		$this->logger->debug("getTableValidationColumnsOrderIsDifferent errors: " . var_export($validationResult->errors, true));
+		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
 		
 		$this->logger->debug("FINISH");
 	}
+
+	/**
+     * @dataProvider getTableValidationColumnsMoreInXml
+     */
+	public function testTableValidationColumnsMoreInXml($table, $tableMetaFromDb) {
+		$this->logger->debug("START");
+		$stub = $this->createMock(DdlExecutor::class);
+        $stub->method("getTableMetaFromDb")->willReturn($tableMetaFromDb);     
+        $stub->method("tableExists")->willReturn(true); 
+
+        $this->assertTrue($tableMetaFromDb == $stub->getTableMetaFromDb(new Table()));
+        $this->assertEquals(true, $stub->tableExists($table->getName()));
+
+        $validator = new Validator($stub);
+        $validationResult = $validator->validate($table);
+
+		$this->assertFalse($validationResult->passed);
+		$this->assertTrue(count($validationResult->errors) > 0);
+		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
+		$this->logger->debug("FINISH");
+	}
+    
+    /**
+     * @dataProvider getTableValidationColumnsHasDiffType
+     */
+	public function testTableValidationColumnsHasDiffType($table, $tableMetaFromDb) {
+		$this->logger->debug("START");
+		$stub = $this->createMock(DdlExecutor::class);
+        $stub->method("getTableMetaFromDb")->willReturn($tableMetaFromDb);     
+        $stub->method("tableExists")->willReturn(true); 
+
+        $this->assertTrue($tableMetaFromDb == $stub->getTableMetaFromDb(new Table()));
+        $this->assertEquals(true, $stub->tableExists($table->getName()));
+
+        $validator = new Validator($stub);
+        $validationResult = $validator->validate($table);
+
+		$this->assertFalse($validationResult->passed);
+		$this->assertTrue(count($validationResult->errors) > 0);
+		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
+		$this->logger->debug("FINISH");
+	}
+
+    /**
+     * @dataProvider getTableValidationColumnsOrderIsDifferent
+     */
+	public function testTableValidationColumnsOrderIsDifferent($table, $tableMetaFromDb) {
+		$this->logger->debug("START");
+		$stub = $this->createMock(DdlExecutor::class);
+        $stub->method("getTableMetaFromDb")->willReturn($tableMetaFromDb);     
+        $stub->method("tableExists")->willReturn(true); 
+
+        $this->assertTrue($tableMetaFromDb == $stub->getTableMetaFromDb(new Table()));
+        $this->assertEquals(true, $stub->tableExists($table->getName()));
+
+        $validator = new Validator($stub);
+        $validationResult = $validator->validate($table);
+
+		$tableValidation = $this->getTableValidationColumnsOrderIsDifferent();
+		$this->logger->trace("start check when getTableValidationColumnsOrderIsDifferent");
+		$this->assertFalse($validationResult->passed);
+		$this->logger->trace("finish check when getTableValidationColumnsOrderIsDifferent");
+		$this->assertTrue(count($validationResult->errors) > 0);
+		$this->logger->debug("errors: " . var_export($validationResult->errors, true));
+		$this->logger->debug("FINISH");
+	}
 }
+

@@ -237,28 +237,9 @@ class TriggerTest extends TestCase{
 					$this->assertEquals($value, $rowJrnl[$key]);
 					//$this->logger->debug ( " $key => $value" );
 				}
-
-				/*
-
-                $updateResult = $this->ddlExecutor->updateValue($table->getName(), {''}, $insertId);
-                updateValue(string $table_name, array $parameters, array $id_param) {
-
-
-		        $rowJrnl = $this->ddlExecutor->getLastRowFromJrnlById($table->getTableJrnl()->getName(), $insertId);
-		        $this->assertNotNull($rowJrnl);
-		        $this->assertEquals(1, $rowJrnl['insert_ind']);
-				$this->assertTrue(is_array($rowJrnl));
-				$this->assertGreaterThan(0, $rowJrnl);
-				foreach ($row as $key => $value) {
-					$this->assertEquals($value, $rowJrnl[$key]);
-					//$this->logger->debug ( " $key => $value" );
-				}
-
-				*/
 			}
 		}
 		
-		$this->assertTrue(1==1);
 		$this->logger->debug ( "FINISH" );
 
 	}
