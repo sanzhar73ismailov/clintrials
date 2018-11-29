@@ -61,6 +61,16 @@
     	</table>
     </td></tr>
     <table>
+   {if !$validationResult->passed}
+   <div>
+   	<div></div>
+
+   	<h3>Actions</h3>
+   	<table class="table table-bordered table-sm">
+
+   	</table>
+   </div>
+   {/if}
 
 </div>
 <!-- Optional JavaScript -->

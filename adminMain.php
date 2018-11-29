@@ -9,6 +9,8 @@ use clintrials\admin\{
     ReportDb,
     ReportTables
 };
+use clintrials\admin\validation\Validator;
+use clintrials\admin\validation\ValidationResult;
 
 
 //$logger = Logger::getRootLogger();
@@ -45,9 +47,14 @@ $tpl = 'index.tpl';
 if (isset($_REQUEST['editTable'])) {
 	$tpl = 'tableEdit.tpl';
 	$table = $db->getTable($_REQUEST['editTable']);
+	$tableMetaFromDb = $ddlExecutor->getTableMetaFromDb($table);
+	$validator = new Validator($ddlExecutor);
+	$validationResult = $validator->validate($table);
 	$smarty->assign('table', $table);
-	$smarty->assign('tableMetaFromDb', $ddlExecutor->getTableMetaFromDb($table));
-	$logger->trace('$ddlExecutor->getTableMetaFromDb($table)=' . var_export($ddlExecutor->getTableMetaFromDb($table), true));
+	$smarty->assign('tableMetaFromDb', $tableMetaFromDb);
+	$smarty->assign('validationResult', $validationResult);
+	
+	$logger->trace('$ddlExecutor->getTableMetaFromDb($table)=' . var_export($tableMetaFromDb, true));
 
 } else {
 	//$logger->trace("ddlExecutor=" . var_export($ddlExecutor, true));
