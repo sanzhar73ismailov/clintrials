@@ -40,7 +40,7 @@ class Validator {
 	        //$validationResult = $this->ddlExecutor->tableMatched ( $table );
 
            
-			$tableMetaFromDb = $this->ddlExecutor->getTableMetaFromDb($table) ;
+			$tableMetaFromDb = $this->ddlExecutor->getTableMetaFromDb($table);
 
 			$columnsNamesXml = array ();
 			$columnsNamesDb = array ();

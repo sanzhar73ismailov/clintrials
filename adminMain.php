@@ -41,13 +41,26 @@ $smarty->setCacheDir('cache/');
 $metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
 $db = $metadataCreator->getDb();
 $ddlExecutor = new DdlExecutor ( $db );
-//$logger->trace("ddlExecutor=" . var_export($ddlExecutor, true));
-$reportDb = ReportDb::createReport($metadataCreator, $ddlExecutor);
+$tpl = 'index.tpl';
+if (isset($_REQUEST['editTable'])) {
+	$tpl = 'tableEdit.tpl';
+	$table = $db->getTable($_REQUEST['editTable']);
+	$smarty->assign('table', $table);
+	$smarty->assign('tableMetaFromDb', $ddlExecutor->getTableMetaFromDb($table));
+	$logger->trace('$ddlExecutor->getTableMetaFromDb($table)=' . var_export($ddlExecutor->getTableMetaFromDb($table), true));
+
+} else {
+	//$logger->trace("ddlExecutor=" . var_export($ddlExecutor, true));
+	$reportDb = ReportDb::createReport($metadataCreator, $ddlExecutor);
+	$smarty->assign('reportDb',$reportDb);
+}
+
+$smarty->display($tpl);
 //$logger->debug(var_export($reportDb, true) );
 //$reportTables = $reportDb->getReportTables();
 
 //$smarty->assign('name','Ned');
-$smarty->assign('reportDb',$reportDb);
+
 
 
 
@@ -61,5 +74,5 @@ $smarty->assign('reportDb',$reportDb);
 	//$ddlExecutor->createDbWhole ();
 //	$logger->debug(( $ddlExecutor->dbExists () ));
 //}
-$smarty->display('index.tpl');
+
 $logger->trace("FINISH");

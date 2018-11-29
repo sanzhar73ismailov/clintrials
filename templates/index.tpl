@@ -56,7 +56,10 @@ getDbSchema
                <div id="{$reportTable->getTable()->getName()}_ddl" class="collapse"><pre>{$reportTable->getTable()->getDdl()}</pre></div>
 	    	</td>
 	    	<td>{if $reportTable->getReportTableValid()}<div class="alert alert-success">Valid</div>
-	    	    {else}<div class="alert alert-warning">Valid</div>{/if}</td>
+	    	    {else}<div class="alert alert-warning">Valid
+                <a href="?editTable={$reportTable->getTable()->getName()}">edit</a>
+                </div>
+	    	{/if}</td>
 	    	<td>
 	    		{if $reportTable->getReportTableValid()==false}
 	    		<button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#{$reportTable->getTable()->getName()}_errors">Show error details</button>
@@ -65,8 +68,11 @@ getDbSchema
 		    		{showOk label='table valid' isOk=$reportTable->getTableValid()}
 		    		{showOk label='tableJrnl exist' isOk=$reportTable->getTableJrnlExist()}
 		    		{showOk label='tableJrnl vaild' isOk=$reportTable->getTableJrnlVaild()}
-		    		{showOk label='trigger insertExist' isOk=$reportTable->getTriggerInsertExist()}
-		    		{showOk label='trigger updateExist' isOk=$reportTable->getTriggerUpdateExist()}
+		    		{showOk label='trigger insert exist' isOk=$reportTable->getTriggerInsertExist()}
+		    		{showOk label='trigger insert valid' isOk=$reportTable->getTriggerInsertValid()}
+		    		
+		    		{showOk label='trigger update exist' isOk=$reportTable->getTriggerUpdateExist()}
+		    		{showOk label='trigger update valid' isOk=$reportTable->getTriggerUpdateValid()}
 		    		{if $reportTable->getTableValidationResult()->passed==false}
 		    		   <div class='badge badge-secondary'>Table validation result errors:</div>
 		    		   {foreach from=$reportTable->getTableValidationResult()->errors item=error}
@@ -81,16 +87,12 @@ getDbSchema
 		    		{/if}
 	    		{/if}
 	    	    </div>
-	    	</td>    
+	    	</td>
+	    	<td></td>
 	    </tr>
 	{/foreach}
 	</table>
 </div>
-
-
-
-
-
 <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="vendor/components/jquery/jquery.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

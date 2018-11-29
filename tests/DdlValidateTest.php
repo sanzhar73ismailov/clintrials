@@ -5,6 +5,8 @@ use PHPUnit\Framework\TestCase;
 use clintrials\admin\MetadataCreator;
 use clintrials\admin\DdlExecutor;
 use clintrials\admin\metadata\Table;
+use clintrials\admin\validation\Validator;
+
 class DdlValidateTest extends TestCase {
 	private $logger;
 	private $metadataCreator;
@@ -70,12 +72,14 @@ class DdlValidateTest extends TestCase {
 		$this->assertNotNull($this->db->getTable('clin_test_lab'));
 		$this->assertNotNull($this->db->getTable('clin_test_instrument'));
 		$this->assertTrue ( count ( $tables ) > 0 );
+		$validator = new Validator($ddlExecutor);
 		foreach ( $tables as $table ) {
 			
 			$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName() ) );
 			$this->logger->debug ( "test table " . $table->getName () );
 			
-			$res = $ddlExecutor->tableMatched ( $table );
+
+			$res = $validator->validate ( $table );
 			$this->logger->debug ( var_export ( $res, true ) );
 			$this->assertTrue ( $res->passed );
 			$this->assertTrue ( count ( $res->errors ) == 0 );
@@ -93,14 +97,14 @@ class DdlValidateTest extends TestCase {
 		$this->assertNotNull($table);
 		$this->assertTrue ( $ddlExecutor->tableExists ( $table->getName() ) );
 		$this->logger->debug ( "test table " . $table->getName () );
-		
-		$res = $ddlExecutor->tableMatched ( $table );
+		$validator = new Validator($ddlExecutor);
+		$res =  $validator->validate ( $table );
 		$this->logger->debug ( var_export ( $res, true ) );
 		$this->assertTrue ( $res->passed );
 		$this->assertTrue ( count ( $res->errors ) == 0 );
 		$query = "ALTER TABLE `clin_test_lab` MODIFY COLUMN `visit_id` INTEGER(11) DEFAULT NULL COMMENT 'Визит' AFTER `id`";
 		$this->assertTrue ($ddlExecutor->runSql($query));
-		$res = $ddlExecutor->tableMatched ( $table );
+		$res = $validator->validate ( $table );
 		$this->assertFalse ( $res->passed );
 		$this->assertTrue ( count ( $res->errors ) == 1 );
 		$this->logger->debug ( var_export ( $res->errors, true ) );
