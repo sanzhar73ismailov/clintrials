@@ -81,5 +81,25 @@ class Table extends MetaGeneral {
 		return $columnNames;
 	}
 
+	public function getFieldByName(string $name) : Field{
+		foreach ( $this->fields as $field ) {
+			if($field->getName () == $name) {
+				return $field;
+			}
+		}
+		return null;
+	}
+
+	public function getFieldBefore(string $name) {
+		$filedBefore = null;
+		foreach ( $this->fields as $field ) {
+			if($field->getName () == $name) {
+				return $filedBefore;
+			}
+			$filedBefore = $field;
+		}
+		return false;
+	}
+
 }
 
