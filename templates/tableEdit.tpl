@@ -27,13 +27,14 @@
    			</tr>
    		{/foreach}
    		{foreach from=$tableChangeAdviser->getActionsRemove() item=action}
-   			<tr class="alert alert-danger"><td>{$action->field->getName()}</td>
+   			<tr class="alert alert-danger">
+   				<td>{$action->field->getName()}</td>
    				<td>
-   					<select>
+   					<select class="remove_select" id="remove_change_{$action->field->getName()}">
    					    <option value="remove" selected="">remove</option>
    					    <option value="change">change to</option>
    				    </select>
-   				    <select>
+   				    <select id="select_remove_change_{$action->field->getName()}" style="display:none">
    				    	{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
    					    <option value="{$action->field->getName()}">{$action->field->getName()}</option>
    					    {/foreach}
@@ -117,5 +118,24 @@
     <script src="vendor/components/jquery/jquery.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="vendor/twbs/bootstrap/site/docs/4.1/assets/js/vendor/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script>
+	$(document).ready(function(){
+	    //$("p").click(function(){
+	    //    $(this).hide();
+	   // });
+	   
+	});
+
+	$(document).ready(function(){
+	    $("button").click(function(){
+	        $("#test").hide();
+	    });
+	    $( ".remove_select" ).change(function() {
+           console.log( $(this).attr('id'));
+       });
+	});
+	
+</script>
 </body>
 </html>
