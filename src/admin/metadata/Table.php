@@ -90,15 +90,27 @@ class Table extends MetaGeneral {
 		return null;
 	}
 
-	public function getFieldBefore(string $name) {
-		$filedBefore = null;
+	public function getFieldBefore(string $name) : Field{
+		$filedBefore = new Field ("","","");
 		foreach ( $this->fields as $field ) {
 			if($field->getName () == $name) {
-				return $filedBefore;
+				break;
 			}
 			$filedBefore = $field;
 		}
-		return false;
+		return $filedBefore;
+	}
+
+
+	/**
+	* Return field as string + name of field before as hash 
+     */
+	public function getFieldAsHashByName(string $name) : string{
+		$field = $this->getFieldByName($name);
+		$fieldBefore = $this->getFieldBefore($name);
+		$res = ((string)$field) .  ($fieldBefore ?: "" );
+
+		return $res;
 	}
 
 }

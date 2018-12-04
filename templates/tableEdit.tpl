@@ -12,66 +12,105 @@
 <div class="container">
 	<h2>Table {$table->getName()}</h2>
 	<p/>
-	<table class="">
-		<tr><td>
-			<table class="table table-bordered table-sm">
-				<tr>
-					<th>N</th>
-					<th>Name</th>
-					<th>Type</th>
-					<th>Comment</th>
-					<th>Is Null</th>
-					<th>Is Seevice</th>
-				</tr>
-				{foreach from=$table->getFields() item=field name=smartyloop}
-				{assign var="counter" value=$smarty.foreach.smartyloop.iteration}
-				<tr>
-					<td>{$counter}</td>
-					<td>{if $field->getPk()}<span class='text text-success'>{$field->getName()} (PK)</span>
-						{else}{$field->getName()}{/if}</td>
-					<td>{$field->getType()}</td>
-					<td>{$field->getComment()}</td>
-					<td>{$field->getNull()}</td>
-					<td>{$field->getService()}</td>
-				</tr>
-					
-				{/foreach}
-		    </table>
-    </td>
-    <td scope="col"><=></td>
-    <td>
-    	<table class="table table-bordered table-sm">
-				<tr>
-					<th>N</th>
-					<th>Name</th>
-					<th>Type</th>
-					<th>Comment</th>
-					<th>Is Null</th>
-				</tr>
-    	{foreach from=$tableMetaFromDb->columns item=field name=smartyloop2}
-    	{assign var="counter" value=$smarty.foreach.smartyloop2.iteration}
-    	<tr>
-					<td>{$counter}</td>
-					<td>{$field->column_name}</td>
-					<td>{$field->data_type}</td>
-					<td>{$field->column_comment}</td>
-					<td>{$field->is_nullable}</td>
-		</tr>
-    	{/foreach}
-    	</table>
-    </td></tr>
-    <table>
-   {if !$validationResult->passed}
+{if !$validationResult->passed}
    <div>
-   	<div></div>
-
-   	<h3>Actions</h3>
+    <h3>Actions</h3>
    	<table class="table table-bordered table-sm">
+   			<tr><th>Fileld name</th><th>Action type</th><th>After field</th><th>Comment</th><th>Skip</th></tr>
+   		{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
+   			<tr class="alert alert-success">
+   				<td>{$action->field->getName()}</td>
+   				<td>{$action->type}</td>
+   				<td>{$action->after->getName()}</td>
+   				<td>&nbsp;</td>
+   				<td><input type="checkbox" name="{$action->type}_{$action->field->getName()}"/></td>
+   			</tr>
+   		{/foreach}
+   		{foreach from=$tableChangeAdviser->getActionsRemove() item=action}
+   			<tr class="alert alert-danger"><td>{$action->field->getName()}</td>
+   				<td>
+   					<select>
+   					    <option value="remove" selected="">remove</option>
+   					    <option value="change">change to</option>
+   				    </select>
+   				    <select>
+   				    	{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
+   					    <option value="{$action->field->getName()}">{$action->field->getName()}</option>
+   					    {/foreach}
+   				    </select>
+   				</td>
+   				<td>{$action->after}</td>
+   				<td>&nbsp;</td>
+   				<td><input type="checkbox" name="{$action->type}_{$action->field->getName()}"/></td>
+   			</tr>
+   		{/foreach}
+   		{foreach from=$tableChangeAdviser->getActionsChange() item=action}
+   			<tr class="alert alert-warning">
+   				<td>{$action->field->getName()}</td>
+   				<td>{$action->type}</td>
+   				<td>{$action->after}</td>
+   				<td>{$action->comment}</td>
+   				<td><input type="checkbox" name="{$action->type}_{$action->field->getName()}"/></td>
+   			</tr>
+   		{/foreach}
 
    	</table>
    </div>
    {/if}
 
+   <div>
+	   <h3>Tables info</h3>
+		<table class="">
+			<tr><th>Table in XML</th><th>&nbsp;</th><th>Table in DB</th></tr>
+			<tr><td>
+				<table class="table table-bordered table-sm">
+					<tr>
+						<th>N</th>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Comment</th>
+						<th>Is null</th>
+						<th>Is service</th>
+					</tr>
+					{foreach from=$table->getFields() item=field name=smartyloop}
+					{assign var="counter" value=$smarty.foreach.smartyloop.iteration}
+					<tr>
+						<td>{$counter}</td>
+						<td>{if $field->getPk()}<span class='text text-success'>{$field->getName()} (PK)</span>
+							{else}{$field->getName()}{/if}</td>
+						<td>{$field->getType()}</td>
+						<td>{$field->getComment()}</td>
+						<td>{$field->getNull()}</td>
+						<td>{$field->getService()}</td>
+					</tr>
+						
+					{/foreach}
+			    </table>
+	    </td>
+	    <td scope="col"><=></td>
+	    <td>
+	    	<table class="table table-bordered table-sm">
+					<tr>
+						<th>N</th>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Comment</th>
+						<th>Is Null</th>
+					</tr>
+	    	{foreach from=$tableMetaFromDb->columns item=field name=smartyloop2}
+	    	{assign var="counter" value=$smarty.foreach.smartyloop2.iteration}
+	    	<tr>
+						<td>{$counter}</td>
+						<td>{$field->column_name}</td>
+						<td>{$field->data_type}</td>
+						<td>{$field->column_comment}</td>
+						<td>{$field->is_nullable}</td>
+			</tr>
+	    	{/foreach}
+	    	</table>
+	    </td></tr>
+	    <table>
+    </div>
 </div>
 <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

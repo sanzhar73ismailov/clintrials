@@ -29,4 +29,15 @@ class TableMetaFromDb {
 		}
 		return $columnNames;
 	}
+
+	public function getFieldBefore(string $name) {
+		$filedBefore = new FieldMetaFromDb("", "", "");
+		foreach ( $this->columns as $field ) {
+			if($field->column_name == $name) {
+				break;
+			}
+			$filedBefore = $field;
+		}
+		return $filedBefore;
+	}
 }

@@ -11,6 +11,7 @@ use clintrials\admin\{
 };
 use clintrials\admin\validation\Validator;
 use clintrials\admin\validation\ValidationResult;
+use clintrials\admin\validation\TableChangeAdviser;
 
 
 //$logger = Logger::getRootLogger();
@@ -50,9 +51,12 @@ if (isset($_REQUEST['editTable'])) {
 	$tableMetaFromDb = $ddlExecutor->getTableMetaFromDb($table);
 	$validator = new Validator($ddlExecutor);
 	$validationResult = $validator->validate($table);
+	$tableChangeAdviser = new TableChangeAdviser($ddlExecutor, $table);
+    $tableChangeAdviser->advise();
 	$smarty->assign('table', $table);
 	$smarty->assign('tableMetaFromDb', $tableMetaFromDb);
 	$smarty->assign('validationResult', $validationResult);
+	$smarty->assign('tableChangeAdviser', $tableChangeAdviser);
 	
 	$logger->trace('$ddlExecutor->getTableMetaFromDb($table)=' . var_export($tableMetaFromDb, true));
 

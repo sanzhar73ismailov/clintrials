@@ -11,38 +11,41 @@ use Exception;
 class TableChangeAdviser {
 	private $logger;
 	private $ddlExecutor;
-	private $actonsAdd = array();
-	private $actonsRemove = array();
-	private $actonsChange = array();
+	private $table;
+	private $actionsAdd = array();
+	private $actionsRemove = array();
+	private $actionsChange = array();
 
 
 
 
-	public function __construct(DdlExecutor $ddlExecutor) {
+	public function __construct(DdlExecutor $ddlExecutor, Table $table) {
 			$this->ddlExecutor = $ddlExecutor;
+			$this->table = $table;
 			$this->logger = Logger::getLogger(__CLASS__);
 	}
 
-	public function advise(Table $table) : void {
+	public function advise() : void {
 		$this->logger->debug("START");
 
-		$tableMetaFromDb = $this->ddlExecutor->getTableMetaFromDb($table);
+		$tableMetaFromDb = $this->ddlExecutor->getTableMetaFromDb($this->table);
 
 		$columnsNamesXml = array ();
 		$columnsNamesDb = array ();
-		$columnsNamesXml = $table->getFieldsName();
+		$columnsNamesXml = $this->table->getFieldsName();
 		$columnsNamesDb = $tableMetaFromDb->getFieldsName();
 
-		$this->fillActonsAdd($table, $columnsNamesXml, $columnsNamesDb);
-		$this->fillActonsRemove($table, $columnsNamesXml, $columnsNamesDb);
-		$this->fillActonsChange($table, $columnsNamesXml, $columnsNamesDb);
+		$this->fillActonsAdd($columnsNamesXml, $columnsNamesDb);
+		$this->fillActonsRemove($columnsNamesXml, $columnsNamesDb);
+		$this->fillActonsChange($tableMetaFromDb);
 
 		$this->logger->debug("FINISH");
 
 	}
 
-	private function fillActonsAdd($table, $columnsNamesXml, $columnsNamesDb) {
+	private function fillActonsAdd($columnsNamesXml, $columnsNamesDb) {
 		$this->logger->debug("START");
+		$table = $this->table;
 		$resultDiff = array_diff($columnsNamesXml, $columnsNamesDb);
 		$this->logger->trace('resultDiff=' . var_export($resultDiff, true));
 		if(count($resultDiff)) {
@@ -59,15 +62,16 @@ class TableChangeAdviser {
 
 				$this->logger->trace('adviserAction=' . var_export($adviserAction, true));
 		
-				$this->actonsAdd [] = $adviserAction;
+				$this->actionsAdd [] = $adviserAction;
 			}
 		}
-		$this->logger->trace('$this->actonsAdd=' . var_export($this->actonsAdd, true));
+		$this->logger->trace('$this->actionsAdd=' . var_export($this->actionsAdd, true));
 		$this->logger->debug("FINISH");
 	}
 
-	private function fillActonsRemove($table, $columnsNamesXml, $columnsNamesDb) {
+	private function fillActonsRemove($columnsNamesXml, $columnsNamesDb) {
 		$this->logger->debug("START");
+		$table = $this->table;
 		$resultDiff = array_diff($columnsNamesDb, $columnsNamesXml);
 		$this->logger->trace('columnsNamesDb=' . var_export($columnsNamesDb, true));
 		$this->logger->trace('columnsNamesXml=' . var_export($columnsNamesXml, true));
@@ -76,49 +80,67 @@ class TableChangeAdviser {
 			foreach ($resultDiff as $fieldNameToAdd) {
 				$adviserAction = new AdviserAction("remove");
 				$adviserAction->field = new Field($fieldNameToAdd, "", "");
-				$this->actonsRemove [] = $adviserAction;
+				$this->actionsRemove [] = $adviserAction;
 			}
 		}
 		$this->logger->debug("FINISH");
 	}
 
-	private function fillActonsChange($table, $tableMetaFromDb) {
-		/*
+	private function fillActonsChange($tableMetaFromDb) {
+		$this->logger->debug("START");
+		$table = $this->table;
 		$columnsNamesXml = $table->getFieldsName();
 		$columnsNamesDb = $tableMetaFromDb->getFieldsName();
-		
-		
+		$this->logger->trace('$columnsNamesXml=' . var_export($columnsNamesXml,true));
+		$this->logger->trace('$columnsNamesDb=' . var_export($columnsNamesDb,true));
+
 		foreach ($columnsNamesXml as $columnNameXml) {
-			if(in_array($columnNameXml, $columnsNamesDb){
+
+			if(in_array($columnNameXml, $columnsNamesDb)) {
 				$columnXml = $table->getFieldByName($columnNameXml);
 				$columnDb = $tableMetaFromDb->getFieldByName($columnNameXml);
-				if( ((string) $columnXml) != ((string) $columnDb) ) {
+
+				/*
+				$columnXmlBefore = $table->getFieldBefore($columnNameXml);
+				$columnDbBefore = $tableMetaFromDb->getFieldBefore($columnNameXml);
+
+				$columnXmlAfter = ((string) $columnXml) . ($columnXmlBefore ? $columnXmlBefore->getName() : "") ;
+				$columnDbAfter = ((string) $columnDb) . ($columnDbBefore ? $columnDbBefore->column_name : "") ;
+				*/
+
+
+				if( ((string)$columnXml) != ((string)$columnDb) ) {
 					$adviserAction = new AdviserAction("change");
 				    $adviserAction->field = $columnXml;
-				    $fieldBefore = $table->getFieldBefore($columnXml);
-				    if ($fieldBefore) {
-				       $adviserAction->after = $table->getFieldBefore($columnXml);	
-				    }
-				$this->logger->trace('adviserAction=' . var_export($adviserAction, true));
-				$this->actonsChange [] = $adviserAction;
+				    $adviserAction->comment = $this->getWhyComment($columnXml, $columnDb);
+				    //$adviserAction->after = $columnXmlBefore ?: "";
+				    $this->logger->trace('adviserAction=' . var_export($adviserAction, true));
+				    $this->actionsChange [] = $adviserAction;
+				    
 				}
 			}
 		}
-		*/
+		$this->logger->debug("FINISH");
+	}
 
+	private function getWhyComment($columnXml, $columnDb) :string {
+		$description = "";
+		$description .= $columnXml->getComment() != $columnDb->column_comment ? "comments not equal" : "";
+		$description .= $columnXml->getType() != $columnDb->data_type ? ($description ? ", type is not equal" : "type is not equal") : "";
+		return $description;
 	}
 
 
-	public function getActonsAdd() : array {
-		return $this->actonsAdd;
+	public function getActionsAdd() : array {
+		return $this->actionsAdd;
 	}
 
-	public function getActonsRemove() : array {
-		return $this->actonsRemove;
+	public function getActionsRemove() : array {
+		return $this->actionsRemove;
 	}
 
-	public function getActonsChange() : array {
-		return $this->actonsChange;
+	public function getActionsChange() : array {
+		return $this->actionsChange;
 	}
 
 

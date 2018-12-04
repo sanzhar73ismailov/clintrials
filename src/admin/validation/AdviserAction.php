@@ -6,6 +6,7 @@ class AdviserAction {
 	public $type; //add, remove, change
 	public $field;
 	public $after = ""; //if add or change
+	public $comment = ""; //description of action cause
 
 	public function __construct(string $type) {
 			$this->type = $type;
