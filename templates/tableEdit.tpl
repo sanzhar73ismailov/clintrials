@@ -12,18 +12,19 @@
 <div class="container">
 	<h2>Table {$table->getName()}</h2>
 	<p/>
+	<div id="myjson">{[]}</div><button id="mybutton">Press</button>
 {if !$validationResult->passed}
    <div>
     <h3>Actions</h3>
    	<table class="table table-bordered table-sm">
-   			<tr><th>Fileld name</th><th>Action type</th><th>After field</th><th>Comment</th><th>Skip</th></tr>
-   		{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
+   			<tr><th>Fileld name</th><th>Action type</th><th>After field</th><th>Comment</th><th>Enable</th></tr>
+   		{foreach from=$tableChangeAdviser->getActionsAdd() item=action key=k}
    			<tr class="alert alert-success">
-   				<td>{$action->field->getName()}</td>
-   				<td>{$action->type}</td>
-   				<td>{$action->after->getName()}</td>
+   				<td id="add_field_{$k}">{$action->field->getName()}</td>
+   				<td id="add_type_{$k}">{$action->type}</td>
+   				<td id="add_after_{$k}">{$action->after->getName()}</td>
    				<td>&nbsp;</td>
-   				<td><input type="checkbox" name="{$action->type}_{$action->field->getName()}"/></td>
+   				<td><input type="checkbox"  id="add_enable_{$k}"  name="{$action->type}_{$action->field->getName()}"/></td>
    			</tr>
    		{/foreach}
    		{foreach from=$tableChangeAdviser->getActionsRemove() item=action}
@@ -119,23 +120,6 @@
     <script src="vendor/twbs/bootstrap/site/docs/4.1/assets/js/vendor/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <script>
-	$(document).ready(function(){
-	    //$("p").click(function(){
-	    //    $(this).hide();
-	   // });
-	   
-	});
-
-	$(document).ready(function(){
-	    $("button").click(function(){
-	        $("#test").hide();
-	    });
-	    $( ".remove_select" ).change(function() {
-           console.log( $(this).attr('id'));
-       });
-	});
-	
-</script>
+    <script src="js/script.js"></script>
 </body>
 </html>
