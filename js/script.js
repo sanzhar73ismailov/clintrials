@@ -45,10 +45,13 @@ $(document).ready(function() {
 			var action = {}
 			action ["id"] = suffix;
 			action ["field"] = $( "#field_" + suffix).text();
+			action ["initial_type"] = $( "#initial_type_" + suffix).text();
 			
-			if(action ["type"] == 'remove') {
-				console.log("selected="+$( "#remove_change__" + suffix).find(":selected").text());
-				
+			if(action ["initial_type"] == 'remove') {
+				console.log("selected text="+$( "#remove_change_" + suffix).find(":selected").text());
+				console.log("selected val="+$( "#remove_change_" + suffix).find(":selected").val());
+				action ["type"] = $( "#remove_change_" + suffix).find(":selected").val();
+				action ["to"] = $( "#select_remove_change_" + suffix).find(":selected").val();
 			} else {
 				action ["type"] = $( "#type_" + suffix).text().trim();
 			}

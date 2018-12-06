@@ -19,10 +19,11 @@
     <h3>Actions</h3>
 
     <table class="table table-bordered table-sm">
-   			<tr><th>Fileld name</th><th>Action type</th><th>After field</th><th>Comment</th><th>Enable</th></tr>
+   			<tr><th>Fileld name</th><th>Initial type</th><th>Action type</th><th>After field</th><th>Comment</th><th>Enable</th></tr>
    		{foreach from=$tableChangeAdviser->getAllActions() item=action key=k}
    			<tr class="">
    				<td id="field_{$k}">{$action->field->getName()}</td>
+   				<td  id="initial_type_{$k}">{$action->type}</td>
    				<td  id="type_{$k}">
    				{if $action->type=="remove"}
    					<select class="remove_select" id="remove_change_{$k}">
@@ -48,7 +49,7 @@
 
 
    	<form action="post">
-   	!!!jsonToPost:<textArea rows="10" cols="70" name="jsonToPost" id="jsonToPost"></textArea>!!!
+   	!!!jsonToPost:<textArea rows="10" cols="100" name="jsonToPost" id="jsonToPost"></textArea>!!!
    	<br/><button id="mybutton" class="btn btn-primary">Go</button>
    </form>
 
