@@ -76,6 +76,18 @@ class PhpBaseTest extends TestCase {
 
 		$this->logger->debug("FINISH");
 	}
+	public function testArraMerge() {
+		$arr1 = [1,2,3];
+		$arr2 = [10,20,33];
+		$arr_merged = array_merge($arr1, $arr2);
+		$this->assertCount(3, $arr1);
+		$this->assertCount(3, $arr2);
+		$this->assertCount(6, $arr_merged);
+		$this->assertEquals([1,2,3,10,20,33], $arr_merged);
+
+
+
+	}
 }
 
 class A {

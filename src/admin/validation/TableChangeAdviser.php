@@ -142,6 +142,10 @@ class TableChangeAdviser {
 	public function getActionsChange() : array {
 		return $this->actionsChange;
 	}
+	//array_merge
+	public function getAllActions() : array {
+		return array_merge($this->actionsAdd, $this->actionsRemove, $this->actionsChange);
+	}
 
 
 

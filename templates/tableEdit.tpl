@@ -11,11 +11,52 @@
 <body>
 <div class="container">
 	<h2>Table {$table->getName()}</h2>
+	<div id="err_mess" class="text-danger"></div>
 	<p/>
-	<div id="myjson">{[]}</div><button id="mybutton">Press</button>
+	
 {if !$validationResult->passed}
    <div>
     <h3>Actions</h3>
+
+    <table class="table table-bordered table-sm">
+   			<tr><th>Fileld name</th><th>Action type</th><th>After field</th><th>Comment</th><th>Enable</th></tr>
+   		{foreach from=$tableChangeAdviser->getAllActions() item=action key=k}
+   			<tr class="">
+   				<td id="field_{$k}">{$action->field->getName()}</td>
+   				<td  id="type_{$k}">
+   				{if $action->type=="remove"}
+   					<select class="remove_select" id="remove_change_{$k}">
+   					    <option value="remove" selected="">remove</option>
+   					    <option value="change">change to</option>
+   				    </select>
+   				    <select id="select_remove_change_{$k}" style="display:">
+   				    	{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
+   					    <option value="{$action->field->getName()}">{$action->field->getName()}</option>
+   					    {/foreach}
+   				    </select>
+   				{else}
+   					{$action->type}
+   				{/if}
+   			    </td>
+   				
+   				<td id="after_{$k}">{if $action->after}{$action->after->getName()}{/if}</td>
+   				<td>&nbsp;</td>
+   				<td><input type="checkbox" class="check_action"  id="action_enable_{$k}"  name="{$action->type}_{$action->field->getName()}"/></td>
+   			</tr>
+   		{/foreach}
+   	</table>
+
+
+   	<form action="post">
+   	!!!jsonToPost:<textArea rows="10" cols="70" name="jsonToPost" id="jsonToPost"></textArea>!!!
+   	<br/><button id="mybutton" class="btn btn-primary">Go</button>
+   </form>
+
+
+
+
+
+{*
    	<table class="table table-bordered table-sm">
    			<tr><th>Fileld name</th><th>Action type</th><th>After field</th><th>Comment</th><th>Enable</th></tr>
    		{foreach from=$tableChangeAdviser->getActionsAdd() item=action key=k}
@@ -24,26 +65,18 @@
    				<td id="add_type_{$k}">{$action->type}</td>
    				<td id="add_after_{$k}">{$action->after->getName()}</td>
    				<td>&nbsp;</td>
-   				<td><input type="checkbox"  id="add_enable_{$k}"  name="{$action->type}_{$action->field->getName()}"/></td>
+   				<td><input type="checkbox" class="check_action"  id="add_enable_{$k}"  name="{$action->type}_{$action->field->getName()}"/></td>
    			</tr>
    		{/foreach}
    		{foreach from=$tableChangeAdviser->getActionsRemove() item=action}
    			<tr class="alert alert-danger">
    				<td>{$action->field->getName()}</td>
    				<td>
-   					<select class="remove_select" id="remove_change_{$action->field->getName()}">
-   					    <option value="remove" selected="">remove</option>
-   					    <option value="change">change to</option>
-   				    </select>
-   				    <select id="select_remove_change_{$action->field->getName()}" style="display:none">
-   				    	{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
-   					    <option value="{$action->field->getName()}">{$action->field->getName()}</option>
-   					    {/foreach}
-   				    </select>
+   					
    				</td>
    				<td>{$action->after}</td>
    				<td>&nbsp;</td>
-   				<td><input type="checkbox" name="{$action->type}_{$action->field->getName()}"/></td>
+   				<td><input type="checkbox" class="check_action" name="{$action->type}_{$action->field->getName()}"/></td>
    			</tr>
    		{/foreach}
    		{foreach from=$tableChangeAdviser->getActionsChange() item=action}
@@ -52,11 +85,12 @@
    				<td>{$action->type}</td>
    				<td>{$action->after}</td>
    				<td>{$action->comment}</td>
-   				<td><input type="checkbox" name="{$action->type}_{$action->field->getName()}"/></td>
+   				<td><input type="checkbox" class="check_action" name="{$action->type}_{$action->field->getName()}"/></td>
    			</tr>
    		{/foreach}
 
    	</table>
+   	*}
    </div>
    {/if}
 
