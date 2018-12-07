@@ -22,6 +22,22 @@ function isActioArrayValid(actionArray) {
    	  }
    }
 
+   for (var i = 0; i < actionArray.length; i++) {
+   	  var field = actionArray[i];
+   	  if(field.type == "change"){
+		for (var j = 0; j < arrayFieldNames.length; j++) {
+			if(i==j){
+				continue;
+			}
+   	  		var fieldName = arrayFieldNames[i];
+   	  		if(fieldName == field.to){
+   	  			$errors.push("Field " + fieldName + " used as change to and field name");
+   	  		}
+   	  	}
+   	  }
+   }
+
+
    //$errors.push("is not implemented");
    return $errors;
 }
