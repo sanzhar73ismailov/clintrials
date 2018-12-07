@@ -18,6 +18,7 @@ $(document).ready(function() {
 	});
 
 	$( ".remove_select" ).change(function() {
+		var suffix = $(this).attr('id').replace("remove_select_", "");
 		console.log( $(this).attr('id'));
 	});
 	/*
@@ -50,8 +51,16 @@ $(document).ready(function() {
 			if(action ["initial_type"] == 'remove') {
 				console.log("selected text="+$( "#remove_change_" + suffix).find(":selected").text());
 				console.log("selected val="+$( "#remove_change_" + suffix).find(":selected").val());
-				action ["type"] = $( "#remove_change_" + suffix).find(":selected").val();
-				action ["to"] = $( "#select_remove_change_" + suffix).find(":selected").val();
+				var removeType = $( "#remove_change_" + suffix).find(":selected").val();
+				action ["type"] = removeType;
+				if(removeType == "change") {
+					$( "#select_remove_change_" + suffix).show();
+					action ["to"] = $( "#select_remove_change_" + suffix).find(":selected").val();
+				} else {
+					$( "#select_remove_change_" + suffix).hide();
+
+				}
+				
 			} else {
 				action ["type"] = $( "#type_" + suffix).text().trim();
 			}
@@ -73,3 +82,4 @@ $(document).ready(function() {
 	$( "#err_mess" ).html( err.message );
 	}
 });
+

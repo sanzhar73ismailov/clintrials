@@ -30,7 +30,7 @@
    					    <option value="remove" selected="">remove</option>
    					    <option value="change">change to</option>
    				    </select>
-   				    <select id="select_remove_change_{$k}" style="display:">
+   				    <select id="select_remove_change_{$k}" style="display:none">
    				    	{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
    					    <option value="{$action->field->getName()}">{$action->field->getName()}</option>
    					    {/foreach}
@@ -41,7 +41,7 @@
    			    </td>
    				
    				<td id="after_{$k}">{if $action->after}{$action->after->getName()}{/if}</td>
-   				<td>&nbsp;</td>
+   				<td>{$action->comment}</td>
    				<td><input type="checkbox" class="check_action"  id="action_enable_{$k}"  name="{$action->type}_{$action->field->getName()}"/></td>
    			</tr>
    		{/foreach}
