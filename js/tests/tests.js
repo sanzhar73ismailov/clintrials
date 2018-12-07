@@ -11,7 +11,7 @@ QUnit.skip( "add test", function( assert ) {
 ]
 */
 
-QUnit.test( "Json actions create", function( assert ) {
+QUnit.test( "Json actions validate", function( assert ) {
   var actionsArray = [];
   //var action = ;
   actionsArray.push({id:"0", field:"f1", initial_type:"add", type:"add", after:"instr_mrt_descr"});
@@ -23,8 +23,14 @@ QUnit.test( "Json actions create", function( assert ) {
   assert.ok(Array.isArray(actionsArray), "actionsArray is array.");
   assert.equal( 5, actionsArray.length, "actionsArray.length should be 5." );
 
-  var expectedErrors = [];
-  assert.equal(isActioArrayValid(actionsArray), [], "isActioArrayValid(actionsArray) return empty array.");
+  
+  assert.ok("0" == isActioArrayValid([]).length, "isActioArrayValid([]) return empty array.");
+
+  var expectedErrors = ["Field f2 used more than once"];
+  var result = isActioArrayValid(actionsArray);
+
+  assert.deepEqual( result, expectedErrors, "result == [\"Field f2 used more than once\"]");
+  //assert.equal(expectedErrors[0], result[0], "result == [\"Field f2 used more than once\"]");
 
 
   
