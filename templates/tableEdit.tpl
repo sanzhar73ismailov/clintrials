@@ -30,7 +30,7 @@
    					    <option value="remove" selected="">remove</option>
    					    <option value="change">change to</option>
    				    </select>
-   				    <select id="select_remove_change_{$k}" style="display:none">
+   				    <select id="select_remove_change_{$k}" style="display:">
    				    	{foreach from=$tableChangeAdviser->getActionsAdd() item=action}
    					    <option value="{$action->field->getName()}">{$action->field->getName()}</option>
    					    {/foreach}
@@ -48,50 +48,10 @@
    	</table>
 
 
-   	<form action="post">
-   	!!!jsonToPost:<textArea rows="10" cols="100" name="jsonToPost" id="jsonToPost"></textArea>!!!
-   	<br/><button id="mybutton" class="btn btn-primary">Go</button>
+   	<form method="post">
+   	<textArea rows="10" cols="100" name="jsonActions" id="jsonToPost"></textArea>
+   	<br/><button id="updateTableButton" class="btn btn-primary">Update Db table</button>
    </form>
-
-
-
-
-
-{*
-   	<table class="table table-bordered table-sm">
-   			<tr><th>Fileld name</th><th>Action type</th><th>After field</th><th>Comment</th><th>Enable</th></tr>
-   		{foreach from=$tableChangeAdviser->getActionsAdd() item=action key=k}
-   			<tr class="alert alert-success">
-   				<td id="add_field_{$k}">{$action->field->getName()}</td>
-   				<td id="add_type_{$k}">{$action->type}</td>
-   				<td id="add_after_{$k}">{$action->after->getName()}</td>
-   				<td>&nbsp;</td>
-   				<td><input type="checkbox" class="check_action"  id="add_enable_{$k}"  name="{$action->type}_{$action->field->getName()}"/></td>
-   			</tr>
-   		{/foreach}
-   		{foreach from=$tableChangeAdviser->getActionsRemove() item=action}
-   			<tr class="alert alert-danger">
-   				<td>{$action->field->getName()}</td>
-   				<td>
-   					
-   				</td>
-   				<td>{$action->after}</td>
-   				<td>&nbsp;</td>
-   				<td><input type="checkbox" class="check_action" name="{$action->type}_{$action->field->getName()}"/></td>
-   			</tr>
-   		{/foreach}
-   		{foreach from=$tableChangeAdviser->getActionsChange() item=action}
-   			<tr class="alert alert-warning">
-   				<td>{$action->field->getName()}</td>
-   				<td>{$action->type}</td>
-   				<td>{$action->after}</td>
-   				<td>{$action->comment}</td>
-   				<td><input type="checkbox" class="check_action" name="{$action->type}_{$action->field->getName()}"/></td>
-   			</tr>
-   		{/foreach}
-
-   	</table>
-   	*}
    </div>
    {/if}
 
@@ -156,5 +116,6 @@
     <script src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <script src="js/script.js"></script>
+    <script src="js/functions.js"></script>
 </body>
 </html>

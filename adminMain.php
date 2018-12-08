@@ -12,6 +12,7 @@ use clintrials\admin\{
 use clintrials\admin\validation\Validator;
 use clintrials\admin\validation\ValidationResult;
 use clintrials\admin\validation\TableChangeAdviser;
+use clintrials\admin\validation\AdviserAction;
 
 
 //$logger = Logger::getRootLogger();
@@ -47,6 +48,15 @@ $ddlExecutor = new DdlExecutor ( $db );
 $tpl = 'index.tpl';
 if (isset($_REQUEST['editTable'])) {
 	$tpl = 'tableEdit.tpl';
+	
+	if (isset($_REQUEST['jsonActions'])) {
+		$jsonDecode = json_decode($_REQUEST['jsonActions']);
+		$logger->debug("jsonDecode=" . var_export($jsonDecode, true));
+		$objArray = AdviserAction::convertJsonToAdviserActionArray($_REQUEST['jsonActions']);
+		$logger->debug("objArray=" . var_export($objArray, true));
+	}
+
+
 	$table = $db->getTable($_REQUEST['editTable']);
 	$tableMetaFromDb = $ddlExecutor->getTableMetaFromDb($table);
 	$validator = new Validator($ddlExecutor);

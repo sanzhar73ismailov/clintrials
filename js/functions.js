@@ -4,7 +4,12 @@ function add (x1, x2){
 
 function isActioArrayValid(actionArray) {
    $errors = [];
-   if(actionArray.length == 0) {
+   if(!Array.isArray(actionArray)){
+   	 $errors.push("actionArray is not array");
+   	 return $errors;
+   }
+   if(!actionArray.length) {
+   	$errors.push("actionArray is empty");
    	return $errors;
    }
    let arrayFieldNames = actionArray.map(a => a.field);
@@ -29,9 +34,9 @@ function isActioArrayValid(actionArray) {
 			if(i==j){
 				continue;
 			}
-   	  		var fieldName = arrayFieldNames[i];
+   	  		var fieldName = arrayFieldNames[j];
    	  		if(fieldName == field.to){
-   	  			$errors.push("Field " + fieldName + " used as change to and field name");
+   	  			$errors.push("Field " + fieldName + " used as change <to> and field name");
    	  		}
    	  	}
    	  }

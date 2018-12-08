@@ -1,31 +1,31 @@
 $(document).ready(function() {
 
-	$("#mybutton").click(function(){
-		var jsonDiv = $( "#jsonToPost" );
-		var arrActions = [];
-		if (jsonDiv.text()) {
-			arrActions = jQuery.parseJSON( jsonDiv.text() );
+	$("#updateTableButton").click(function(event){
+		try {
+		  	var jsonDiv = $( "#jsonToPost" );
+			var arrActions = [];
+			if (jsonDiv.val()) {
+				arrActions = jQuery.parseJSON( jsonDiv.val() );
+			}
+
+			var errors = isActioArrayValid(arrActions);
+	        console.log("arrActions="+arrActions);
+			console.log("errors="+errors);
+			if(errors.length) {
+				$( "#err_mess" ).html( errors );
+				event.preventDefault();
+			}
+		} catch(err) {
+		  //document.getElementById("err_mess").innerHTML = err.message;
+		  event.preventDefault();
+		  $( "#err_mess" ).html( err.message );
 		}
-		console.log(arrActions);
-		var action = {}
-		action ["type"] = "add";
-		action ["field"] = "f1_" + new Date().getTime();
-		action ["after"] = "a1";
-
-		arrActions.push(action)
-		jsonDiv.html( JSON.stringify(arrActions) );
-
 	});
 
 	$( ".remove_select" ).change(function() {
 		var suffix = $(this).attr('id').replace("remove_select_", "");
 		console.log( $(this).attr('id'));
 	});
-	/*
- 				<td id="field_{$k}">{$action->field->getName()}</td>
-   				<td id="type_{$k}">{$action->type}</td>
-   				<td id="after_{$k}">{if $action->after}{$action->after->getName()}{/if}</td>
-	*/
 
 	$( ".check_action" ).change(function() {
 		//action_enable_
@@ -38,8 +38,8 @@ $(document).ready(function() {
 
 		var jsonDiv = $( "#jsonToPost" );
 		var arrActions = [];
-		if (jsonDiv.text()) {
-			arrActions = jQuery.parseJSON( jsonDiv.text() );
+		if (jsonDiv.val()) {
+			arrActions = jQuery.parseJSON( jsonDiv.val() );
 		}
 		console.log(arrActions);
 		if (toAdd) {
@@ -70,16 +70,11 @@ $(document).ready(function() {
 		} else {
 			arrActions = $.grep(arrActions, function(e) { return e.id!=suffix });
 		}
-		jsonDiv.html( JSON.stringify(arrActions) );
+		jsonDiv.val( JSON.stringify(arrActions) );
 	});
 
 
 
-	try {
-
-	} catch(err) {
-	//document.getElementById("err_mess").innerHTML = err.message;
-	$( "#err_mess" ).html( err.message );
-	}
+	
 });
 
