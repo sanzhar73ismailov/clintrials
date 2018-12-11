@@ -46,6 +46,7 @@ $metadataCreator = new MetadataCreator ( "tests/clintrials_test.xml" );
 $db = $metadataCreator->getDb();
 $ddlExecutor = new DdlExecutor ( $db );
 $tpl = 'index.tpl';
+// for testins use -- start clin_test_lab DDL - with errors for testing from tests/scr_for_tests.sql
 if (isset($_REQUEST['editTable'])) {
 	$tpl = 'tableEdit.tpl';
 	
