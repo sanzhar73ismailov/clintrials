@@ -117,17 +117,39 @@ class AlterTableTest extends TestCase {
 	public function testChangeColumn() : void {
 		$this->logger->debug ( "START" );
 		$ddlExecutor = new DdlExecutor ( $this->db );
-		$sql = "create table t1 (id int, name varchar(20))";
-		//$this->assertTrue ($ddlExecutor->runSql($sql));
-		//$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
+		$sql = "create table t1 (id int, name varchar(20), f1 int, f2 float, f3 date )";
+		$this->assertTrue ($ddlExecutor->runSql($sql));
+		$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
+		$columnsFromDb = $ddlExecutor->getColumnsFromDb($this->db->getName(), 't1');
+		$this->assertCount(5, $columnsFromDb);
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1', "id"));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','name'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f1'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f2'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f3'));
 
-		$fieldNew = new Field("col_name", "col_comment", "int");
-		$this->logger->debug ( "fieldNew ddl 1=" . $fieldNew->getDdl() );
 
-		$fieldNew = new Field("col_name", "col_comment", "int", "id");
-		$this->logger->debug ( "fieldNew ddl 2=" . $fieldNew->getDdl() );
-		$this->logger->debug ( "START" );
+		$fieldChanged = new Field("f1_changed", "col_comment", "varchar", "f2");
+		$this->logger->debug ( "fieldChanged ddl =" . $fieldChanged->getDdl() );
 
+		$this->assertTrue ($ddlExecutor->changeColumn("t1", "f1", $fieldChanged));
+		$columnsFromDb = $ddlExecutor->getColumnsFromDb($this->db->getName(), 't1');
+		$this->assertCount(5, $columnsFromDb);
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1', "id"));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','name'));
+
+		$this->assertNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f1'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f1_changed'));
+
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f2'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f3'));
+
+		$prevColumnFromDb = $ddlExecutor->getPreviousColumnFromDb($this->db->getName(), 't1', $fieldChanged->getName());
+		$this->assertEquals("f2", $prevColumnFromDb->column_name);
+
+		$colChanged = $ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f1_changed');
+		$this->assertEquals ((string) $fieldChanged, (string) $colChanged);
+	
 
         // $prev_col = "id";
         // for ($i=0; $i < 10; $i++) { 
