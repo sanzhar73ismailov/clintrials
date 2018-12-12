@@ -288,6 +288,9 @@ class DdlExecutor {
 		$this->logger->trace("START");
 		$columns = array();
 		$tableMetaFromDb = new TableMetaFromDb();
+		if(!$dbName) {
+			$dbName = $this->db->getName();
+		}
 		try {
 			$query = "SELECT t.COLUMN_NAME, t.DATA_TYPE, t.COLUMN_COMMENT, t.IS_NULLABLE " .
 					" FROM INFORMATION_SCHEMA.columns t " .
@@ -320,6 +323,18 @@ class DdlExecutor {
        	}
        }
        return null;
+    }
+
+    function getPreviousColumnFromDb(string $dbName, string $tableName, string $columnName) {
+       $columns = $this->getColumnsFromDb($dbName, $tableName);
+       $previousColumn = "";
+       foreach ($columns as $column) {
+       	if($column->column_name == $columnName){
+       		break;
+       	}
+       	$previousColumn = $column;
+       }
+       return $previousColumn;
     }
 
 	function backupTable(Table $table) {
@@ -425,10 +440,10 @@ class DdlExecutor {
 		return $result;
 	}
 
-	public function addColumn(string $table_name, Field $field, string $after_column) : bool {
+	public function addColumn(string $table_name, Field $field) : bool {
 		$this->logger->trace("START");
 		$result = false;
-		$query = sprintf("ALTER TABLE %s ADD %s AFTER %s", $table_name, $field->getDdl(), $after_column);
+		$query = sprintf("ALTER TABLE %s ADD %s", $table_name, $field->getDdl());
 		$this->logger->trace("query=" . $query );
 		$result = $this->runSql($query);
 		$this->logger->trace("FINISH, return " . $result );
@@ -438,6 +453,9 @@ class DdlExecutor {
 	public function changeColumn(string $table_name, string $column, Field $field) : bool {
 		$this->logger->trace("START");
 		$result = false;
+		$query = sprintf("ALTER TABLE %s CHANGE %s %s", $table_name, $column, $field->getDdl());
+		$this->logger->trace("query=" . $query );
+		$result = $this->runSql($query);
 		$this->logger->trace("FINISH, return " . $result );
 		return $result;
 	}
@@ -445,6 +463,9 @@ class DdlExecutor {
 	public function dropColumn(string $table_name, string $column) : bool {
 		$this->logger->trace("START");
 		$result = false;
+		$query = sprintf("ALTER TABLE %s DROP %s", $table_name, $column);
+		$this->logger->trace("query=" . $query );
+		$result = $this->runSql($query);
 		$this->logger->trace("FINISH, return " . $result );
 		return $result;
 	}

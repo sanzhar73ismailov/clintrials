@@ -10,11 +10,13 @@ class Field extends MetaGeneral {
 	private $service = false; // служенбное поле (типа user_insert или user_update, которое в каждой таблице есть)
 	private $null = true; // null is possible
 	private $default = null;
+	private $after = null;
 	
-	public function __construct(string $name, string $comment, string $type){
+	public function __construct(string $name, string $comment, string $type, string $after = ""){
 		$this->name = $name;
 		$this->comment = $comment;
 		$this->type = $type;
+		$this->after = $after;
 	}
 
 	private function buildDdl() : string {
@@ -56,7 +58,27 @@ class Field extends MetaGeneral {
 				}
 			}
 			$ddl .= " COMMENT '" . $this->getComment () . "'";
+			$ddl .= " COMMENT '" . $this->getComment () . "'";
+			$ddl .= $this->after ? " AFTER " . $this->after : "";
+
 			return $ddl;
+	}
+
+
+	/**
+	 *
+	 * @return $after
+	 */
+	public function getAfter() : string {
+		return $this->after;
+	}
+	
+	/**
+	 *
+	 * @param $after
+	 */
+	public function setAfter(string $after) {
+		$this->after = $after;
 	}
 	
 	/**

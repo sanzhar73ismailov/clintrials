@@ -47,6 +47,7 @@ class AdviserActionTest extends TestCase {
 	 	$fieldNew = new Field ("f_new", "This is a new column", "int");
 
 	 	$this->assertTrue ($this->ddlExecutor->addColumn( $this->tName, $fieldNew, "age"));
+	 	$this->assertNotNull($this->ddlExecutor->getColumnFromDb("", $this->tName, $fieldNew->getName()));
 	 }
 
 }

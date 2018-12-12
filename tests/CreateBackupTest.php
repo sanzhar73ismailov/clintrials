@@ -10,14 +10,32 @@ class CreateBackupTest extends TestCase {
 	private $logger;
 	private $metadataCreator;
 	private $db;
+	private $patientVisitPairs = array(); // uniq set of patient and visit numbers
 
 	public function setUp() {
 		$this->logger = Logger::getLogger ( __CLASS__ );
 		$this->metadataCreator = new MetadataCreator ( ClinTrialsTestHelper::TEST_XML );
 		$this->createDb ();
 		$this->createTablesAndTriggers ();
+		$this->fillPatientVisitPairs();
 		
 	}
+
+	public function fillPatientVisitPairs(){
+		for ($i=0; $i < 100; $i++) { 
+			for ($j=0; $j < 100; $j++) {
+				$this->patientVisitPairs[] = array($i, $j);
+			}
+		}
+	}
+
+    public function popPatientVisitPairs(){
+		$toRet = $this->patientVisitPairs[0];
+		array_splice($this->patientVisitPairs, 0, 1);
+		return $toRet;
+	}
+
+
 	public function createDb() {
 		$this->db = $this->metadataCreator->getDb ();
 		$ddlExecutor = new DdlExecutor ( $this->db );
@@ -54,11 +72,16 @@ class CreateBackupTest extends TestCase {
 		
 		$this->logger->debug ( "FINISH" );
 	}
+
+
 	
 	private function insertRowTo_clin_test_patient(){
 		$ddlExecutor = new DdlExecutor ( $this->db );
-		$randPatId = rand(1,100);
-		$randVisitId = rand(100,500);
+		$patientVisitNumbers = $this->popPatientVisitPairs();
+		//$randPatId = rand(1,100);
+		//$randVisitId = rand(100,500);
+		$randPatId = $patientVisitNumbers[0];
+		$randVisitId = $patientVisitNumbers[1];
 		$query = "INSERT INTO   clin_test_patient( id, code, sex_id, doctor, checked, row_stat, user_insert, user_update)" 
                  ." VALUE (null, $randPatId, 2, 'doctor fio', 0, 1, 'user1', 'user1')";
         return $ddlExecutor->runSql($query);
