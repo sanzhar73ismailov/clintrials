@@ -30,11 +30,14 @@ class Table extends MetaGeneral {
 		$this->tableJrnl = $tableJrnl;
 	}
 	public function addField(Field $field) {
+		//if($this->fields){
+			//$field->setAfter($this->fields[count($this->fields) - 1]->getName());
+		//}
 		$this->fields [] = $field;
 	}
 	public function addFields(array $fields) : void {
 		foreach ( $fields as $field ) {
-			$this->fields [] = $field;
+			$this->addField($field);
 		}
 	}
 	public function isPatient() : bool {
@@ -47,7 +50,9 @@ class Table extends MetaGeneral {
 		return $this->fields;
 	}
 	public function setFields(array $fields) : void {
-		$this->fields = $fields;
+		$this->fields = array();
+		$this->addFields($fields);
+
 	}
 	public function getTriggerInsert() : Trigger{
 		return $this->triggerInsert;

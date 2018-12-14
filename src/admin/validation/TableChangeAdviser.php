@@ -147,6 +147,30 @@ class TableChangeAdviser {
 		return array_merge($this->actionsAdd, $this->actionsRemove, $this->actionsChange);
 	}
 
+	public function applyActions(array $adviserActions) : void {
+		$ddlExecutor = $this->ddlExecutor;
+		/*
+		AdviserAction 
+	 	$type; //add, remove, change
+	 	$field;
+	 	$after = ""; //if add or change
+	 	$comment = ""; //description of action cause
+	 	*/
+	 	foreach ($adviserActions as $action) {
+	 		if($action->type == "add") {
+	 			$action->field->after = $action->after;
+	 			$ddlExecutor->addColumn($this->table->getName(), $action->field);
+	 		}
+	 		if($action->type == "remove") {
+	 			$ddlExecutor->dropColumn($this->table->getName(), $action->field->getName());
+	 			
+	 		}
+	 		if($action->type == "change") {
+	 			$ddlExecutor->changeColumn($this->table->getName(), $action->field->getName());
+	 		}
+	 	}
+	}
+
 
 
 }

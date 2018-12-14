@@ -5,6 +5,7 @@ namespace clintrials\admin\validation;
 class AdviserAction {
 	public $type; //add, remove, change
 	public $field;
+	public $oldName; // for change actions
 	public $after = ""; //if add or change
 	public $comment = ""; //description of action cause
 
@@ -12,12 +13,13 @@ class AdviserAction {
 			$this->type = $type;
 	}
 
-	public static function buildAdviserAction($type, $field, $after, $comment = '') : AdviserAction{
+	public static function buildAdviserAction($type, $field, $after, $comment = '', $oldName = '') : AdviserAction{
 		$obj = new AdviserAction();
 		$obj->type = $type;
 		$obj->field = $field;
 		$obj->after = $after;
 		$obj->comment = $comment;
+		$obj->$oldName = $oldName;
 		return $obj;
 	}
 
@@ -27,14 +29,32 @@ class AdviserAction {
      'initial_type' => 'add',
      'type' => 'add',
      'after' => 'instr_mrt_descr',
+     [{
+     "id":"1",
+     "field":"field11",
+     "initial_type":"remove",
+     "type":"change",
+     "to":"sex_id",
+     "after":""}]
 	*/
 
 
-	public static function convertJsonToAdviserActionArray($json){
+	public static function convertJsonToAdviserActionArray($table, $json){
 		$adviserActionArray = [];
 		$array = json_decode($json);
 		foreach ($array as $item) {
-			$adviserActionArray[] = self::buildAdviserAction($item->type, $item->field, $item->after, '');
+			$field = null;
+			$oldName = "";
+			$after = "";
+			if($item->type == 'change'){
+				$field = $table->getFieldByName($item->to);
+				$oldName = $item->field;
+			}else{
+				$field = $table->getFieldByName($item->field);
+			}
+			$field = $table->getFieldByName($item->field);
+
+			$adviserActionArray[] = self::buildAdviserAction($item->type, $field, $item->after, '', $oldName);
 		}
 		return $adviserActionArray;
 	}

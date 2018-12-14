@@ -49,16 +49,18 @@ $tpl = 'index.tpl';
 // for testins use -- start clin_test_lab DDL - with errors for testing from tests/scr_for_tests.sql
 if (isset($_REQUEST['editTable'])) {
 	$tpl = 'tableEdit.tpl';
+
+	$table = $db->getTable($_REQUEST['editTable']);
 	
 	if (isset($_REQUEST['jsonActions'])) {
 		$jsonDecode = json_decode($_REQUEST['jsonActions']);
 		$logger->debug("jsonDecode=" . var_export($jsonDecode, true));
-		$objArray = AdviserAction::convertJsonToAdviserActionArray($_REQUEST['jsonActions']);
+		$objArray = AdviserAction::convertJsonToAdviserActionArray($table,$_REQUEST['jsonActions']);
 		$logger->debug("objArray=" . var_export($objArray, true));
 	}
 
 
-	$table = $db->getTable($_REQUEST['editTable']);
+	
 	$tableMetaFromDb = $ddlExecutor->getTableMetaFromDb($table);
 	$validator = new Validator($ddlExecutor);
 	$validationResult = $validator->validate($table);
