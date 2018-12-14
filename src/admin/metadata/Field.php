@@ -10,9 +10,10 @@ class Field extends MetaGeneral {
 	private $service = false; // служенбное поле (типа user_insert или user_update, которое в каждой таблице есть)
 	private $null = true; // null is possible
 	private $default = null;
+	private $after = null;
 	
-		//private $prev = null;
-	//private $next = null;
+    private $prev = null;
+	private $next = null;
 	
 	public function __construct(string $name, string $comment, string $type, string $after = ""){
 		$this->name = $name;
@@ -67,6 +68,23 @@ class Field extends MetaGeneral {
 	}
 
 
+	public function getPrev() {
+		return $this->prev;
+	}
+
+	public function setPrev($prev) {
+		$this->prev = $prev;
+	}
+
+	public function getNext() {
+		return $this->next;
+	}
+
+	public function setNext($next) {
+		$this->next = $next;
+	}
+
+
 	/**
 	 *
 	 * @return $after
@@ -82,7 +100,7 @@ class Field extends MetaGeneral {
 	public function setAfter(string $after) {
 		$this->after = $after;
 	}
-	
+
 	/**
 	 *
 	 * @return $type

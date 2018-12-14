@@ -30,9 +30,12 @@ class Table extends MetaGeneral {
 		$this->tableJrnl = $tableJrnl;
 	}
 	public function addField(Field $field) {
-		//if($this->fields){
+		if (count($this->fields)) {
+			$lastField = $this->fields[count($this->fields) - 1];
+			$lastField->setNext($field->getName());
+			$field->setPrev($lastField->getName());
 			//$field->setAfter($this->fields[count($this->fields) - 1]->getName());
-		//}
+		}
 		$this->fields [] = $field;
 	}
 	public function addFields(array $fields) : void {

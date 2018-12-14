@@ -178,9 +178,9 @@ class TableChangeAdviserTest extends TestCase {
 
         $this->assertEquals("add", $tableChangeAdviser->getActionsAdd()[0]->type);
         $this->assertEquals("f4", $tableChangeAdviser->getActionsAdd()[0]->field->getName());
-        $this->assertEquals(new Field("f4", "comment4", "varchar"), $tableChangeAdviser->getActionsAdd()[0]->field);
+        $this->assertEquals((string) new Field("f4", "comment4", "varchar"), (string) $tableChangeAdviser->getActionsAdd()[0]->field);
         $this->assertEquals("f3", $tableChangeAdviser->getActionsAdd()[0]->after->getName());
-        $this->assertEquals(new Field("f3", "comment3", "int"), $tableChangeAdviser->getActionsAdd()[0]->after);
+        $this->assertEquals((string) new Field("f3", "comment3", "int"), (string) $tableChangeAdviser->getActionsAdd()[0]->after);
 
         $this->assertEquals("add", $tableChangeAdviser->getActionsAdd()[0]->type);
         $this->assertEquals("afterf4", $tableChangeAdviser->getActionsAdd()[1]->field->getName());
@@ -239,11 +239,11 @@ class TableChangeAdviserTest extends TestCase {
 
         $this->assertEquals("change", $tableChangeAdviser->getActionsChange()[0]->type);
         $this->assertEquals("f2", $tableChangeAdviser->getActionsChange()[0]->field->getName());
-        $this->assertEquals(new Field("f2", "comment2", "varchar"), $tableChangeAdviser->getActionsChange()[0]->field);
+        $this->assertEquals((string) new Field("f2", "comment2", "varchar"), (string)  $tableChangeAdviser->getActionsChange()[0]->field);
 
         $this->assertEquals("change", $tableChangeAdviser->getActionsChange()[1]->type);
         $this->assertEquals("f4", $tableChangeAdviser->getActionsChange()[1]->field->getName());
-        $this->assertEquals(new Field("f4", "comment4Another", "int"), $tableChangeAdviser->getActionsChange()[1]->field);
+        $this->assertEquals((string) new Field("f4", "comment4Another", "int"), (string) $tableChangeAdviser->getActionsChange()[1]->field);
 
         /*
         
