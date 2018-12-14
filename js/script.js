@@ -47,6 +47,7 @@ $(document).ready(function() {
 			action ["id"] = suffix;
 			action ["field"] = $( "#field_" + suffix).text();
 			action ["initial_type"] = $( "#initial_type_" + suffix).text();
+			action ["to"] = action ["field"];
 			
 			if(action ["initial_type"] == 'remove') {
 				console.log("selected text="+$( "#remove_change_" + suffix).find(":selected").text());
@@ -65,7 +66,6 @@ $(document).ready(function() {
 				action ["type"] = $( "#type_" + suffix).text().trim();
 			}
 			
-			action ["after"] = $( "#after_" + suffix).text();
 			arrActions.push(action);
 		} else {
 			arrActions = $.grep(arrActions, function(e) { return e.id!=suffix });

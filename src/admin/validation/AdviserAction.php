@@ -2,22 +2,22 @@
 declare ( strict_types = 1 );
 namespace clintrials\admin\validation;
 
+use clintrials\admin\metadata\Field;
+
 class AdviserAction {
 	public $type; //add, remove, change
 	public $field;
 	public $oldName; // for change actions
-	public $after = ""; //if add or change
 	public $comment = ""; //description of action cause
 
 	public function __construct(string $type='') {
 			$this->type = $type;
 	}
 
-	public static function buildAdviserAction($type, $field, $after, $comment = '', $oldName = '') : AdviserAction{
+	public static function buildAdviserAction($type, $field, $comment = '', $oldName = '') : AdviserAction{
 		$obj = new AdviserAction();
 		$obj->type = $type;
 		$obj->field = $field;
-		$obj->after = $after;
 		$obj->comment = $comment;
 		$obj->$oldName = $oldName;
 		return $obj;
@@ -46,15 +46,20 @@ class AdviserAction {
 			$field = null;
 			$oldName = "";
 			$after = "";
-			if($item->type == 'change'){
+			// var_dump($item);
+			// echo "<br/>";
+			if ($item->type == 'change') {
 				$field = $table->getFieldByName($item->to);
 				$oldName = $item->field;
-			}else{
+			} elseif ($item->type == 'remove') {
+				$field = new Field($item->field);
+			} else {
+				
 				$field = $table->getFieldByName($item->field);
 			}
-			$field = $table->getFieldByName($item->field);
+			
 
-			$adviserActionArray[] = self::buildAdviserAction($item->type, $field, $item->after, '', $oldName);
+			$adviserActionArray[] = self::buildAdviserAction($item->type, $field, $item->type . ' action', $oldName);
 		}
 		return $adviserActionArray;
 	}

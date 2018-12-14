@@ -19,7 +19,7 @@
     <h3>Actions</h3>
 
     <table class="table table-bordered table-sm">
-   			<tr><th>Fileld name</th><th>Initial type</th><th>Action type</th><th>After field</th><th>Comment</th><th>Enable</th></tr>
+   			<tr><th>Fileld name</th><th>Initial type</th><th>Action type</th><th>Comment</th><th>Enable</th></tr>
    		{foreach from=$tableChangeAdviser->getAllActions() item=action key=k}
    			<tr class="">
    				<td id="field_{$k}">{$action->field->getName()}</td>
@@ -40,7 +40,6 @@
    				{/if}
    			    </td>
    				
-   				<td id="after_{$k}">{if $action->after}{$action->after->getName()}{/if}</td>
    				<td>{$action->comment}</td>
    				<td><input type="checkbox" class="check_action"  id="action_enable_{$k}"  name="{$action->type}_{$action->field->getName()}"/></td>
    			</tr>

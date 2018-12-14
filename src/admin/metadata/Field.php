@@ -15,7 +15,7 @@ class Field extends MetaGeneral {
     private $prev = null;
 	private $next = null;
 	
-	public function __construct(string $name, string $comment, string $type, string $after = ""){
+	public function __construct(string $name = "", string $comment = "", string $type = "", string $after = ""){
 		$this->name = $name;
 		$this->comment = $comment;
 		$this->type = $type;
