@@ -45,6 +45,7 @@ getDbSchema
 			<th>DDL</th>
 			<th>Valid</th>
 			<th>Valid Rusults</th>
+			<th>Actions</th>
 		</tr>
 	{function name=showOk label='' isOk='0'}
 	    <div>{$label}={if $isOk}<span class='text text-success'>Yes</span>{else}<span class='text text-danger'>No</span>{/if}</div>
@@ -89,7 +90,14 @@ getDbSchema
 	    		{/if}
 	    	    </div>
 	    	</td>
-	    	<td></td>
+	    	<td>
+	    		{if !$reportTable->getTriggerInsertValid() or !$reportTable->getTriggerUpdateValid()}
+	    		<a href='?recreateTriggers&table={$reportTable->getTable()->getName()}'>Recreate Triggers</a><br/>
+	    		{/if}
+	    		
+	    		<a href='?recreateTable&table={$reportTable->getTable()->getName()}'>Recreate table</a>
+	    		
+	    	</td>
 	    </tr>
 	{/foreach}
 	</table>

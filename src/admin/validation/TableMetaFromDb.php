@@ -10,8 +10,8 @@ class TableMetaFromDb {
 	public function addColumn($column){
 		if (count($this->columns)) {
 			$lastColumn = $this->columns[count($this->columns) - 1];
-			$lastColumn->next = $column->column_name;
-			$column->prev = $lastColumn->column_name;
+			$lastColumn->setNext($column->column_name);
+			$column->setPrev($lastColumn->column_name);
 			//$field->setAfter($this->fields[count($this->fields) - 1]->getName());
 		}
 		$this->columns[] = $column;

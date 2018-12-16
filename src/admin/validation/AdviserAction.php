@@ -57,9 +57,11 @@ class AdviserAction {
 			} elseif ($item->type == 'remove') {
 				$field = new Field($item->field);
 			} else {
-				
 				$field = $table->getFieldByName($item->field);
 			}
+
+
+			$field->setAfter($field->getPrev() ?: "");
 			
 			$adviserAction = self::buildAdviserAction($item->type, $field, $item->type . ' action', $oldName);
 

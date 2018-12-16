@@ -50,7 +50,7 @@
 
 
    	<form method="post" action="adminMain.php">
-   		<input type="hidden" name="tableAction" value="{$table->getName()}"/>
+   		<input type="hidden" name="table" value="{$table->getName()}"/>
 	   	<textArea rows="10" cols="100" name="jsonActions" id="jsonToPost"></textArea>
 	   	<br/>
 	   	<button id="updateTableButton" class="btn btn-primary">Update Db table</button>
@@ -97,7 +97,7 @@
 						<th>Comment</th>
 						<th>Is Null</th>
 					</tr>
-	    	{foreach from=$tableMetaFromDb->columns item=field name=smartyloop2}
+	    	{foreach from=$tableMetaFromDb->getColumns() item=field name=smartyloop2}
 	    	{assign var="counter" value=$smarty.foreach.smartyloop2.iteration}
 	    	<tr>
 						<td>{$counter}</td>

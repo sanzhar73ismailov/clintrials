@@ -8,8 +8,8 @@ class FieldMetaFromDb {
 	public $column_comment;
 	public $data_type;
 	public $is_nullable = true;
-	public $prev;
-	public $next;
+	private $prev;
+	private $next;
 	
 	function __construct(string $column_name, string $column_comment, string $data_type, bool $is_nullable=true) {
 		$this->column_name = $column_name;
@@ -22,5 +22,21 @@ class FieldMetaFromDb {
 		$isNull =  $this->is_nullable ? 'is_nullable=YES' : 'is_nullable=NO';
 		return sprintf("%s-%s-%s-%s", 
 			    strtolower($this->column_name), strtolower($this->data_type), $this->column_comment, $isNull);
+	}
+
+	public function getPrev(){
+		return $this->prev;
+	}
+
+	public function setPrev($prev){
+		$this->prev = $prev;
+	}
+
+	public function getNext(){
+		return $this->next;
+	}
+	
+	public function setNext($next){
+		$this->next = $next;
 	}
 }

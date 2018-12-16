@@ -117,7 +117,14 @@ class TableChangeAdviser {
 				    $this->logger->trace('adviserAction=' . var_export($adviserAction, true));
 				    $this->actionsChange [] = $adviserAction;
 				}else{
-					//if()
+					if($columnXml->getPrev() != $columnDb->getPrev()){
+						$adviserAction = new AdviserAction("change");
+					    $adviserAction->field = $columnXml;
+					    $adviserAction->comment = "Position is not the same";
+					    //$adviserAction->after = $columnXmlBefore ?: "";
+					    $this->logger->trace('adviserAction=' . var_export($adviserAction, true));
+					    $this->actionsChange [] = $adviserAction;
+					}
 				}
 			}
 		}
@@ -150,6 +157,11 @@ class TableChangeAdviser {
 
 	public function applyActions(array $adviserActions) : void {
 		$ddlExecutor = $this->ddlExecutor;
+		if(!$adviserActions) {
+			return;
+		}
+		$ddlExecutor->backupTable($this->table);
+
 		/*
 		AdviserAction 
 	 	$type; //add, remove, change
@@ -160,17 +172,31 @@ class TableChangeAdviser {
 	 	foreach ($adviserActions as $action) {
 	 		$this->logger->trace("action:" . var_export($action, true));
 	 		if($action->type == "add") {
-	 			$action->field->after = $action->after;
+	 			//$action->field->after = $action->after;
 	 			$ddlExecutor->addColumn($this->table->getName(), $action->field);
+	 			$ddlExecutor->addColumn($this->table->getTableJrnl()->getName(), $action->field);
 	 		}
 	 		if($action->type == "remove") {
 	 			$ddlExecutor->dropColumn($this->table->getName(), $action->field->getName());
+	 			$ddlExecutor->dropColumn($this->table->getTableJrnl()->getName(), $action->field->getName());
 	 			
 	 		}
 	 		if($action->type == "change") {
 	 			$ddlExecutor->changeColumn($this->table->getName(), $action->oldName, $action->field);
+	 			$ddlExecutor->changeColumn($this->table->getTableJrnl()->getName(), $action->oldName, $action->field);
 	 		}
 	 	}
+	 	$ddlExecutor->createAllTriggers($this->table);
+	 	/*
+	 	$trigCreate = $ddlExecutor->createTrigger($this->table->getTriggerInsert());
+	 	if(!$trigCreate){
+	 		throw new Exception("Trigger " . $this->table->getTriggerInsert()->getName() . " was not created");
+	 	}
+	 	$trigCreate = $ddlExecutor->createTrigger($this->table->getTriggerUpdate());
+	 	if(!$trigCreate){
+	 		throw new Exception("Trigger " . $this->table->getTriggerUpdate()->getName() . " was not created");
+	 	}
+	 	*/
 	}
 
 

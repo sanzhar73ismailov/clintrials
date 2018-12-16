@@ -5,6 +5,7 @@ namespace clintrials\admin;
 use Logger;
 use PDO;
 use PDOException;
+use Exception;
 use clintrials\admin\metadata\ {
 	DbSchema,
 	Table,
@@ -198,18 +199,34 @@ class DdlExecutor {
 	
 	function createTrigger(Trigger $trigger) : bool {
 		$this->logger->trace("START");
-		$result = $this->runSql($trigger->getDdl());
+		$sql = "DROP TRIGGER IF EXISTS " . $trigger->getName() . ";\r\n";
+		$sql .= $trigger->getDdl();
+		$result = $this->runSql($sql);
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
+	}
+
+	function createAllTriggers(Table $table) {
+		$this->logger->trace("START");
+		$trigCreate = $this->createTrigger($table->getTriggerInsert());
+	 	if(!$trigCreate){
+	 		throw new Exception("Trigger " . $table->getTriggerInsert()->getName() . " was not created");
+	 	}
+	 	$trigCreate = $this->createTrigger($table->getTriggerUpdate());
+	 	if(!$trigCreate){
+	 		throw new Exception("Trigger " . $table->getTriggerUpdate()->getName() . " was not created");
+	 	}
 	}
 	
 	function runSql($sql) : bool {
 		$this->logger->trace("START");
 		$result = false;
 		try {
+			$this->conn->beginTransaction();
 			$this->conn->exec('USE ' . $this->db->getName());
 			$this->logger->trace("sql=" . $sql);
 			$result = $this->conn->exec ( $sql ) !== false;
+			$this->conn->commit();
 		} catch ( PDOException $e ) {
 			$this->logger->error($e->getMessage(), $e);
 		}
@@ -238,6 +255,24 @@ class DdlExecutor {
 	
 	function createTable(Table $table) : bool {
 		return $this->createTableFromDdl($table->getDdl());
+	}
+
+	function dropTable(Table $table) {
+		$this->runSql("DROP TABLE IF EXISTS ". $table->getName());
+	}
+	
+
+	function reCreateTable(Table $table) {
+		$this->backupTable($table);
+
+		$this->dropTable($table);
+		if ($this->createTable($table)) {
+			throw new  Exception("Table " . $table->getName() . " not created");
+		}
+		$this->dropTable($table->getTableJrnl());
+		if ($this->createTableJrnl($table)) {
+			throw new  Exception("Table " . $table->getTableJrnl()->getName() . " not created");
+		}
 	}
 	
 	function createTableJrnl(Table $table) : bool {

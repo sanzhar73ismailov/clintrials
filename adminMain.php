@@ -63,15 +63,20 @@ if (isset($_REQUEST['editTable'])) {
 } else {
 	
 	if (isset($_REQUEST['jsonActions'])) {
-		$table = $db->getTable($_REQUEST['tableAction']);
+		$table = $db->getTable($_REQUEST['table']);
 		$jsonDecode = json_decode($_REQUEST['jsonActions']);
 		$logger->debug("jsonDecode=" . var_export($jsonDecode, true));
 		$adviserActions = AdviserAction::convertJsonToAdviserActionArray($table,$_REQUEST['jsonActions']);
 		$logger->debug("adviserActions=" . var_export($adviserActions, true));
 		$tableChangeAdviser = new TableChangeAdviser($ddlExecutor, $table);
         $tableChangeAdviser->applyActions($adviserActions);
-		
+	} elseif (isset($_REQUEST['recreateTriggers'])) {
+		$ddlExecutor->createAllTriggers($db->getTable($_REQUEST['table']));
+	} elseif (isset($_REQUEST['recreateTable'])) {
+		$logger->debug("REQUEST['recreateTable'] is flow");
+		$ddlExecutor->reCreateTable($db->getTable($_REQUEST['table']));
 	}
+
 	//$logger->trace("ddlExecutor=" . var_export($ddlExecutor, true));
 	$reportDb = ReportDb::createReport($metadataCreator, $ddlExecutor);
 	$smarty->assign('reportDb',$reportDb);
