@@ -136,12 +136,17 @@ class DdlExecutor {
 		$result = 0;
 		try {
 			$this->conn->exec('USE ' . $this->db->getName());
-			$query = "select count(1) from " . $table_name . "";
+			$query = "select count(1) num from " . $table_name . "";
 			$stmt = $this->conn->prepare ( $query );
 			$stmt->execute ();
 			//$row = $stmt->fetchAll ( PDO::FETCH_ASSOC );
 			//$this->logger->trace("\$stmt->rowCount ()=" . $stmt->rowCount ());
-			$result = $stmt->rowCount ();
+			if ($row = $stmt->fetch ( PDO::FETCH_ASSOC )){
+				$result = (int) $row['num'];
+			}else{
+				throw new Exception("Error Processing Request");
+				
+			}
 		} catch ( PDOException $e ) {
 			$this->logger->error("error", $e);
 		}
@@ -266,13 +271,14 @@ class DdlExecutor {
 		$this->backupTable($table);
 
 		$this->dropTable($table);
-		if ($this->createTable($table)) {
+		if (!$this->createTable($table)) {
 			throw new  Exception("Table " . $table->getName() . " not created");
 		}
 		$this->dropTable($table->getTableJrnl());
-		if ($this->createTableJrnl($table)) {
+		if (!$this->createTableJrnl($table)) {
 			throw new  Exception("Table " . $table->getTableJrnl()->getName() . " not created");
 		}
+		$this->createAllTriggers($table);
 	}
 	
 	function createTableJrnl(Table $table) : bool {

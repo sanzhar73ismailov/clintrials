@@ -29,6 +29,10 @@ class ReportTable {
 	private $triggerInsertValidationResult;
 	private $triggerUpdateValidationResult;
 	private $reportTableValid = false;
+	private $tableRowsCount = 0;
+	private $tableJrnlRowsCount = 0;
+
+
 
 
 	function __construct() {
@@ -121,6 +125,22 @@ class ReportTable {
 
 	public function setReportTableValid($reportTableValid) {
 		$this->reportTableValid = $reportTableValid;
+	}
+
+	public function getTableRowsCount(){
+		return $this->tableRowsCount;
+	}
+
+	public function setTableRowsCount($tableRowsCount){
+		$this->tableRowsCount = $tableRowsCount;
+	}
+
+	public function getTableJrnlRowsCount(){
+		return $this->tableJrnlRowsCount;
+	}
+
+	public function setTableJrnlRowsCount($tableJrnlRowsCount){
+		$this->tableJrnlRowsCount = $tableJrnlRowsCount;
 	}
 
 	

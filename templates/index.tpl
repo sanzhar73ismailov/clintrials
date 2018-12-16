@@ -42,6 +42,7 @@ getDbSchema
 		<tr>
 			<th>Name</th>
 			<th>Comment</th>
+			<th>Rows count</th>
 			<th>DDL</th>
 			<th>Valid</th>
 			<th>Valid Rusults</th>
@@ -54,6 +55,12 @@ getDbSchema
         <tr>
 	    	<td>{$reportTable->getTable()->getName()} {if $reportTable->getTable()->isPatient()} <span class="text-primary">is Patient</span>{/if}</td>
 	    	<td>{$reportTable->getTable()->getComment()}</td>
+	    	<td>
+	    		<div class="{if $reportTable->getTableRowsCount() or $reportTable->getTableJrnlRowsCount()}alert alert-warning{/if}">
+	    		Table: {$reportTable->getTableRowsCount()}<br/>
+	    		TableJrnl: {$reportTable->getTableJrnlRowsCount()}
+	    	    </div>
+	    	</td>
 	    	<td><button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#{$reportTable->getTable()->getName()}_ddl">Show DDL</button>
                <div id="{$reportTable->getTable()->getName()}_ddl" class="collapse"><pre>{$reportTable->getTable()->getDdl()}</pre></div>
 	    	</td>

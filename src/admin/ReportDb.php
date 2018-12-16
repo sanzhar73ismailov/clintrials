@@ -96,6 +96,7 @@ class ReportDb {
 
 			$reportTable = new ReportTable();
 			$reportTable->setTable($table);
+
 	        $reportTableValid  = false;
 
 	        $validator = new Validator($ddlExecutor);
@@ -104,6 +105,13 @@ class ReportDb {
 	        $reportTable->setTriggerInsertValidationResult($validator->validate($table->getTriggerInsert()));
 	        $reportTable->setTriggerUpdateValidationResult($validator->validate($table->getTriggerUpdate()));
 
+	        if($reportTable->getTableExist()){
+	        	$reportTable->setTableRowsCount($ddlExecutor->getRowsCount($table->getName()));
+	        }
+	        if($reportTable->getTableJrnlExist()){
+	        	$reportTable->setTableJrnlRowsCount($ddlExecutor->getRowsCount($table->getTableJrnl()->getName()));
+	        }
+	        
 	        $reportTableValid  = $reportTable->getTableValid() 
 	                             && $reportTable->getTableJrnlVaild()
 	                             && $reportTable->getTriggerInsertValid()
