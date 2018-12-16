@@ -3,8 +3,37 @@ declare ( strict_types = 1 );
 namespace clintrials\admin\validation;
 
 class TableMetaFromDb {
-	public $columns = array ();
-	
+	private $columns = array ();
+
+
+
+	public function addColumn($column){
+		if (count($this->columns)) {
+			$lastColumn = $this->columns[count($this->columns) - 1];
+			$lastColumn->next = $column->column_name;
+			$column->prev = $lastColumn->column_name;
+			//$field->setAfter($this->fields[count($this->fields) - 1]->getName());
+		}
+		$this->columns[] = $column;
+	}
+
+	public function addColumns($columns) {
+	    foreach ($columns as $column) {
+	    	$this->addColumn($column);
+	    }
+    }
+
+	public function getColumns() {
+		return $this->columns;
+	}
+
+	public function setColumns($columns) {
+		$this->columns = array();
+		$this->addColumns($columns);
+	}
+
+
+
 	public function getFieldByName(string $name) {
 		foreach ( $this->columns as $field ) {
 			if ($field->column_name == $name) {

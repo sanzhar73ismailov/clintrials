@@ -13,6 +13,8 @@
 	<h2>Table {$table->getName()}</h2>
 	<div id="err_mess" class="text-danger"></div>
 	<p/>
+
+<a class="btn btn-info" href="adminMain.php">< Home</a>
 	
 {if !$validationResult->passed}
    <div>
@@ -47,9 +49,11 @@
    	</table>
 
 
-   	<form method="post">
-   	<textArea rows="10" cols="100" name="jsonActions" id="jsonToPost"></textArea>
-   	<br/><button id="updateTableButton" class="btn btn-primary">Update Db table</button>
+   	<form method="post" action="adminMain.php">
+   		<input type="hidden" name="tableAction" value="{$table->getName()}"/>
+	   	<textArea rows="10" cols="100" name="jsonActions" id="jsonToPost"></textArea>
+	   	<br/>
+	   	<button id="updateTableButton" class="btn btn-primary">Update Db table</button>
    </form>
    </div>
    {/if}

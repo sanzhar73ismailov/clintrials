@@ -12,6 +12,7 @@
 <div class="container">
 
    <h2>DB info</h2>
+   <a class="btn btn-info" href="adminMain.php">Refresh page</a>
    <table class="table table-bordered">
     <tr><td>Name</td><td>{$reportDb->getDbSchema()->getName()}</td></tr>
     <tr><td>Number Xml Tables</td><td>{$reportDb->getNumberXmlTables()}</td></tr>

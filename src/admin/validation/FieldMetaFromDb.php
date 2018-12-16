@@ -8,6 +8,8 @@ class FieldMetaFromDb {
 	public $column_comment;
 	public $data_type;
 	public $is_nullable = true;
+	public $prev;
+	public $next;
 	
 	function __construct(string $column_name, string $column_comment, string $data_type, bool $is_nullable=true) {
 		$this->column_name = $column_name;

@@ -280,7 +280,7 @@ class DdlExecutor {
 		$this->logger->trace("START");
 		$resultValidation = null;
 		$tableMetaFromDb = new TableMetaFromDb();
-		$tableMetaFromDb->columns = $this->getColumnsFromDb($this->db->getName(), $table->getName());
+		$tableMetaFromDb->setColumns($this->getColumnsFromDb($this->db->getName(), $table->getName()));
 		return $tableMetaFromDb;
 	}
 	
@@ -452,6 +452,9 @@ class DdlExecutor {
 
 	public function changeColumn(string $table_name, string $column, Field $field) : bool {
 		$this->logger->trace("START");
+		$this->logger->trace("param table_name:" . $table_name);
+		$this->logger->trace("param column:" . $column);
+		$this->logger->trace("param field:" . var_export($field, true));
 		$result = false;
 		$query = sprintf("ALTER TABLE %s CHANGE %s %s", $table_name, $column, $field->getDdl());
 		$this->logger->trace("query=" . $query );

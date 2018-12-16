@@ -20,9 +20,9 @@ class TableChangeAdviser {
 
 
 	public function __construct(DdlExecutor $ddlExecutor, Table $table) {
+		    $this->logger = Logger::getLogger(__CLASS__);
 			$this->ddlExecutor = $ddlExecutor;
 			$this->table = $table;
-			$this->logger = Logger::getLogger(__CLASS__);
 	}
 
 	public function advise() : void {
@@ -116,7 +116,8 @@ class TableChangeAdviser {
 				    //$adviserAction->after = $columnXmlBefore ?: "";
 				    $this->logger->trace('adviserAction=' . var_export($adviserAction, true));
 				    $this->actionsChange [] = $adviserAction;
-				    
+				}else{
+					//if()
 				}
 			}
 		}
@@ -157,6 +158,7 @@ class TableChangeAdviser {
 	 	$comment = ""; //description of action cause
 	 	*/
 	 	foreach ($adviserActions as $action) {
+	 		$this->logger->trace("action:" . var_export($action, true));
 	 		if($action->type == "add") {
 	 			$action->field->after = $action->after;
 	 			$ddlExecutor->addColumn($this->table->getName(), $action->field);
@@ -166,7 +168,7 @@ class TableChangeAdviser {
 	 			
 	 		}
 	 		if($action->type == "change") {
-	 			$ddlExecutor->changeColumn($this->table->getName(), $action->field->getName());
+	 			$ddlExecutor->changeColumn($this->table->getName(), $action->oldName, $action->field);
 	 		}
 	 	}
 	}

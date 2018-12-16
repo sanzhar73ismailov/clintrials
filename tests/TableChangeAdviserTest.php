@@ -66,9 +66,9 @@ class TableChangeAdviserTest extends TestCase {
 		$table->addField(new Field("afterf4", "comment_afterf44", "varchar"));
 		
 		$tableMetaFromDb = new TableMetaFromDb();
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f1", "comment1", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f3", "comment3", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f2", "comment2", "int");
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f1", "comment1", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f3", "comment3", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f2", "comment2", "int"));
 		
 		$data [] = array($table, $tableMetaFromDb);
 		return $data;
@@ -83,10 +83,10 @@ class TableChangeAdviserTest extends TestCase {
 		$table->addField(new Field("f3", "comment3", "int"));
 		
 		$tableMetaFromDb = new TableMetaFromDb();
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f1", "comment1", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f2", "comment2", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f3", "comment3", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("fTobRemoved", "comment_fTobRemoved", "int");
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f1", "comment1", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f2", "comment2", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f3", "comment3", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("fTobRemoved", "comment_fTobRemoved", "int"));
 		
 		$data [] = array($table, $tableMetaFromDb);
 		return $data;
@@ -101,9 +101,9 @@ class TableChangeAdviserTest extends TestCase {
 		$table->addField(new Field("f3", "comment3", "int"));
 		
 		$tableMetaFromDb = new TableMetaFromDb();
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f1", "comment1", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f3", "comment3", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f2", "comment2", "int");
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f1", "comment1", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f3", "comment3", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f2", "comment2", "int"));
 		
 		$data [] = array($table, $tableMetaFromDb);
 		return $data;
@@ -119,10 +119,10 @@ class TableChangeAdviserTest extends TestCase {
 		$table->addField(new Field("f4", "comment4Another", "int"));
 		
 		$tableMetaFromDb = new TableMetaFromDb();
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f1", "comment1", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f3", "comment3", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f2", "comment2", "int");
-		$tableMetaFromDb->columns[] = new FieldMetaFromDb("f4", "comment4", "int");
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f1", "comment1", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f3", "comment3", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f2", "comment2", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f4", "comment4", "int"));
 		
 		$data [] = array($table, $tableMetaFromDb);
 		return $data;

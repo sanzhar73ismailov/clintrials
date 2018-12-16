@@ -3,15 +3,18 @@ declare ( strict_types = 1 );
 namespace clintrials\admin\validation;
 
 use clintrials\admin\metadata\Field;
+use Logger;
 
 class AdviserAction {
+	private $logger;
 	public $type; //add, remove, change
 	public $field;
 	public $oldName; // for change actions
 	public $comment = ""; //description of action cause
 
 	public function __construct(string $type='') {
-			$this->type = $type;
+		$this->logger = Logger::getLogger(__CLASS__);
+		$this->type = $type;
 	}
 
 	public static function buildAdviserAction($type, $field, $comment = '', $oldName = '') : AdviserAction{
@@ -19,7 +22,7 @@ class AdviserAction {
 		$obj->type = $type;
 		$obj->field = $field;
 		$obj->comment = $comment;
-		$obj->$oldName = $oldName;
+		$obj->oldName = $oldName;
 		return $obj;
 	}
 
@@ -58,8 +61,9 @@ class AdviserAction {
 				$field = $table->getFieldByName($item->field);
 			}
 			
+			$adviserAction = self::buildAdviserAction($item->type, $field, $item->type . ' action', $oldName);
 
-			$adviserActionArray[] = self::buildAdviserAction($item->type, $field, $item->type . ' action', $oldName);
+			$adviserActionArray[] = $adviserAction;
 		}
 		return $adviserActionArray;
 	}

@@ -49,18 +49,7 @@ $tpl = 'index.tpl';
 // for testins use -- start clin_test_lab DDL - with errors for testing from tests/scr_for_tests.sql
 if (isset($_REQUEST['editTable'])) {
 	$tpl = 'tableEdit.tpl';
-
 	$table = $db->getTable($_REQUEST['editTable']);
-	
-	if (isset($_REQUEST['jsonActions'])) {
-		$jsonDecode = json_decode($_REQUEST['jsonActions']);
-		$logger->debug("jsonDecode=" . var_export($jsonDecode, true));
-		$objArray = AdviserAction::convertJsonToAdviserActionArray($table,$_REQUEST['jsonActions']);
-		$logger->debug("objArray=" . var_export($objArray, true));
-	}
-
-
-	
 	$tableMetaFromDb = $ddlExecutor->getTableMetaFromDb($table);
 	$validator = new Validator($ddlExecutor);
 	$validationResult = $validator->validate($table);
@@ -70,10 +59,19 @@ if (isset($_REQUEST['editTable'])) {
 	$smarty->assign('tableMetaFromDb', $tableMetaFromDb);
 	$smarty->assign('validationResult', $validationResult);
 	$smarty->assign('tableChangeAdviser', $tableChangeAdviser);
-	
 	$logger->trace('$ddlExecutor->getTableMetaFromDb($table)=' . var_export($tableMetaFromDb, true));
-
 } else {
+	
+	if (isset($_REQUEST['jsonActions'])) {
+		$table = $db->getTable($_REQUEST['tableAction']);
+		$jsonDecode = json_decode($_REQUEST['jsonActions']);
+		$logger->debug("jsonDecode=" . var_export($jsonDecode, true));
+		$adviserActions = AdviserAction::convertJsonToAdviserActionArray($table,$_REQUEST['jsonActions']);
+		$logger->debug("adviserActions=" . var_export($adviserActions, true));
+		$tableChangeAdviser = new TableChangeAdviser($ddlExecutor, $table);
+        $tableChangeAdviser->applyActions($adviserActions);
+		
+	}
 	//$logger->trace("ddlExecutor=" . var_export($ddlExecutor, true));
 	$reportDb = ReportDb::createReport($metadataCreator, $ddlExecutor);
 	$smarty->assign('reportDb',$reportDb);

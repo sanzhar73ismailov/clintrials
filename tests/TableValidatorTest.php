@@ -37,9 +37,9 @@ class TableValidatorTest extends TestCase {
 		$column1 = new FieldMetaFromDb("f1", "comment1", "int");
 		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
 		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
-		$tableMetaFromDb->columns[] = $column1;
-		$tableMetaFromDb->columns[] = $column2;
-		$tableMetaFromDb->columns[] = $column3;
+		$tableMetaFromDb->addColumn($column1);
+		$tableMetaFromDb->addColumn($column2);
+		$tableMetaFromDb->addColumn($column3);
 		
 		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
@@ -60,10 +60,10 @@ class TableValidatorTest extends TestCase {
 		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
 		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
 		$column4 = new FieldMetaFromDb("f4", "comment4", "int");
-		$tableMetaFromDb->columns[] = $column1;
-		$tableMetaFromDb->columns[] = $column2;
-		$tableMetaFromDb->columns[] = $column3;
-		$tableMetaFromDb->columns[] = $column4;
+		$tableMetaFromDb->addColumn($column1);
+		$tableMetaFromDb->addColumn($column2);
+		$tableMetaFromDb->addColumn($column3);
+		$tableMetaFromDb->addColumn($column4);
 		
 		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
@@ -88,10 +88,10 @@ class TableValidatorTest extends TestCase {
 		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
 		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
 		$column4 = new FieldMetaFromDb("f4", "comment4", "int");
-		$tableMetaFromDb->columns[] = $column1;
-		$tableMetaFromDb->columns[] = $column2;
-		$tableMetaFromDb->columns[] = $column3;
-		$tableMetaFromDb->columns[] = $column4;
+		$tableMetaFromDb->addColumn($column1);
+		$tableMetaFromDb->addColumn($column2);
+		$tableMetaFromDb->addColumn($column3);
+		$tableMetaFromDb->addColumn($column4);
 		
 		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
@@ -111,9 +111,9 @@ class TableValidatorTest extends TestCase {
 		$column1 = new FieldMetaFromDb("f1", "comment1", "int");
 		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
 		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
-		$tableMetaFromDb->columns[] = $column1;
-		$tableMetaFromDb->columns[] = $column2;
-		$tableMetaFromDb->columns[] = $column3;
+		$tableMetaFromDb->addColumn($column1);
+		$tableMetaFromDb->addColumn($column2);
+		$tableMetaFromDb->addColumn($column3);
 		
 		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
@@ -135,9 +135,9 @@ class TableValidatorTest extends TestCase {
 		$column3 = new FieldMetaFromDb("f3", "comment3", "int");
 		$column2 = new FieldMetaFromDb("f2", "comment2", "int");
 
-		$tableMetaFromDb->columns[] = $column1;
-		$tableMetaFromDb->columns[] = $column3;
-		$tableMetaFromDb->columns[] = $column2;
+		$tableMetaFromDb->addColumn($column1);
+		$tableMetaFromDb->addColumn($column3);
+		$tableMetaFromDb->addColumn($column2);
 		
 		$tableValidation [] = array($table, $tableMetaFromDb);
 		return $tableValidation;
