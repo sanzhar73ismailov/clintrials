@@ -86,37 +86,13 @@ class TableChangeAdviser {
 		$this->logger->debug("FINISH");
 	}
 
-	private function fillActonsChange($tableMetaFromDb) {
-		$this->logger->debug("START");
+	private function getChangeReplaces($tableMetaFromDb) {
 		$table = $this->table;
 		$columnsNamesXml = $table->getFieldsName();
 		$columnsNamesDb = $tableMetaFromDb->getFieldsName();
-		$this->logger->trace('$columnsNamesXml=' . var_export($columnsNamesXml,true));
-		$this->logger->trace('$columnsNamesDb=' . var_export($columnsNamesDb,true));
 
-		foreach ($columnsNamesXml as $columnNameXml) {
-
-			if(in_array($columnNameXml, $columnsNamesDb)) {
-				$columnXml = $table->getFieldByName($columnNameXml);
-				$columnDb = $tableMetaFromDb->getFieldByName($columnNameXml);
-
-				/*
-				$columnXmlBefore = $table->getFieldBefore($columnNameXml);
-				$columnDbBefore = $tableMetaFromDb->getFieldBefore($columnNameXml);
-
-				$columnXmlAfter = ((string) $columnXml) . ($columnXmlBefore ? $columnXmlBefore->getName() : "") ;
-				$columnDbAfter = ((string) $columnDb) . ($columnDbBefore ? $columnDbBefore->column_name : "") ;
-				*/
-
-
-				if( ((string)$columnXml) != ((string)$columnDb) ) {
-					$adviserAction = new AdviserAction("change");
-				    $adviserAction->field = $columnXml;
-				    $adviserAction->comment = $this->getWhyComment($columnXml, $columnDb);
-				    //$adviserAction->after = $columnXmlBefore ?: "";
-				    $this->logger->trace('adviserAction=' . var_export($adviserAction, true));
-				    $this->actionsChange [] = $adviserAction;
-				}else{
+		/*
+               else{
 					if($columnXml->getPrev() != $columnDb->getPrev()){
 						$adviserAction = new AdviserAction("change");
 					    $adviserAction->field = $columnXml;
@@ -126,7 +102,38 @@ class TableChangeAdviser {
 					    $this->actionsChange [] = $adviserAction;
 					}
 				}
+		*/
+
+	}
+
+	private function fillActonsChange($tableMetaFromDb) {
+		$this->logger->debug("START");
+		$table = $this->table;
+		$columnsNamesXml = $table->getFieldsName();
+		$columnsNamesDb = $tableMetaFromDb->getFieldsName();
+		$this->logger->trace('$columnsNamesXml=' . var_export($columnsNamesXml,true));
+		$this->logger->trace('$columnsNamesDb=' . var_export($columnsNamesDb,true));
+
+		$isAllColumnsExistsGood = true;
+		foreach ($columnsNamesXml as $columnNameXml) {
+
+			if(in_array($columnNameXml, $columnsNamesDb)) {
+				$columnXml = $table->getFieldByName($columnNameXml);
+				$columnDb = $tableMetaFromDb->getFieldByName($columnNameXml);
+
+				if( ((string)$columnXml) != ((string)$columnDb) ) {
+					$isAllColumnsExistsGood = false;
+					$adviserAction = new AdviserAction("change");
+				    $adviserAction->field = $columnXml;
+				    $adviserAction->comment = $this->getWhyComment($columnXml, $columnDb);
+				    //$adviserAction->after = $columnXmlBefore ?: "";
+				    $this->logger->trace('adviserAction=' . var_export($adviserAction, true));
+				    $this->actionsChange [] = $adviserAction;
+				}
 			}
+		}
+		if($isAllColumnsExistsGood && (count($columnsNamesXml) == count($columnsNamesDb))){
+			$this->getChangeReplaces($tableMetaFromDb);
 		}
 		$this->logger->debug("FINISH");
 	}

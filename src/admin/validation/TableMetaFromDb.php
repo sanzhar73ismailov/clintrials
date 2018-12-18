@@ -2,10 +2,16 @@
 declare ( strict_types = 1 );
 namespace clintrials\admin\validation;
 
+use Logger;
+
 class TableMetaFromDb {
+	private $logger;
 	private $columns = array ();
 
 
+    public function __construct() {
+		    $this->logger = Logger::getLogger(__CLASS__);
+	}
 
 	public function addColumn($column){
 		if (count($this->columns)) {
@@ -32,8 +38,6 @@ class TableMetaFromDb {
 		$this->addColumns($columns);
 	}
 
-
-
 	public function getFieldByName(string $name) {
 		foreach ( $this->columns as $field ) {
 			if ($field->column_name == $name) {
@@ -41,6 +45,17 @@ class TableMetaFromDb {
 			}
 		}
 		return false;
+	}
+
+	public function getFieldIndexByName(string $name) {
+		$i = 0;
+		foreach ( $this->columns as $field ) {
+			if ($field->column_name == $name) {
+				return $i;
+			}
+			$i++;
+		}
+		return -1;
 	}
 
 	public function getFieldsName() : array {

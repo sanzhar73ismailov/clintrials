@@ -6,7 +6,8 @@ use clintrials\admin\metadata\ {
 	TableJrnl, 
 	Trigger
 };
-//use clintrials\admin\metadata\Trigger;
+use Exception;
+use InvalidArgumentException;
 
 class Table extends MetaGeneral {
 	protected $fields = array ();
@@ -15,7 +16,8 @@ class Table extends MetaGeneral {
 	private $triggerInsert;
 	private $triggerUpdate;
 	
-	public function __construct() {
+	public function __construct($name = "") {
+		$this->name = $name;
 	}
 	public function createTableJrnl() : void {
 		if (empty ( $this->fields )) {
@@ -29,8 +31,65 @@ class Table extends MetaGeneral {
 	public function setTableJrnl(TableJrnl $tableJrnl) : void {
 		$this->tableJrnl = $tableJrnl;
 	}
-	public function addField(Field $field) {
+	public function getFirstField() {
 		if (count($this->fields)) {
+			return $this->fields[0];
+		}
+		return null;
+	}
+
+	public function getLastField() {
+		if (count($this->fields)) {
+			return $this->fields[count($this->fields) - 1];
+		}
+		return null;
+	}
+
+	public function getFieldIndex($field) {
+		return $this->getFieldIndexByName($field->getName());
+	}
+
+	public function getFieldIndexByName($name) {
+		for ($i=0; $i < count($this->fields); $i++) { 
+			if($this->fields[$i]->getName() == $name) {
+				return $i;
+			}
+		}
+		return -1;
+	}
+
+	public function reorderField($field, string $after) {
+		$currentIndex = $this->getFieldIndex($field);
+		//$prevField = $this->getFieldByName($after);
+		$fieldIndex = $this->getFieldIndexByName($after) + 1;
+
+		$this->moveElement($this->fields, $currentIndex, $fieldIndex);
+		$this->setFields($this->fields);
+
+
+
+	}
+
+	function moveElement(&$array, $a, $b) {
+        $out = array_splice($array, $a, 1);
+        array_splice($array, $b, 0, $out);
+    }
+
+
+
+	public function addField(Field $field) {
+		if(!$field->getName()){
+			throw new InvalidArgumentException("New field has no name");
+		}
+		$field->setName(trim(strtolower($field->getName())));
+		$pattern = "/^[A-Za-z][A-Za-z0-9_]*$/";
+		if(!preg_match($pattern, $field->getName())){
+			throw new InvalidArgumentException("New field has invalid name {$field->getName()}");
+		}
+		if (count($this->fields)) {
+			if($this->getFieldByName($field->getName()) != null){
+				throw new InvalidArgumentException("Field {$field->getName()} alredy exists in table {$this->getName()}");
+			}
 			$lastField = $this->fields[count($this->fields) - 1];
 			$lastField->setNext($field->getName());
 			$field->setPrev($lastField->getName());
@@ -89,7 +148,7 @@ class Table extends MetaGeneral {
 		return $columnNames;
 	}
 
-	public function getFieldByName(string $name) : Field{
+	public function getFieldByName(string $name) {
 		foreach ( $this->fields as $field ) {
 			if($field->getName () == $name) {
 				return $field;

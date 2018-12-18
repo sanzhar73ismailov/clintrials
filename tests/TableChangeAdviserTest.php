@@ -67,8 +67,9 @@ class TableChangeAdviserTest extends TestCase {
 		
 		$tableMetaFromDb = new TableMetaFromDb();
 		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f1", "comment1", "int"));
-		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f3", "comment3", "int"));
 		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f2", "comment2", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f3", "comment3", "int"));
+		
 		
 		$data [] = array($table, $tableMetaFromDb);
 		return $data;
@@ -128,6 +129,7 @@ class TableChangeAdviserTest extends TestCase {
 		return $data;
 	}
 
+
 	/**
 	 * @dataProvider provideTableAndFields
 	 */
@@ -137,6 +139,21 @@ class TableChangeAdviserTest extends TestCase {
 		$this->assertNotEquals("f111", $table->getFieldByName($fieldName));
 		$this->logger->debug("FINISH");
 	}
+
+
+    public function testTableGetFieldIndexByName() {
+    	$this->logger->debug("START");
+    	$tableMetaFromDb = new TableMetaFromDb();
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f1", "comment1", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f2", "comment2", "int"));
+		$tableMetaFromDb->addColumn(new FieldMetaFromDb("f3", "comment3", "int"));
+		$this->assertEquals(0, $tableMetaFromDb->getFieldIndexByName('f1'));
+		$this->assertEquals(1, $tableMetaFromDb->getFieldIndexByName('f2'));
+		$this->assertEquals(2, $tableMetaFromDb->getFieldIndexByName('f3'));
+		$this->assertEquals(-1, $tableMetaFromDb->getFieldIndexByName('f4'));
+		$this->logger->debug("FINISH");
+    }
+    
 
 	/**
 	 * @dataProvider provideTableAndFieldsBefore
