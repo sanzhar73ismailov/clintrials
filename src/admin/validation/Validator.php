@@ -11,6 +11,8 @@ use Exception;
 class Validator {
 	private $logger;
 	private $ddlExecutor;
+
+
 	
 	public function __construct(DdlExecutor $ddlExecutor) {
 			$this->ddlExecutor = $ddlExecutor;
@@ -143,6 +145,10 @@ class Validator {
 			$pos = (int) strpos($str, "BEGIN");
 			return trim(substr($str, $pos));
 	}
+
+    
+
+	
 
 
 

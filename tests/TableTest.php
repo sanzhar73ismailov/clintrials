@@ -196,21 +196,28 @@ class TableTest extends TestCase {
 	}
 	//reorderField
 
+
+
 	public function testReorderField() {
 		$this->logger->debug("START");
 	    $this->assertTrue(1==1);
 
 	    $table = new Table("t1");
 	    $table->addField(new Field("f1"));
-	    $table->addField(new Field("f4"));
 	    $table->addField(new Field("f3"));
+	    $table->addField(new Field("f4"));
 	    $table->addField(new Field("f2"));
 	    $table->addField(new Field("f5"));
 	    $this->assertCount(5, $table->getFields());
 
+	    $this->logger->debug("before order: " . $table->filedsToString());
+
 	    $table->reorderField(new Field("f2"), "f1");
+
+	    $this->logger->debug("after order: " . $table->filedsToString());
+
         
-        /*
+        
         $field = 'f1';
 	    $this->assertEquals(0, $table->getFieldIndex(new Field($field)));
 	    $this->assertEquals(0, $table->getFieldIndexByName($field));
@@ -233,7 +240,7 @@ class TableTest extends TestCase {
 
 	    $this->assertEquals(0, $table->getFieldIndex($table->getFirstField()));
 	    $this->assertEquals(4, $table->getFieldIndex($table->getLastField()));
-         */
+         
 
 		$this->logger->debug("FINISH");
 	}

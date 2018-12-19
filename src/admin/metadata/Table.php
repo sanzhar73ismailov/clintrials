@@ -66,9 +66,16 @@ class Table extends MetaGeneral {
 		$this->moveElement($this->fields, $currentIndex, $fieldIndex);
 		$this->setFields($this->fields);
 
-
-
 	}
+
+	public function filedsToString() {
+		$str = "";
+		for ($i=0; $i < count($this->fields); $i++) { 
+			$field = $this->fields[$i];
+			$str .= "\r\n[$i] {$field->getName()} (prev: {$field->getPrev()}, next: {$field->getNext()})\r\n"; 
+		}
+		return $str;
+	} 
 
 	function moveElement(&$array, $a, $b) {
         $out = array_splice($array, $a, 1);

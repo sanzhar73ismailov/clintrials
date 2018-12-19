@@ -324,6 +324,10 @@ class DdlExecutor {
 		$tableMetaFromDb->setColumns($this->getColumnsFromDb($this->db->getName(), $table->getName()));
 		return $tableMetaFromDb;
 	}
+
+	function getColumnsCountFromDb($tableName){
+		return count($this->getColumnsFromDb($this->db->getName(), $tableName));
+	}
 	
 	function getColumnsFromDb($dbName, $tableName){
 		$this->logger->trace("START");
@@ -512,6 +516,77 @@ class DdlExecutor {
 		$result = $this->runSql($query);
 		$this->logger->trace("FINISH, return " . $result );
 		return $result;
+	}
+
+   /** Reorder fields if it is requered, return number of changes */
+	public function reorderTableFields(Table $table) : int{
+		$numberChanges = 0;
+		$columnsNamesDb = $this->getTableMetaFromDb($table)->getFieldsName();
+
+        $fieldToReorder = $this->getFieldToReorder($table, $columnsNamesDb);
+
+        $feildsToChageForLog = [];
+        $columnsNamesDbBefore = $columnsNamesDb;
+
+		while ($fieldToReorder != null) {
+			
+			$feildsToChageForLog[] = $fieldToReorder->getName(); 
+			$fieldToReorder->setAfter($fieldToReorder->getPrev());
+			$this->changeColumn($table->getName(), $fieldToReorder->getName(), $fieldToReorder);
+			$columnsNamesDb = $this->getTableMetaFromDb($table)->getFieldsName();
+			$fieldToReorder = $this->getFieldToReorder($table, $columnsNamesDb);
+			$numberChanges++;
+		}
+		
+		$columnsNamesXml = $table->getFieldsName();
+		$this->logger->trace("columnsNamesXml = " . var_export($columnsNamesXml, true));
+		$this->logger->trace("columnsNamesDbBefore = " . var_export($columnsNamesDbBefore, true));
+
+
+		$this->logger->trace("feildsToChageForLog ($numberChanges) = " . var_export($feildsToChageForLog, true));
+		return $numberChanges;
+	}
+
+	private function getFieldToReorder($table, $columns){
+		$fields = $table->getFields();
+		for ($i=0; $i < count($fields); $i++) { 
+			if($fields[$i]->getName() != $columns[$i]){
+				return $table->getFieldByName($columns[$i]);
+			}
+		}
+		return null;
+	}
+
+	/**
+    * Method return true if reorder is required:
+    Return true: If table exists in DB
+                 and number of columns 
+                 and names of columns in XML and DB are same
+    */
+	public function reorderRequired(Table $table) : bool {
+		$this->logger->trace("START");
+		if(!$this->tableExists ($table->getName())) {
+	        return false;
+	     } else {
+	     	$tableMetaFromDb = $this->getTableMetaFromDb($table);
+
+			$columnsNamesXml = array ();
+			$columnsNamesDb = array ();
+			
+			$columnsNamesXml = $table->getFieldsName();
+			$columnsNamesDb = $tableMetaFromDb->getFieldsName();
+			
+			if (count ( $columnsNamesXml ) != count ( $columnsNamesDb )) {
+				return false;
+			}
+
+			for ($i=0; $i < count($columnsNamesXml); $i++) { 
+				if($columnsNamesXml[$i] != $columnsNamesDb[$i]){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 

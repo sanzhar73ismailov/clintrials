@@ -17,8 +17,6 @@ class TableChangeAdviser {
 	private $actionsChange = array();
 
 
-
-
 	public function __construct(DdlExecutor $ddlExecutor, Table $table) {
 		    $this->logger = Logger::getLogger(__CLASS__);
 			$this->ddlExecutor = $ddlExecutor;
@@ -84,26 +82,6 @@ class TableChangeAdviser {
 			}
 		}
 		$this->logger->debug("FINISH");
-	}
-
-	private function getChangeReplaces($tableMetaFromDb) {
-		$table = $this->table;
-		$columnsNamesXml = $table->getFieldsName();
-		$columnsNamesDb = $tableMetaFromDb->getFieldsName();
-
-		/*
-               else{
-					if($columnXml->getPrev() != $columnDb->getPrev()){
-						$adviserAction = new AdviserAction("change");
-					    $adviserAction->field = $columnXml;
-					    $adviserAction->comment = "Position is not the same";
-					    //$adviserAction->after = $columnXmlBefore ?: "";
-					    $this->logger->trace('adviserAction=' . var_export($adviserAction, true));
-					    $this->actionsChange [] = $adviserAction;
-					}
-				}
-		*/
-
 	}
 
 	private function fillActonsChange($tableMetaFromDb) {
@@ -192,6 +170,15 @@ class TableChangeAdviser {
 	 			$ddlExecutor->changeColumn($this->table->getName(), $action->oldName, $action->field);
 	 			$ddlExecutor->changeColumn($this->table->getTableJrnl()->getName(), $action->oldName, $action->field);
 	 		}
+
+	 		if($ddlExecutor->reorderRequired($this->table)){
+	 			$ddlExecutor->reorderTableFields ($this->table);
+	 		}
+
+	 		if($ddlExecutor->reorderRequired($this->table->getTableJrnl())){
+	 			$ddlExecutor->reorderTableFields ($this->table->getTableJrnl());
+	 		}
+
 	 	}
 	 	$ddlExecutor->createAllTriggers($this->table);
 	 	/*
