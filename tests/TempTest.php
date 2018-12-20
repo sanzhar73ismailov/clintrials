@@ -99,4 +99,49 @@ class TempTest extends TestCase {
 		$this->assertFalse ( $ddlExecutor->triggerExists($trigger) );
 		$this->logger->debug ( "FINISH" );
 	}
+
+	public function testShowCreateTable() {
+		$this->logger->debug ( "START" );
+		$db = $this->metadataCreator->getDb ();
+		if (0) {
+			$db = new DbSchema ();
+		}
+		$ddlExecutor = new DdlExecutor ( $db );
+		if ($ddlExecutor->dbExists ()) {
+			$this->assertTrue ( $ddlExecutor->dropDb () );
+		}
+		$this->assertFalse ( $ddlExecutor->dbExists () );
+		$this->assertTrue ( $ddlExecutor->createDb () );
+		$sql = "
+CREATE TABLE `t1` (
+  `id` INTEGER(11) NOT NULL,
+  `field2` INTEGER(11) DEFAULT NULL,
+  `name` VARCHAR(20) COLLATE utf8_general_ci DEFAULT NULL,
+  `field4` INTEGER(11) DEFAULT '3' COMMENT 'rrrr',
+  `field3` INTEGER(11) NOT NULL DEFAULT '3',
+  `field5` INTEGER(11) NOT NULL,
+  `field6` VARCHAR(20) COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+)ENGINE=InnoDB
+CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
+		";
+		$this->assertTrue ($ddlExecutor->runSql($sql));
+		
+		$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
+		$createTableDdl = $ddlExecutor->showCreateTable("t1");
+		$this->assertTrue($createTableDdl != '');
+		$this->assertNotNull($createTableDdl);
+		$this->assertStringStartsWith('CREATE TABLE', $createTableDdl);
+
+		$this->logger->debug ( "createTableDdl={$createTableDdl}" );
+
+        $str = "asdasdasdqweqvc(HiMyFriend)bcsfsderwerwefvb";
+		$this->assertEquals("HiMyFriend", $ddlExecutor->getTextBetweenParentess($str));
+		 $str = "asdasdasdqweqvcHiMyFriend)bcsfsderwerwefvb";
+		$this->assertEquals("", $ddlExecutor->getTextBetweenParentess($str));
+		 $str = "asdasdasdqweqvc(HiMyFriendbcsfsderwerwefvb";
+		$this->assertEquals("", $ddlExecutor->getTextBetweenParentess($str));
+	
+		$this->logger->debug ( "FINISH" );
+	}
 }

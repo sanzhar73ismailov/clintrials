@@ -130,6 +130,57 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
 	}
+
+	function showCreateTable(string $table_name) : string {
+		$this->logger->trace("START");
+		$result = '';
+		try {
+			$this->logger->trace("***** 1");
+			$this->conn->exec('USE ' . $this->db->getName());
+			$this->logger->trace("***** 2");
+			$query = "show create table {$table_name}";
+			$this->logger->trace("***** 3");
+			$this->logger->trace("\query=" . $query);
+			$stmt = $this->conn->prepare ( $query );
+			$stmt->execute ();
+			$row = $stmt->fetch ( PDO::FETCH_ASSOC );
+			$this->logger->trace("\$stmt->rowCount ()=" . $stmt->rowCount ());
+			$result = $row['Create Table'];
+		} catch ( PDOException $e ) {
+			$this->logger->error("error", $e);
+		}
+		$this->logger->trace("FINISH, return " . $result);
+		return $result;
+	}
+
+	function getColumDefinitionsFromDb(string $table_name, string $column){
+		$columDefinitions = array();
+		$showCreateTableDdl = $this->showCreateTable($table_name);
+		
+		$start = strpos($showCreateTableDdl, '(') + 1;
+		$end = strpos($str, ')');
+		
+		echo $start  . "\n";
+		echo $end . "\n";
+		echo substr($showCreateTableDdl, $start, $end-$start) . "\n";
+
+
+	}
+
+	function getTextBetweenParentess($str){
+		$start = strpos($str, '(') ;
+		$end = strpos($str, ')');
+		if(!$start || !$end){
+			return "";
+		}
+		//echo $start  . "\n";
+		//echo $end . "\n";
+		return substr($str, $start + 1, $end - ($start + 1));
+	}
+
+	function getColumDefinitionFromDb($table, $column){
+
+	}
 	
 	function getRowsCount(string $table_name) : int {
 		$this->logger->trace("START");
