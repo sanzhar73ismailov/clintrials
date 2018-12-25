@@ -153,32 +153,40 @@ class DdlExecutor {
 		return $result;
 	}
 
-	function getColumDefinitionsFromDb(string $table_name, string $column){
+	function getColumDefinitionsFromDb(string $table_name) {
+		$this->logger->trace("START");
 		$columDefinitions = array();
 		$showCreateTableDdl = $this->showCreateTable($table_name);
-		
-		$start = strpos($showCreateTableDdl, '(') + 1;
-		$end = strpos($str, ')');
-		
-		echo $start  . "\n";
-		echo $end . "\n";
-		echo substr($showCreateTableDdl, $start, $end-$start) . "\n";
-
-
+		$betweenParentess = $this->getTextBetweenParentess($showCreateTableDdl);
+		$this->logger->trace("betweenParentess={$betweenParentess}");
+		$pieces = explode(",\n", $betweenParentess);
+		$this->logger->trace("\pieces=" . var_export($pieces, true));
+		foreach ($pieces as $line) {
+			if (strpos($line, "NULL") !== FALSE || strpos($line, "DEFAULT") !== FALSE) {
+			   $columDefinitions[] = trim($line); 
+		    }
+		}
+		$this->logger->trace("FINISH, return " . var_export($columDefinitions, true));
+		return $columDefinitions;
 	}
 
-	function getTextBetweenParentess($str){
+	function getTextBetweenParentess(string $str){
 		$start = strpos($str, '(') ;
-		$end = strpos($str, ')');
-		if(!$start || !$end){
+		$end = strpos($str, ') ENGINE');
+		if(!$start || !$end || $end <= $start){
 			return "";
 		}
-		//echo $start  . "\n";
-		//echo $end . "\n";
 		return substr($str, $start + 1, $end - ($start + 1));
 	}
 
 	function getColumDefinitionFromDb($table, $column){
+		$columDefinitionsFromDb = $this->getColumDefinitionsFromDb($table);
+		foreach ($columDefinitionsFromDb as $line) {
+			if(strpos($line, "`{$column}`") !== FALSE){
+				return $line;
+			}
+		}
+		return null;
 
 	}
 	
@@ -559,6 +567,20 @@ class DdlExecutor {
 		return $result;
 	}
 
+	public function changeColumnOrder(string $table_name, string $column, string $after) : bool {
+		$this->logger->trace("START");
+		$this->logger->trace("param table_name:" . $table_name);
+		$this->logger->trace("param column:" . $column);
+		$this->logger->trace("param after:" . $after);
+		$result = false;
+		$columnDef = $this->getColumDefinitionFromDb($table_name, $column);
+		$query = sprintf("ALTER TABLE %s CHANGE %s %s after %s", $table_name, $column, $columnDef, $after);
+		$this->logger->trace("query=" . $query );
+		$result = $this->runSql($query);
+		$this->logger->trace("FINISH, return " . $result );
+		return $result;
+	}
+
 	public function dropColumn(string $table_name, string $column) : bool {
 		$this->logger->trace("START");
 		$result = false;
@@ -580,13 +602,27 @@ class DdlExecutor {
         $columnsNamesDbBefore = $columnsNamesDb;
 
 		while ($fieldToReorder != null) {
+
+			$this->logger->trace('$fieldToReorder->getName() = ' . $fieldToReorder->getName());
+
+			
 			
 			$feildsToChageForLog[] = $fieldToReorder->getName(); 
-			$fieldToReorder->setAfter($fieldToReorder->getPrev());
-			$this->changeColumn($table->getName(), $fieldToReorder->getName(), $fieldToReorder);
-			$columnsNamesDb = $this->getTableMetaFromDb($table)->getFieldsName();
-			$fieldToReorder = $this->getFieldToReorder($table, $columnsNamesDb);
-			$numberChanges++;
+			//$fieldToReorder->setAfter($fieldToReorder->getPrev());
+			//$this->changeColumn($table->getName(), $fieldToReorder->getName(), $fieldToReorder);
+			$reorderResult = $this->changeColumnOrder($table->getName(), $fieldToReorder->getName(), $fieldToReorder->getPrev());
+			$this->logger->trace('$reorderResult = ' .$reorderResult);
+			if($reorderResult) {
+			    $columnsNamesDb = $this->getTableMetaFromDb($table)->getFieldsName();
+			    $fieldToReorder = $this->getFieldToReorder($table, $columnsNamesDb);
+
+			    $this->logger->trace('$fieldToReorder->getName() inside while = ' . ($fieldToReorder ?  $fieldToReorder->getName() : "NULL"));
+
+			    $numberChanges++;
+			}else{
+				throw new Exception("reorderTableFields {$table->getName()}");
+				
+			}
 		}
 		
 		$columnsNamesXml = $table->getFieldsName();
@@ -603,6 +639,7 @@ class DdlExecutor {
 		for ($i=0; $i < count($fields); $i++) { 
 			if($fields[$i]->getName() != $columns[$i]){
 				return $table->getFieldByName($columns[$i]);
+				//return $columns[$i];
 			}
 		}
 		return null;

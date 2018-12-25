@@ -114,16 +114,15 @@ class TempTest extends TestCase {
 		$this->assertTrue ( $ddlExecutor->createDb () );
 		$sql = "
 CREATE TABLE `t1` (
-  `id` INTEGER(11) NOT NULL,
-  `field2` INTEGER(11) DEFAULT NULL,
-  `name` VARCHAR(20) COLLATE utf8_general_ci DEFAULT NULL,
-  `field4` INTEGER(11) DEFAULT '3' COMMENT 'rrrr',
-  `field3` INTEGER(11) NOT NULL DEFAULT '3',
-  `field5` INTEGER(11) NOT NULL,
-  `field6` VARCHAR(20) COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `id` int(11) NOT NULL,
+  `field2` int(11) DEFAULT NULL,
+  `name` varchar(20) DEFAULT NULL,
+  `field4` int(11) DEFAULT '3' COMMENT 'rrrr',
+  `field3` int(11) NOT NULL DEFAULT '3',
+  `field5` int(11) NOT NULL,
+  `field6` varchar(20) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-)ENGINE=InnoDB
-CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 		";
 		$this->assertTrue ($ddlExecutor->runSql($sql));
 		
@@ -135,12 +134,19 @@ CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
 
 		$this->logger->debug ( "createTableDdl={$createTableDdl}" );
 
+        /*
         $str = "asdasdasdqweqvc(HiMyFriend)bcsfsderwerwefvb";
 		$this->assertEquals("HiMyFriend", $ddlExecutor->getTextBetweenParentess($str));
-		 $str = "asdasdasdqweqvcHiMyFriend)bcsfsderwerwefvb";
+		$str = "asdasdasdqweqvcHiMyFriend)bcsfsderwerwefvb";
 		$this->assertEquals("", $ddlExecutor->getTextBetweenParentess($str));
-		 $str = "asdasdasdqweqvc(HiMyFriendbcsfsderwerwefvb";
+		$str = "asdasdasdqweqvc(HiMyFriendbcsfsderwerwefvb";
 		$this->assertEquals("", $ddlExecutor->getTextBetweenParentess($str));
+		$str = "asdasdasdqweqv)c(HiMyFriendbcsfsderwerwefvb";
+		$this->assertEquals("", $ddlExecutor->getTextBetweenParentess($str));
+         */
+
+		$this->assertCount(7, $ddlExecutor->getColumDefinitionsFromDb("t1"));
+		$this->assertEquals("`field2` int(11) DEFAULT NULL", $ddlExecutor->getColumDefinitionFromDb("t1", "field2"));
 	
 		$this->logger->debug ( "FINISH" );
 	}

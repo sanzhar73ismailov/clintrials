@@ -160,5 +160,42 @@ class AlterTableTest extends TestCase {
 		$this->logger->debug ( "FINISH" );
 	}
 
+	public function testChangeColumnOrder() : void {
+		$this->logger->debug ( "START" );
+		$ddlExecutor = new DdlExecutor ( $this->db );
+		$sql = "create table t1 (id int, name varchar(20), f4 int, f1 int, f2 float, f3 date )";
+		$this->assertTrue ($ddlExecutor->runSql($sql));
+		$this->assertTrue ( $ddlExecutor->tableExists ("t1") );
+		$columnsFromDb = $ddlExecutor->getColumnsFromDb($this->db->getName(), 't1');
+		$this->assertCount(6, $columnsFromDb);
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1', "id"));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','name'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f1'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f2'));
+		$this->assertNotNull($ddlExecutor->getColumnFromDb($this->db->getName(), 't1','f3'));
+
+		$showCreateTable = $ddlExecutor->showCreateTable("t1");
+		$this->assertTrue (strpos($showCreateTable, "`f4`") < strpos($showCreateTable, "`f3`"));
+
+        $ddlExecutor->changeColumnOrder("t1", "f4", "f3");
+        $this->assertCount(6, $columnsFromDb);
+
+        $showCreateTable = $ddlExecutor->showCreateTable("t1");
+		$this->assertTrue (strpos($showCreateTable, "`f1`") < strpos($showCreateTable, "`f4`"));
+		$this->assertTrue (strpos($showCreateTable, "`f2`") < strpos($showCreateTable, "`f4`"));
+		$this->assertTrue (strpos($showCreateTable, "`f3`") < strpos($showCreateTable, "`f4`"));
+
+		$ddlExecutor->changeColumnOrder("t1", "name", "f4");
+        $this->assertCount(6, $columnsFromDb);
+
+        $showCreateTable = $ddlExecutor->showCreateTable("t1");
+		$this->assertTrue (strpos($showCreateTable, "`f1`") < strpos($showCreateTable, "`name`"));
+		$this->assertTrue (strpos($showCreateTable, "`f2`") < strpos($showCreateTable, "`name`"));
+		$this->assertTrue (strpos($showCreateTable, "`f3`") < strpos($showCreateTable, "`name`"));
+		$this->assertTrue (strpos($showCreateTable, "`f4`") < strpos($showCreateTable, "`name`"));
+		
+		$this->logger->debug ( "FINISH" );
+	}
+
 
 }
