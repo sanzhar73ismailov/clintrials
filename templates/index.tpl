@@ -16,7 +16,11 @@
    <table class="table table-bordered">
     <tr><td>Name</td><td>{$reportDb->getDbSchema()->getName()}</td></tr>
     <tr><td>Number Xml Tables</td><td>{$reportDb->getNumberXmlTables()}</td></tr>
-    <tr><td>Number Db Tables</td><td>{$reportDb->getNumberDbTables()}</td></tr>
+    <tr><td>Number Db Tables</td><td>{$reportDb->getNumberDbTables()}
+    	{if !$reportDb->getNumberDbTables()}
+    	<a class="btn btn-info" href="?createAllTables">Create all tables</a>
+    	{/if}
+    </td></tr>
     <tr><td>Validation</td><td>
     	{if $reportDb->getValidationResult()->passed}
     		<div class='text text-success'>OK</div>
@@ -74,14 +78,16 @@ getDbSchema
 	    		<button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#{$reportTable->getTable()->getName()}_errors">Show error details</button>
 	    		<div id="{$reportTable->getTable()->getName()}_errors" class="collapse">
 		    		{showOk label='table exist' isOk=$reportTable->getTableExist()}
-		    		{showOk label='table valid' isOk=$reportTable->getTableValid()}
-		    		{showOk label='tableJrnl exist' isOk=$reportTable->getTableJrnlExist()}
-		    		{showOk label='tableJrnl vaild' isOk=$reportTable->getTableJrnlVaild()}
-		    		{showOk label='trigger insert exist' isOk=$reportTable->getTriggerInsertExist()}
-		    		{showOk label='trigger insert valid' isOk=$reportTable->getTriggerInsertValid()}
-		    		
-		    		{showOk label='trigger update exist' isOk=$reportTable->getTriggerUpdateExist()}
-		    		{showOk label='trigger update valid' isOk=$reportTable->getTriggerUpdateValid()}
+		    		{if $reportTable->getTableExist()}
+			    		{showOk label='table valid' isOk=$reportTable->getTableValid()}
+			    		{showOk label='tableJrnl exist' isOk=$reportTable->getTableJrnlExist()}
+			    		{showOk label='tableJrnl vaild' isOk=$reportTable->getTableJrnlVaild()}
+			    		{showOk label='trigger insert exist' isOk=$reportTable->getTriggerInsertExist()}
+			    		{showOk label='trigger insert valid' isOk=$reportTable->getTriggerInsertValid()}
+			    		
+			    		{showOk label='trigger update exist' isOk=$reportTable->getTriggerUpdateExist()}
+			    		{showOk label='trigger update valid' isOk=$reportTable->getTriggerUpdateValid()}
+		    		{/if}
 		    		{if $reportTable->getTableValidationResult()->passed==false}
 		    		   <div class='badge badge-secondary'>Table validation result errors:</div>
 		    		   {foreach from=$reportTable->getTableValidationResult()->errors item=error}
@@ -98,11 +104,14 @@ getDbSchema
 	    	    </div>
 	    	</td>
 	    	<td>
-	    		{if !$reportTable->getTriggerInsertValid() or !$reportTable->getTriggerUpdateValid()}
-	    		<a href='?recreateTriggers&table={$reportTable->getTable()->getName()}'>Recreate Triggers</a><br/>
+	    		{if $reportTable->getTableExist()}
+		    		{if !$reportTable->getTriggerInsertValid() or !$reportTable->getTriggerUpdateValid()}
+		    			<a href='?recreateTriggers&table={$reportTable->getTable()->getName()}'>Recreate Triggers</a><br/>
+		    		{/if}
+		    			<a href='?recreateTable&table={$reportTable->getTable()->getName()}'>Recreate table</a>
+	    		{else}
+	    			<a href='?createTable&table={$reportTable->getTable()->getName()}'>Create table</a>
 	    		{/if}
-	    		
-	    		<a href='?recreateTable&table={$reportTable->getTable()->getName()}'>Recreate table</a>
 	    		
 	    	</td>
 	    </tr>

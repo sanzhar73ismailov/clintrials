@@ -79,7 +79,16 @@ if (isset($_REQUEST['editTable'])) {
 	} elseif (isset($_REQUEST['recreateTable'])) {
 		$logger->debug("REQUEST['recreateTable'] is flow");
 		$ddlExecutor->reCreateTable($db->getTable($_REQUEST['table']));
+	} elseif (isset($_REQUEST['createTable'])) {
+		$logger->debug("REQUEST['createTable'] is flow");
+		$ddlExecutor->createPackTable($db->getTable($_REQUEST['table']));
 	}
+
+	//createAllTables
+	if (isset($_REQUEST['createAllTables'])) {
+		$ddlExecutor->createAllTables();
+	}
+
 
 	//$logger->trace("ddlExecutor=" . var_export($ddlExecutor, true));
 	$reportDb = ReportDb::createReport($metadataCreator, $ddlExecutor);

@@ -52,6 +52,34 @@ class DdlExecutor {
 		$this->logger->trace("FINISH, returned " . $result);
 		return $result;
 	}
+
+	function createAllTables() : void {
+		$this->logger->trace("START");
+		try {
+			$tables = $this->db->getTables();
+			foreach ($tables as $table) {
+				$this->createPackTable($table);
+			}
+		} catch (Exception $e ) {
+			$this->logger->error("error", $e);
+			throw $e;
+		}
+		$this->logger->trace("FINISH");
+	}
+
+	function createPackTable(Table $table) : void {
+		$this->logger->trace("START");
+		try {
+				$this->createTable($table);
+				$this->createTableJrnl($table);
+				$this->createTrigger($table->getTriggerInsert());
+				$this->createTrigger($table->getTriggerUpdate());
+		} catch (Exception $e ) {
+			$this->logger->error("error", $e);
+			throw $e;
+		}
+		$this->logger->trace("FINISH");
+	}
 	
 	function dropDb() : bool {
 		$this->logger->trace("START");
