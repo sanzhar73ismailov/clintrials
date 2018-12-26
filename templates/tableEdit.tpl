@@ -51,9 +51,12 @@
 
    	<form method="post" action="adminMain.php">
    		<input type="hidden" name="table" value="{$table->getName()}"/>
-	   	<textArea rows="10" cols="100" name="jsonActions" id="jsonToPost"></textArea>
+	   	<textArea style="display: none" rows="10" cols="100" name="jsonActions" id="jsonToPost"></textArea>
 	   	<br/>
-	   	<button id="updateTableButton" class="btn btn-primary">Update Db table</button>
+	   	{if count($tableChangeAdviser->getAllActions())==0}
+	   	<input type="checkbox" class=""  id="reorder"  name="reorder"/>Reorder fields<br/>
+	   	{/if}
+	   	<button id="updateTableButton" class="btn btn-primary" name="updateTableButton">Update Db table</button>
    </form>
    </div>
    {/if}

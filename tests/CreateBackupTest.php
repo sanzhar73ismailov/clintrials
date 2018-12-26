@@ -155,10 +155,13 @@ class CreateBackupTest extends TestCase {
 		// copy table of t123 that not exists
 		$table_src = new Table();
 		$table_src->setName("t123");
+		$this->expectException(PDOException::class);
 		$bc_table_name = $ddlExecutor->createBackupTable ( $table_src );
-		$this->assertNull($bc_table_name);
+        
+
+		//$this->assertNull($bc_table_name);
 		//$this->assertFalse($ddlExecutor->tableExists($bc_table_name));
-		$this->assertFalse($ddlExecutor->copyDataToBackupTable($table_src, "t1_table_not_exists"));
+		//$this->assertFalse($ddlExecutor->copyDataToBackupTable($table_src, "t1_table_not_exists"));
 	
 		
 		

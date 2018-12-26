@@ -110,9 +110,9 @@ class TableChangeAdviser {
 				}
 			}
 		}
-		if($isAllColumnsExistsGood && (count($columnsNamesXml) == count($columnsNamesDb))){
-			$this->getChangeReplaces($tableMetaFromDb);
-		}
+		//if($isAllColumnsExistsGood && (count($columnsNamesXml) == count($columnsNamesDb))){
+		//	$this->getChangeReplaces($tableMetaFromDb);
+		//}
 		$this->logger->debug("FINISH");
 	}
 
@@ -138,6 +138,20 @@ class TableChangeAdviser {
 	//array_merge
 	public function getAllActions() : array {
 		return array_merge($this->actionsAdd, $this->actionsRemove, $this->actionsChange);
+	}
+
+	public function reorderTable($backupDo = true) : void {
+		$ddlExecutor = $this->ddlExecutor;
+		if($backupDo) {
+			$ddlExecutor->backupTable($this->table);
+		}
+		
+		if($ddlExecutor->reorderRequired($this->table)){
+	 			$ddlExecutor->reorderTableFields ($this->table);
+	 	}
+		if($ddlExecutor->reorderRequired($this->table->getTableJrnl())){
+	 			$ddlExecutor->reorderTableFields ($this->table->getTableJrnl());
+	 	}
 	}
 
 	public function applyActions(array $adviserActions) : void {
@@ -171,6 +185,9 @@ class TableChangeAdviser {
 	 			$ddlExecutor->changeColumn($this->table->getTableJrnl()->getName(), $action->oldName, $action->field);
 	 		}
 
+	 		$this->reorderTable(false);
+
+	 		/*
 	 		if($ddlExecutor->reorderRequired($this->table)){
 	 			$ddlExecutor->reorderTableFields ($this->table);
 	 		}
@@ -178,6 +195,7 @@ class TableChangeAdviser {
 	 		if($ddlExecutor->reorderRequired($this->table->getTableJrnl())){
 	 			$ddlExecutor->reorderTableFields ($this->table->getTableJrnl());
 	 		}
+	 		*/
 
 	 	}
 	 	$ddlExecutor->createAllTriggers($this->table);

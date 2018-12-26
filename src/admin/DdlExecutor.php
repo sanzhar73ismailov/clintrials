@@ -286,13 +286,14 @@ class DdlExecutor {
 		$this->logger->trace("START");
 		$result = false;
 		try {
-			$this->conn->beginTransaction();
+			//$this->conn->beginTransaction();
 			$this->conn->exec('USE ' . $this->db->getName());
 			$this->logger->trace("sql=" . $sql);
 			$result = $this->conn->exec ( $sql ) !== false;
-			$this->conn->commit();
+			//$this->conn->commit();
 		} catch ( PDOException $e ) {
 			$this->logger->error($e->getMessage(), $e);
+			throw $e;
 		}
 		$this->logger->trace("FINISH, return " . $result);
 		return $result;
@@ -427,6 +428,10 @@ class DdlExecutor {
        	}
        }
        return null;
+    }
+
+    function isColumnExistInDb(string $tableName, string $columnName) {
+       return $this->getColumnFromDb($this->db->getName(), $tableName, $columnName) != null;
     }
 
     function getPreviousColumnFromDb(string $dbName, string $tableName, string $columnName) {
@@ -584,9 +589,11 @@ class DdlExecutor {
 	public function dropColumn(string $table_name, string $column) : bool {
 		$this->logger->trace("START");
 		$result = false;
-		$query = sprintf("ALTER TABLE %s DROP %s", $table_name, $column);
-		$this->logger->trace("query=" . $query );
-		$result = $this->runSql($query);
+		if ($this->isColumnExistInDb($table_name, $column)) {
+			$query = sprintf("ALTER TABLE %s DROP %s", $table_name, $column);
+			$this->logger->trace("query=" . $query );
+			$result = $this->runSql($query);
+	    }
 		$this->logger->trace("FINISH, return " . $result );
 		return $result;
 	}
@@ -602,14 +609,8 @@ class DdlExecutor {
         $columnsNamesDbBefore = $columnsNamesDb;
 
 		while ($fieldToReorder != null) {
-
 			$this->logger->trace('$fieldToReorder->getName() = ' . $fieldToReorder->getName());
-
-			
-			
 			$feildsToChageForLog[] = $fieldToReorder->getName(); 
-			//$fieldToReorder->setAfter($fieldToReorder->getPrev());
-			//$this->changeColumn($table->getName(), $fieldToReorder->getName(), $fieldToReorder);
 			$reorderResult = $this->changeColumnOrder($table->getName(), $fieldToReorder->getName(), $fieldToReorder->getPrev());
 			$this->logger->trace('$reorderResult = ' .$reorderResult);
 			if($reorderResult) {

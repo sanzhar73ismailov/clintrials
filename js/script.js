@@ -2,6 +2,10 @@ $(document).ready(function() {
 
 	$("#updateTableButton").click(function(event){
 		try {
+			
+			if($('#reorder').prop("checked")){
+				return;
+			}
 		  	var jsonDiv = $( "#jsonToPost" );
 			var arrActions = [];
 			if (jsonDiv.val()) {

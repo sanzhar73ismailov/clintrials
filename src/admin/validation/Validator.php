@@ -56,11 +56,11 @@ class Validator {
 			}
 			$resultDiff = array_diff($columnsNamesXml, $columnsNamesDb);
 			if(count($resultDiff)){
-				$validationResult->errors [] = sprintf ( "Table '%s' - XML has columns %s that are not available in DB", $table->getName(), implode(",", $resultDiff));
+				$validationResult->errors [] = sprintf ( "Table '%s' - XML has columns <code>%s</code> that are not available in DB", $table->getName(), implode(",", $resultDiff));
 			}
 			$resultDiff = array_diff($columnsNamesDb, $columnsNamesXml);
 			if(count($resultDiff)){
-				$validationResult->errors [] = sprintf ( "Table '%s' - DB has columns %s that are not available in XML", $table->getName(), implode(",", $resultDiff));
+				$validationResult->errors [] = sprintf ( "Table '%s' - DB has columns <code>%s</code> that are not available in XML", $table->getName(), implode(",", $resultDiff));
 			}
 			$columnsNameTypeCommentsXml = $table->getFieldNameTypeComments();
 			$columnsNameTypeCommentsDb = $tableMetaFromDb->getFieldNameTypeComments();
@@ -78,11 +78,11 @@ class Validator {
 			$resultDiff = array_diff($columnsNameTypeCommentsXml, $columnsNameTypeCommentsDb);
 			$this->logger->debug('resultDiff=' . var_export($resultDiff,true));
 			if(count($resultDiff)){
-				$validationResult->errors [] = sprintf ( "Table '%s' - XML has columns with types and comments %s that are not available in DB", $table->getName(), implode(",", $resultDiff));
+				$validationResult->errors [] = sprintf ( "Table '%s' - XML has columns with types and comments <code>%s</code> that are not available in DB", $table->getName(), implode(",", $resultDiff));
 			}
 			$resultDiff = array_diff($columnsNameTypeCommentsDb, $columnsNameTypeCommentsXml);
 			if(count($resultDiff)){
-				$validationResult->errors [] = sprintf ( "Table '%s' - DB has columns with types and comments %s that are not available in XML", $table->getName(), implode(",", $resultDiff));
+				$validationResult->errors [] = sprintf ( "Table '%s' - DB has columns with types and comments <code>%s</code> that are not available in XML", $table->getName(), implode(",", $resultDiff));
 			}
 
 			if(count($validationResult->errors) == 0){
@@ -97,7 +97,7 @@ class Validator {
 					 $this->logger->trace(var_export($colInXml===$colInDb, true));
 					 if($colInXml !== $colInDb){
 					 	$this->logger->trace("3");
-					 	$validationResult->errors [] = sprintf ( "Table '%s' - the order of columns in XML is different than in DB. In XML on position '%s' is column '%s', in DB is '%s'", $table->getName(), $i+1, $colInXml, $colInDb);
+					 	$validationResult->errors [] = sprintf ( "Table '%s' - the order of columns in XML is different than in DB. In XML on position '%s' is column '<code>%s</code>', in DB is '<code>%s</code>'", $table->getName(), $i+1, $colInXml, $colInDb);
 					 	break;
 					 }
 				}

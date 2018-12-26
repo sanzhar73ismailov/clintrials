@@ -62,14 +62,18 @@ if (isset($_REQUEST['editTable'])) {
 	$logger->trace('$ddlExecutor->getTableMetaFromDb($table)=' . var_export($tableMetaFromDb, true));
 } else {
 	
-	if (isset($_REQUEST['jsonActions'])) {
+	if (isset($_REQUEST['updateTableButton'])) {
 		$table = $db->getTable($_REQUEST['table']);
 		$jsonDecode = json_decode($_REQUEST['jsonActions']);
 		$logger->debug("jsonDecode=" . var_export($jsonDecode, true));
-		$adviserActions = AdviserAction::convertJsonToAdviserActionArray($table,$_REQUEST['jsonActions']);
-		$logger->debug("adviserActions=" . var_export($adviserActions, true));
 		$tableChangeAdviser = new TableChangeAdviser($ddlExecutor, $table);
-        $tableChangeAdviser->applyActions($adviserActions);
+		if(isset($_REQUEST['reorder'])) {
+			$tableChangeAdviser->reorderTable();
+		} else {
+			$adviserActions = AdviserAction::convertJsonToAdviserActionArray($table,$_REQUEST['jsonActions']);
+			$logger->debug("adviserActions=" . var_export($adviserActions, true));
+	        $tableChangeAdviser->applyActions($adviserActions);
+        }
 	} elseif (isset($_REQUEST['recreateTriggers'])) {
 		$ddlExecutor->createAllTriggers($db->getTable($_REQUEST['table']));
 	} elseif (isset($_REQUEST['recreateTable'])) {
